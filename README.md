@@ -100,21 +100,6 @@ The example app includes comprehensive demos for every component, organized into
 - Material Equivalents (8 pages)
 - Carbon Widgets (3 pages)
 
-## 📦 Installation
-
-Add this to your `pubspec.yaml`:
-
-```yaml
-dependencies:
-  flutter_carbon:
-    path: ./  # Update with your path or pub.dev reference when published
-```
-
-Then run:
-```bash
-flutter pub get
-```
-
 ## 🚀 Quick Start
 
 ### 1. Setup Theme
