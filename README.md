@@ -6,6 +6,8 @@
 
 A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **48 components** (31 pure Carbon + 17 Material equivalents), 4 theme variants, and seamless Material Design integration.
 
+#### 🔗 [Live Demo](https://hwkim1127.github.io/flutter_carbon/)
+
 **Component Coverage**: 100% Practical Coverage (48 production-ready components)
 > **Note**: We implement 48 out of 60 Carbon components. The 12 omitted components are architectural concepts (like Grid) or better served by standard Flutter widgets, ensuring 100% coverage of practical UI needs.
 
