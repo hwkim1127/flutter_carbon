@@ -53,27 +53,26 @@ class _MaterialSelectionDemoPageState extends State<MaterialSelectionDemoPage> {
         DemoSection(
           title: 'Radio Button',
           description: 'Material Radio with Carbon styling',
-          builder: (context) => Column(
-            children: [
-              RadioListTile<int>(
-                title: const Text('Option 1'),
-                value: 1,
-                groupValue: _radioValue,
-                onChanged: (value) => setState(() => _radioValue = value!),
-              ),
-              RadioListTile<int>(
-                title: const Text('Option 2'),
-                value: 2,
-                groupValue: _radioValue,
-                onChanged: (value) => setState(() => _radioValue = value!),
-              ),
-              RadioListTile<int>(
-                title: const Text('Option 3 (Disabled)'),
-                value: 3,
-                groupValue: _radioValue,
-                onChanged: null,
-              ),
-            ],
+          builder: (context) => RadioGroup<int>(
+            groupValue: _radioValue,
+            onChanged: (value) => setState(() => _radioValue = value!),
+            child: Column(
+              children: [
+                RadioListTile<int>(
+                  title: const Text('Option 1'),
+                  value: 1,
+                ),
+                RadioListTile<int>(
+                  title: const Text('Option 2'),
+                  value: 2,
+                ),
+                RadioListTile<int>(
+                  title: const Text('Option 3 (Disabled)'),
+                  value: 3,
+                  toggleable: false,
+                ),
+              ],
+            ),
           ),
         ),
         DemoSection(

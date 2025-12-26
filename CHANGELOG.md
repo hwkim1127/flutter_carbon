@@ -1,3 +1,7 @@
+## 1.0.0+3
+
+* Fixed deprecated `RadioListTile.groupValue` usage in example app by migrating to `RadioGroup` widget (Flutter v3.32.0+)
+
 ## 1.0.0+2
 
 * README.md updated
