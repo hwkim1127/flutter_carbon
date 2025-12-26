@@ -18,8 +18,7 @@ class _SelectDemoPageState extends State<SelectDemoPage> {
   Widget build(BuildContext context) {
     return DemoPageTemplate(
       title: 'Select / Dropdown',
-      description:
-          'Select menus allow users to choose from a list of options. '
+      description: 'Select menus allow users to choose from a list of options. '
           'Built using Material DropdownMenu with Carbon theming.',
       sections: [
         DemoSection(

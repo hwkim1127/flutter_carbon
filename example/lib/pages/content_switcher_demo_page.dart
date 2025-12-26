@@ -105,8 +105,8 @@ class _ContentSwitcherDemoPageState extends State<ContentSwitcherDemoPage> {
                   _iconValue == 'grid'
                       ? 'Grid view content'
                       : _iconValue == 'list'
-                      ? 'List view content'
-                      : 'Table view content',
+                          ? 'List view content'
+                          : 'Table view content',
                   style: TextStyle(
                     fontSize: 14,
                     color: context.carbon.text.textPrimary,

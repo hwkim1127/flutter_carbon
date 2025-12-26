@@ -29,8 +29,7 @@ ThemeData carbonTheme({
   TextTheme? textTheme, // Optional override
 }) {
   final colorScheme = ColorScheme(
-    brightness:
-        carbon.layer.background == const Color(0xff161616) ||
+    brightness: carbon.layer.background == const Color(0xff161616) ||
             carbon.layer.background == const Color(0xff262626)
         ? Brightness.dark
         : Brightness.light,
@@ -482,8 +481,7 @@ ThemeData carbonTheme({
     ),
     tooltipTheme: TooltipThemeData(
       decoration: BoxDecoration(
-        color: carbon
-            .layer
+        color: carbon.layer
             .backgroundInverse, // Dark background in light themes, light in dark themes
         borderRadius: BorderRadius.circular(2),
       ),
@@ -799,14 +797,14 @@ ThemeData carbonTheme({
     // Typography
     typography: Typography.material2021(),
     textTheme: Typography.material2021().black.apply(
-      bodyColor: carbon.text.textPrimary,
-      displayColor: carbon.text.textPrimary,
-      decorationColor: carbon.text.textPrimary,
-    ),
+          bodyColor: carbon.text.textPrimary,
+          displayColor: carbon.text.textPrimary,
+          decorationColor: carbon.text.textPrimary,
+        ),
     primaryTextTheme: Typography.material2021().black.apply(
-      bodyColor: carbon.text.textPrimary,
-      displayColor: carbon.text.textPrimary,
-    ),
+          bodyColor: carbon.text.textPrimary,
+          displayColor: carbon.text.textPrimary,
+        ),
 
     // Global
     splashFactory: InkRipple.splashFactory,
@@ -867,9 +865,8 @@ class CarbonInputDecorationHelper {
       suffixIcon: suffixIcon,
       enabled: enabled,
       filled: true,
-      fillColor: enabled
-          ? carbon.layer.field01
-          : carbon.layer.layerSelectedDisabled,
+      fillColor:
+          enabled ? carbon.layer.field01 : carbon.layer.layerSelectedDisabled,
 
       // Filled variant uses OutlineInputBorder with no radius
       border: const OutlineInputBorder(borderRadius: BorderRadius.zero),
@@ -1008,9 +1005,8 @@ class CarbonInputDecorationHelper {
       suffixIcon: suffixIcon,
       enabled: enabled,
       filled: true,
-      fillColor: enabled
-          ? carbon.layer.field01
-          : carbon.layer.layerSelectedDisabled,
+      fillColor:
+          enabled ? carbon.layer.field01 : carbon.layer.layerSelectedDisabled,
 
       // Fluid variant has no visible border by default
       border: OutlineInputBorder(

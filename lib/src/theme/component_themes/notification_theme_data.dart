@@ -51,21 +51,20 @@ class CarbonNotificationThemeData
           notificationBackgroundWarning ?? this.notificationBackgroundWarning,
       notificationActionHover:
           notificationActionHover ?? this.notificationActionHover,
-      notificationActionTertiaryInverse:
-          notificationActionTertiaryInverse ??
+      notificationActionTertiaryInverse: notificationActionTertiaryInverse ??
           this.notificationActionTertiaryInverse,
       notificationActionTertiaryInverseActive:
           notificationActionTertiaryInverseActive ??
-          this.notificationActionTertiaryInverseActive,
+              this.notificationActionTertiaryInverseActive,
       notificationActionTertiaryInverseHover:
           notificationActionTertiaryInverseHover ??
-          this.notificationActionTertiaryInverseHover,
+              this.notificationActionTertiaryInverseHover,
       notificationActionTertiaryInverseText:
           notificationActionTertiaryInverseText ??
-          this.notificationActionTertiaryInverseText,
+              this.notificationActionTertiaryInverseText,
       notificationActionTertiaryInverseTextOnColorDisabled:
           notificationActionTertiaryInverseTextOnColorDisabled ??
-          this.notificationActionTertiaryInverseTextOnColorDisabled,
+              this.notificationActionTertiaryInverseTextOnColorDisabled,
     );
   }
 

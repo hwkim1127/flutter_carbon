@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 @immutable
-class CarbonBreadcrumbThemeData extends ThemeExtension<CarbonBreadcrumbThemeData> {
+class CarbonBreadcrumbThemeData
+    extends ThemeExtension<CarbonBreadcrumbThemeData> {
   /// Text color for breadcrumb links
   final Color linkColor;
 

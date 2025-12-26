@@ -82,7 +82,8 @@ class CarbonStructuredListThemeData
       headerTextColor: Color.lerp(headerTextColor, other.headerTextColor, t)!,
       rowTextColor: Color.lerp(rowTextColor, other.rowTextColor, t)!,
       helperTextColor: Color.lerp(helperTextColor, other.helperTextColor, t)!,
-      headerBackground: Color.lerp(headerBackground, other.headerBackground, t)!,
+      headerBackground:
+          Color.lerp(headerBackground, other.headerBackground, t)!,
     );
   }
 }

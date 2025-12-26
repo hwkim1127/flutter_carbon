@@ -46,8 +46,7 @@ class _DataTableDemoPageState extends State<DataTableDemoPage> {
 
     return DemoPageTemplate(
       title: 'Data Table',
-      description:
-          'Data tables display sets of data across rows and columns. '
+      description: 'Data tables display sets of data across rows and columns. '
           'Built using Material DataTable with Carbon theming.',
       sections: [
         DemoSection(

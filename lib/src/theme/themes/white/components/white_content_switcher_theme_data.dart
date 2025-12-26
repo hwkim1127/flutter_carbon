@@ -10,11 +10,11 @@ import '../../../component_themes/content_switcher_theme_data.dart';
 /// - Divider: border-subtle-01 (gray-30)
 class WhiteContentSwitcherThemeData extends CarbonContentSwitcherThemeData {
   const WhiteContentSwitcherThemeData()
-    : super(
-        contentSwitcherSelected: CarbonPalette.gray20,
-        contentSwitcherBackground: CarbonPalette.white,
-        contentSwitcherBackgroundHover: CarbonPalette.gray10,
-        contentSwitcherDivider: CarbonPalette.gray30,
-        contentSwitcherTextOnColor: CarbonPalette.gray100,
-      );
+      : super(
+          contentSwitcherSelected: CarbonPalette.gray20,
+          contentSwitcherBackground: CarbonPalette.white,
+          contentSwitcherBackgroundHover: CarbonPalette.gray10,
+          contentSwitcherDivider: CarbonPalette.gray30,
+          contentSwitcherTextOnColor: CarbonPalette.gray100,
+        );
 }

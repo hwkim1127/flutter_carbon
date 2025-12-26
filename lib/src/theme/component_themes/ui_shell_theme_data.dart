@@ -101,23 +101,35 @@ class CarbonUIShellThemeData extends ThemeExtension<CarbonUIShellThemeData> {
       headerText: headerText ?? this.headerText,
       headerIconPrimary: headerIconPrimary ?? this.headerIconPrimary,
       headerIconSecondary: headerIconSecondary ?? this.headerIconSecondary,
-      headerNavItemBackground: headerNavItemBackground ?? this.headerNavItemBackground,
-      headerNavItemBackgroundHover: headerNavItemBackgroundHover ?? this.headerNavItemBackgroundHover,
-      headerNavItemBackgroundActive: headerNavItemBackgroundActive ?? this.headerNavItemBackgroundActive,
-      headerNavItemBackgroundSelected: headerNavItemBackgroundSelected ?? this.headerNavItemBackgroundSelected,
-      headerNavItemBackgroundSelectedHover: headerNavItemBackgroundSelectedHover ?? this.headerNavItemBackgroundSelectedHover,
+      headerNavItemBackground:
+          headerNavItemBackground ?? this.headerNavItemBackground,
+      headerNavItemBackgroundHover:
+          headerNavItemBackgroundHover ?? this.headerNavItemBackgroundHover,
+      headerNavItemBackgroundActive:
+          headerNavItemBackgroundActive ?? this.headerNavItemBackgroundActive,
+      headerNavItemBackgroundSelected: headerNavItemBackgroundSelected ??
+          this.headerNavItemBackgroundSelected,
+      headerNavItemBackgroundSelectedHover:
+          headerNavItemBackgroundSelectedHover ??
+              this.headerNavItemBackgroundSelectedHover,
       headerNavItemText: headerNavItemText ?? this.headerNavItemText,
-      headerNavItemTextHover: headerNavItemTextHover ?? this.headerNavItemTextHover,
-      headerNavItemBorderActive: headerNavItemBorderActive ?? this.headerNavItemBorderActive,
+      headerNavItemTextHover:
+          headerNavItemTextHover ?? this.headerNavItemTextHover,
+      headerNavItemBorderActive:
+          headerNavItemBorderActive ?? this.headerNavItemBorderActive,
       sideNavBackground: sideNavBackground ?? this.sideNavBackground,
       sideNavOverlay: sideNavOverlay ?? this.sideNavOverlay,
-      sideNavItemBackground: sideNavItemBackground ?? this.sideNavItemBackground,
-      sideNavItemBackgroundHover: sideNavItemBackgroundHover ?? this.sideNavItemBackgroundHover,
-      sideNavItemBackgroundActive: sideNavItemBackgroundActive ?? this.sideNavItemBackgroundActive,
+      sideNavItemBackground:
+          sideNavItemBackground ?? this.sideNavItemBackground,
+      sideNavItemBackgroundHover:
+          sideNavItemBackgroundHover ?? this.sideNavItemBackgroundHover,
+      sideNavItemBackgroundActive:
+          sideNavItemBackgroundActive ?? this.sideNavItemBackgroundActive,
       sideNavItemText: sideNavItemText ?? this.sideNavItemText,
       sideNavItemTextHover: sideNavItemTextHover ?? this.sideNavItemTextHover,
       sideNavItemIcon: sideNavItemIcon ?? this.sideNavItemIcon,
-      sideNavItemBorderActive: sideNavItemBorderActive ?? this.sideNavItemBorderActive,
+      sideNavItemBorderActive:
+          sideNavItemBorderActive ?? this.sideNavItemBorderActive,
       sideNavDivider: sideNavDivider ?? this.sideNavDivider,
       panelBackground: panelBackground ?? this.panelBackground,
       panelBorder: panelBorder ?? this.panelBorder,
@@ -131,28 +143,49 @@ class CarbonUIShellThemeData extends ThemeExtension<CarbonUIShellThemeData> {
   ) {
     if (other is! CarbonUIShellThemeData) return this;
     return CarbonUIShellThemeData(
-      headerBackground: Color.lerp(headerBackground, other.headerBackground, t)!,
+      headerBackground:
+          Color.lerp(headerBackground, other.headerBackground, t)!,
       headerBorder: Color.lerp(headerBorder, other.headerBorder, t)!,
       headerText: Color.lerp(headerText, other.headerText, t)!,
-      headerIconPrimary: Color.lerp(headerIconPrimary, other.headerIconPrimary, t)!,
-      headerIconSecondary: Color.lerp(headerIconSecondary, other.headerIconSecondary, t)!,
-      headerNavItemBackground: Color.lerp(headerNavItemBackground, other.headerNavItemBackground, t)!,
-      headerNavItemBackgroundHover: Color.lerp(headerNavItemBackgroundHover, other.headerNavItemBackgroundHover, t)!,
-      headerNavItemBackgroundActive: Color.lerp(headerNavItemBackgroundActive, other.headerNavItemBackgroundActive, t)!,
-      headerNavItemBackgroundSelected: Color.lerp(headerNavItemBackgroundSelected, other.headerNavItemBackgroundSelected, t)!,
-      headerNavItemBackgroundSelectedHover: Color.lerp(headerNavItemBackgroundSelectedHover, other.headerNavItemBackgroundSelectedHover, t)!,
-      headerNavItemText: Color.lerp(headerNavItemText, other.headerNavItemText, t)!,
-      headerNavItemTextHover: Color.lerp(headerNavItemTextHover, other.headerNavItemTextHover, t)!,
-      headerNavItemBorderActive: Color.lerp(headerNavItemBorderActive, other.headerNavItemBorderActive, t)!,
-      sideNavBackground: Color.lerp(sideNavBackground, other.sideNavBackground, t)!,
+      headerIconPrimary:
+          Color.lerp(headerIconPrimary, other.headerIconPrimary, t)!,
+      headerIconSecondary:
+          Color.lerp(headerIconSecondary, other.headerIconSecondary, t)!,
+      headerNavItemBackground: Color.lerp(
+          headerNavItemBackground, other.headerNavItemBackground, t)!,
+      headerNavItemBackgroundHover: Color.lerp(
+          headerNavItemBackgroundHover, other.headerNavItemBackgroundHover, t)!,
+      headerNavItemBackgroundActive: Color.lerp(headerNavItemBackgroundActive,
+          other.headerNavItemBackgroundActive, t)!,
+      headerNavItemBackgroundSelected: Color.lerp(
+          headerNavItemBackgroundSelected,
+          other.headerNavItemBackgroundSelected,
+          t)!,
+      headerNavItemBackgroundSelectedHover: Color.lerp(
+          headerNavItemBackgroundSelectedHover,
+          other.headerNavItemBackgroundSelectedHover,
+          t)!,
+      headerNavItemText:
+          Color.lerp(headerNavItemText, other.headerNavItemText, t)!,
+      headerNavItemTextHover:
+          Color.lerp(headerNavItemTextHover, other.headerNavItemTextHover, t)!,
+      headerNavItemBorderActive: Color.lerp(
+          headerNavItemBorderActive, other.headerNavItemBorderActive, t)!,
+      sideNavBackground:
+          Color.lerp(sideNavBackground, other.sideNavBackground, t)!,
       sideNavOverlay: Color.lerp(sideNavOverlay, other.sideNavOverlay, t)!,
-      sideNavItemBackground: Color.lerp(sideNavItemBackground, other.sideNavItemBackground, t)!,
-      sideNavItemBackgroundHover: Color.lerp(sideNavItemBackgroundHover, other.sideNavItemBackgroundHover, t)!,
-      sideNavItemBackgroundActive: Color.lerp(sideNavItemBackgroundActive, other.sideNavItemBackgroundActive, t)!,
+      sideNavItemBackground:
+          Color.lerp(sideNavItemBackground, other.sideNavItemBackground, t)!,
+      sideNavItemBackgroundHover: Color.lerp(
+          sideNavItemBackgroundHover, other.sideNavItemBackgroundHover, t)!,
+      sideNavItemBackgroundActive: Color.lerp(
+          sideNavItemBackgroundActive, other.sideNavItemBackgroundActive, t)!,
       sideNavItemText: Color.lerp(sideNavItemText, other.sideNavItemText, t)!,
-      sideNavItemTextHover: Color.lerp(sideNavItemTextHover, other.sideNavItemTextHover, t)!,
+      sideNavItemTextHover:
+          Color.lerp(sideNavItemTextHover, other.sideNavItemTextHover, t)!,
       sideNavItemIcon: Color.lerp(sideNavItemIcon, other.sideNavItemIcon, t)!,
-      sideNavItemBorderActive: Color.lerp(sideNavItemBorderActive, other.sideNavItemBorderActive, t)!,
+      sideNavItemBorderActive: Color.lerp(
+          sideNavItemBorderActive, other.sideNavItemBorderActive, t)!,
       sideNavDivider: Color.lerp(sideNavDivider, other.sideNavDivider, t)!,
       panelBackground: Color.lerp(panelBackground, other.panelBackground, t)!,
       panelBorder: Color.lerp(panelBorder, other.panelBorder, t)!,

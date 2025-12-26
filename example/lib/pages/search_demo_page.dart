@@ -44,8 +44,7 @@ class _SearchDemoPageState extends State<SearchDemoPage> {
   Widget build(BuildContext context) {
     return DemoPageTemplate(
       title: 'Search',
-      description:
-          'Search allows users to find specific content. '
+      description: 'Search allows users to find specific content. '
           'Built using Material SearchBar and SearchAnchor with Carbon theming.',
       sections: [
         DemoSection(
@@ -143,19 +142,17 @@ class _SearchDemoPageState extends State<SearchDemoPage> {
                   );
                 });
               }
-              return _allItems
-                  .where((item) {
-                    return item.toLowerCase().contains(keyword);
-                  })
-                  .map((item) {
-                    return ListTile(
-                      leading: const Icon(Icons.search),
-                      title: Text(item),
-                      onTap: () {
-                        controller.closeView(item);
-                      },
-                    );
-                  });
+              return _allItems.where((item) {
+                return item.toLowerCase().contains(keyword);
+              }).map((item) {
+                return ListTile(
+                  leading: const Icon(Icons.search),
+                  title: Text(item),
+                  onTap: () {
+                    controller.closeView(item);
+                  },
+                );
+              });
             },
           ),
         ),
@@ -205,21 +202,19 @@ class _SearchDemoPageState extends State<SearchDemoPage> {
                   ];
                 }
                 // Show filtered results
-                return _allItems
-                    .where((item) {
-                      return item.toLowerCase().contains(
+                return _allItems.where((item) {
+                  return item.toLowerCase().contains(
                         controller.text.toLowerCase(),
                       );
-                    })
-                    .map((item) {
-                      return ListTile(
-                        leading: const Icon(Icons.search),
-                        title: Text(item),
-                        onTap: () {
-                          controller.closeView(item);
-                        },
-                      );
-                    });
+                }).map((item) {
+                  return ListTile(
+                    leading: const Icon(Icons.search),
+                    title: Text(item),
+                    onTap: () {
+                      controller.closeView(item);
+                    },
+                  );
+                });
               },
             );
           },

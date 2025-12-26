@@ -30,8 +30,7 @@ class _TabsDemoPageState extends State<TabsDemoPage>
   Widget build(BuildContext context) {
     return DemoPageTemplate(
       title: 'Tabs',
-      description:
-          'Tabs organize content across different screens or views. '
+      description: 'Tabs organize content across different screens or views. '
           'Built using Material TabBar with Carbon theming.',
       sections: [
         DemoSection(
@@ -222,24 +221,23 @@ class _TabsDemoPageState extends State<TabsDemoPage>
                 SizedBox(
                   height: 100,
                   child: TabBarView(
-                    children:
-                        [
-                          'Dashboard',
-                          'Articles',
-                          'Analytics',
-                          'Notifications',
-                          'Settings',
-                        ].map((name) {
-                          return Center(
-                            child: Text(
-                              name,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: context.carbon.text.textPrimary,
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                    children: [
+                      'Dashboard',
+                      'Articles',
+                      'Analytics',
+                      'Notifications',
+                      'Settings',
+                    ].map((name) {
+                      return Center(
+                        child: Text(
+                          name,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: context.carbon.text.textPrimary,
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
               ],

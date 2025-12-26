@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Theme data for Carbon combo box (autocomplete dropdown with search).
 @immutable
-class CarbonComboBoxThemeData
-    extends ThemeExtension<CarbonComboBoxThemeData> {
+class CarbonComboBoxThemeData extends ThemeExtension<CarbonComboBoxThemeData> {
   /// Background color for the input field.
   final Color fieldBackground;
 

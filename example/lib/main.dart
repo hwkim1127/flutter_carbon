@@ -414,9 +414,8 @@ class _ThemeSwitcherSheet extends StatelessWidget {
                     mode.toString().split('.').last.toUpperCase(),
                     style: TextStyle(
                       color: carbon.text.textPrimary,
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                   leading: Radio<CarbonThemeMode>(value: mode),

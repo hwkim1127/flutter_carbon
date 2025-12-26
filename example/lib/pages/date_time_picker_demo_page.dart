@@ -35,8 +35,7 @@ class _DateTimePickerDemoPageState extends State<DateTimePickerDemoPage> {
       context: context,
       firstDate: DateTime(current.year - 1),
       lastDate: DateTime(current.year + 2),
-      initialDateRange:
-          _selectedRange ??
+      initialDateRange: _selectedRange ??
           DateTimeRange(
             start: current,
             end: current.add(const Duration(days: 7)),

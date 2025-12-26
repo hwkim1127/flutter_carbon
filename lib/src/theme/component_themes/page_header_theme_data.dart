@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 /// The Page Header provides a consistent header area for pages with
 /// title, breadcrumbs, actions, and optional tabs.
 @immutable
-class CarbonPageHeaderThemeData extends ThemeExtension<CarbonPageHeaderThemeData> {
+class CarbonPageHeaderThemeData
+    extends ThemeExtension<CarbonPageHeaderThemeData> {
   /// Background color of the page header.
   final Color background;
 
@@ -83,7 +84,8 @@ class CarbonPageHeaderThemeData extends ThemeExtension<CarbonPageHeaderThemeData
       descriptionText: Color.lerp(descriptionText, other.descriptionText, t)!,
       icon: Color.lerp(icon, other.icon, t)!,
       border: Color.lerp(border, other.border, t)!,
-      breadcrumbBackground: Color.lerp(breadcrumbBackground, other.breadcrumbBackground, t)!,
+      breadcrumbBackground:
+          Color.lerp(breadcrumbBackground, other.breadcrumbBackground, t)!,
       actionText: Color.lerp(actionText, other.actionText, t)!,
       actionTextHover: Color.lerp(actionTextHover, other.actionTextHover, t)!,
     );

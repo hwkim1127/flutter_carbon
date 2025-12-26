@@ -179,9 +179,8 @@ class _TextInputDemoPageState extends State<TextInputDemoPage> {
                   context: context,
                   labelText: 'Username',
                   hintText: 'Enter username',
-                  helperText: _errorText == null
-                      ? 'Choose a unique username'
-                      : null,
+                  helperText:
+                      _errorText == null ? 'Choose a unique username' : null,
                   errorText: _errorText,
                 ),
               ),

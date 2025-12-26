@@ -64,7 +64,8 @@ class CarbonNumberInputThemeData
           controlButtonBackgroundHover, other.controlButtonBackgroundHover, t)!,
       controlButtonBackgroundActive: Color.lerp(controlButtonBackgroundActive,
           other.controlButtonBackgroundActive, t)!,
-      controlButtonIcon: Color.lerp(controlButtonIcon, other.controlButtonIcon, t)!,
+      controlButtonIcon:
+          Color.lerp(controlButtonIcon, other.controlButtonIcon, t)!,
       controlButtonBorder:
           Color.lerp(controlButtonBorder, other.controlButtonBorder, t)!,
       controlButtonDivider:

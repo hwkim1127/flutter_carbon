@@ -74,7 +74,8 @@ class CarbonOverflowMenuThemeData
   ) {
     if (other is! CarbonOverflowMenuThemeData) return this;
     return CarbonOverflowMenuThemeData(
-      triggerBackground: Color.lerp(triggerBackground, other.triggerBackground, t)!,
+      triggerBackground:
+          Color.lerp(triggerBackground, other.triggerBackground, t)!,
       triggerBackgroundHover: Color.lerp(
         triggerBackgroundHover,
         other.triggerBackgroundHover,

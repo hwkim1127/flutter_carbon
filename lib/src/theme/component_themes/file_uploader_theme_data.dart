@@ -109,7 +109,8 @@ class CarbonFileUploaderThemeData
       dropZoneLabelColor:
           Color.lerp(dropZoneLabelColor, other.dropZoneLabelColor, t)!,
       labelColor: Color.lerp(labelColor, other.labelColor, t)!,
-      descriptionColor: Color.lerp(descriptionColor, other.descriptionColor, t)!,
+      descriptionColor:
+          Color.lerp(descriptionColor, other.descriptionColor, t)!,
       filenameColor: Color.lerp(filenameColor, other.filenameColor, t)!,
       fileItemIconColor:
           Color.lerp(fileItemIconColor, other.fileItemIconColor, t)!,

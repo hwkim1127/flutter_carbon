@@ -173,8 +173,8 @@ class HomePage extends StatelessWidget {
         final crossAxisCount = constraints.maxWidth > 800
             ? 3
             : constraints.maxWidth > 500
-            ? 2
-            : 1;
+                ? 2
+                : 1;
 
         return GridView.count(
           shrinkWrap: true,

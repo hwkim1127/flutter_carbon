@@ -19,8 +19,7 @@ class G100ToggleThemeData extends CarbonToggleThemeData {
           focusColor: CarbonPalette.blue60, // Focus indicator
           labelColor: CarbonPalette.gray10, // Label text (light)
           stateTextColor: CarbonPalette.gray10, // On/Off text (light)
-          textDisabled:
-              const Color(0x4D8D8D8D), // gray50 @ 0.3 - Disabled text
+          textDisabled: const Color(0x4D8D8D8D), // gray50 @ 0.3 - Disabled text
           checkmarkColor: CarbonPalette.gray100, // Checkmark icon (small)
         );
 }

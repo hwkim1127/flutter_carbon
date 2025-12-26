@@ -102,7 +102,7 @@ class CarbonAIThemeData extends ThemeExtension<CarbonAIThemeData> {
       aiPopoverCaretBottom: aiPopoverCaretBottom ?? this.aiPopoverCaretBottom,
       aiPopoverCaretBottomBackgroundActions:
           aiPopoverCaretBottomBackgroundActions ??
-          this.aiPopoverCaretBottomBackgroundActions,
+              this.aiPopoverCaretBottomBackgroundActions,
       aiPopoverCaretBottomBackground:
           aiPopoverCaretBottomBackground ?? this.aiPopoverCaretBottomBackground,
     );
