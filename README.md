@@ -79,7 +79,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 
 All standard Material widgets are automatically themed to match Carbon Design System:
 
-- `FilledButton`, `ElevatedButton`, `OutlinedButton`, `TextButton`
+- `FilledButton` (Primary), `ElevatedButton` (Secondary), `OutlinedButton` (Tertiary), `TextButton` (Ghost)
 - `TextField`, `Checkbox`, `Radio`, `Switch`, `Slider`
 - `ExpansionTile` (Accordion), `TabBar` (Tabs), `Chip` (Tag), `Tooltip`
 - `SearchBar`, `DropdownMenu`, `DataTable`
