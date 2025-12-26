@@ -1,3 +1,8 @@
+## 1.0.0+4
+
+* Updated `ButtonsDemoPage` to correctly document `ElevatedButton` as the Carbon secondary button variant.
+* Integrated `super_drag_and_drop` package in `FileUploaderDemoPage` for native drag and drop support.
+
 ## 1.0.0+3
 
 * Fixed deprecated `RadioListTile.groupValue` usage in example app by migrating to `RadioGroup` widget (Flutter v3.32.0+)

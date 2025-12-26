@@ -5,13 +5,65 @@ import '../widgets/demo_page_template.dart';
 class ButtonsDemoPage extends StatelessWidget {
   const ButtonsDemoPage({super.key});
 
+  static Widget _buildButtonMapping(
+    BuildContext context,
+    String carbonType,
+    String materialWidget,
+    String description,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 4,
+          height: 4,
+          margin: const EdgeInsets.only(top: 8),
+          decoration: BoxDecoration(
+            color: context.carbon.text.textPrimary,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 12,
+                color: context.carbon.text.textPrimary,
+              ),
+              children: [
+                TextSpan(
+                  text: '$carbonType: ',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                TextSpan(
+                  text: materialWidget,
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    color: context.carbon.text.textSecondary,
+                  ),
+                ),
+                TextSpan(
+                  text: ' - $description',
+                  style: TextStyle(
+                    color: context.carbon.text.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DemoPageTemplate(
       title: 'Buttons',
       description:
           'Carbon Design System provides five button variants: primary, secondary, tertiary, ghost, and danger. '
-          'These are styled using Material\'s FilledButton, OutlinedButton, and TextButton components.',
+          'These are styled using Material\'s FilledButton (primary), ElevatedButton (secondary), OutlinedButton (tertiary), and TextButton (ghost/danger).',
       sections: [
         DemoSection(
           title: 'Carbon Button Variants',
@@ -38,9 +90,9 @@ class ButtonsDemoPage extends StatelessWidget {
           ),
         ),
         DemoSection(
-          title: 'Secondary Buttons (FilledButton)',
+          title: 'Secondary Buttons (ElevatedButton)',
           description:
-              'Secondary buttons with filled dark background. Styled using FilledButton with Carbon secondary colors.',
+              'Secondary buttons for supporting actions. Uses Material\'s ElevatedButton with Carbon theme styling.',
           builder: (context) => Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -163,10 +215,9 @@ class ButtonsDemoPage extends StatelessWidget {
           ),
         ),
         DemoSection(
-          title: 'Material ElevatedButton (Not Carbon)',
+          title: 'Button Styling Notes',
           description:
-              'ElevatedButton is NOT part of Carbon Design System. However, elevation is included in the theme '
-              'so you can use Material\'s standard ElevatedButton if needed. For Carbon-compliant buttons, use FilledButton instead.',
+              'Understanding how Carbon button styles are applied to Material widgets',
           builder: (context) => Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -181,161 +232,51 @@ class ButtonsDemoPage extends StatelessWidget {
                     Icon(
                       Icons.info_outline,
                       size: 20,
-                      color: context.carbon.text.textSecondary,
+                      color: context.carbon.text.textPrimary,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'These buttons are Material Design components, not Carbon Design System',
+                        'Carbon button mapping to Material widgets',
                         style: TextStyle(
-                          fontSize: 12,
-                          color: context.carbon.text.textSecondary,
-                          fontStyle: FontStyle.italic,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: context.carbon.text.textPrimary,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('Elevated (Not Carbon)'),
-                    ),
-                    ElevatedButton(
-                      onPressed: null,
-                      child: const Text('Disabled'),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.add, size: 16),
-                      label: const Text('With Icon'),
-                    ),
-                  ],
+                const SizedBox(height: 12),
+                _buildButtonMapping(
+                  context,
+                  'Primary',
+                  'FilledButton',
+                  'Main call-to-action, solid background',
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'Use FilledButton for Carbon-compliant primary buttons instead.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: context.carbon.text.textPrimary,
-                  ),
+                const SizedBox(height: 8),
+                _buildButtonMapping(
+                  context,
+                  'Secondary',
+                  'ElevatedButton',
+                  'Supporting actions, subtle elevation',
+                ),
+                const SizedBox(height: 8),
+                _buildButtonMapping(
+                  context,
+                  'Tertiary',
+                  'OutlinedButton',
+                  'Less prominent actions, outlined style',
+                ),
+                const SizedBox(height: 8),
+                _buildButtonMapping(
+                  context,
+                  'Ghost',
+                  'TextButton',
+                  'Minimal visual weight, transparent',
                 ),
               ],
             ),
-          ),
-        ),
-        DemoSection(
-          title: 'Comparison: Carbon vs Material',
-          description:
-              'Visual comparison between Carbon FilledButton and Material ElevatedButton',
-          builder: (context) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: context.carbon.layer.layer02,
-                  border: Border.all(
-                    color: context.carbon.layer.borderSubtle01,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Carbon Design System (Recommended)',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: context.carbon.text.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    FilledButton(
-                      onPressed: () {},
-                      child: const Text('FilledButton - Flat (0px elevation)'),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Carbon buttons are flat with no shadow/elevation',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: context.carbon.text.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: context.carbon.layer.layer02,
-                  border: Border.all(
-                    color: context.carbon.layer.borderSubtle01,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Material Design (Available but not Carbon)',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: context.carbon.text.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'ElevatedButton - Has elevation/shadow',
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Material buttons have elevation and shadow (not part of Carbon)',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: context.carbon.text.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
         ),
       ],

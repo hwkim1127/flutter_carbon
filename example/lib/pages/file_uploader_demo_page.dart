@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 import '../widgets/demo_page_template.dart';
 
 /// Demo page for CarbonFileUploader component.
@@ -14,7 +15,7 @@ class _FileUploaderDemoPageState extends State<FileUploaderDemoPage> {
   final List<_FileItem> _files1 = [];
   final List<_FileItem> _files2 = [];
   final List<_FileItem> _files3 = [];
-  final bool _isDragging = false;
+  bool _isDragging = false;
 
   void _simulateFileUpload(List<_FileItem> fileList) {
     // Simulate adding a file
@@ -43,8 +44,54 @@ class _FileUploaderDemoPageState extends State<FileUploaderDemoPage> {
   Widget build(BuildContext context) {
     return DemoPageTemplate(
       title: 'File Uploader',
-      description: 'File upload component with button and drop zone variants.',
+      description:
+          'File upload component with button and drop zone variants. Drop zone uses the super_drag_and_drop package for native drag-and-drop support.',
       sections: [
+        DemoSection(
+          title: 'Package Integration',
+          description: 'This demo uses the super_drag_and_drop package',
+          builder: (context) => Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: context.carbon.layer.layer02,
+              border: Border.all(color: context.carbon.layer.borderSubtle01),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.integration_instructions,
+                  size: 24,
+                  color: context.carbon.text.textPrimary,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Using super_drag_and_drop package',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: context.carbon.text.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'The Drop Zone Uploader section demonstrates real native drag-and-drop functionality using the super_drag_and_drop package (v0.9.1). Try dragging files from your desktop!',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: context.carbon.text.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         DemoSection(
           title: 'Button Uploader',
           description: 'Simple button that opens file picker',
@@ -70,11 +117,13 @@ class _FileUploaderDemoPageState extends State<FileUploaderDemoPage> {
           ),
         ),
         DemoSection(
-          title: 'Drop Zone Uploader',
-          description: 'Drag and drop area for file upload',
+          title: 'Drop Zone Uploader (Real Drag & Drop)',
+          description:
+              'Native drag and drop area powered by super_drag_and_drop - try dragging files from your desktop!',
           builder: (context) => CarbonFileUploader(
             labelTitle: 'Upload documents',
-            labelDescription: 'Drag and drop files or click to browse',
+            labelDescription:
+                'Drag and drop files from your desktop or click to browse',
             items: _files2
                 .map(
                   (file) => CarbonFileUploaderItem(
@@ -86,11 +135,78 @@ class _FileUploaderDemoPageState extends State<FileUploaderDemoPage> {
                   ),
                 )
                 .toList(),
-            child: GestureDetector(
-              onTap: () => _simulateFileUpload(_files2),
-              child: CarbonFileUploaderDropZone(
-                isDragging: _isDragging,
-                onBrowseFiles: () => _simulateFileUpload(_files2),
+            child: DropRegion(
+              formats: Formats.standardFormats,
+              hitTestBehavior: HitTestBehavior.opaque,
+              onDropOver: (event) {
+                // Accept copy operations
+                if (event.session.allowedOperations
+                    .contains(DropOperation.copy)) {
+                  return DropOperation.copy;
+                }
+                return DropOperation.none;
+              },
+              onDropEnter: (event) {
+                setState(() {
+                  _isDragging = true;
+                });
+              },
+              onDropLeave: (event) {
+                setState(() {
+                  _isDragging = false;
+                });
+              },
+              onPerformDrop: (event) async {
+                setState(() {
+                  _isDragging = false;
+                });
+
+                // Handle dropped files
+                for (final item in event.session.items) {
+                  final reader = item.dataReader;
+                  if (reader != null && reader.canProvide(Formats.fileUri)) {
+                    reader.getValue<Uri>(Formats.fileUri, (fileUri) {
+                      if (fileUri != null) {
+                        // Extract filename from URI
+                        final fileName = fileUri.pathSegments.isNotEmpty
+                            ? fileUri.pathSegments.last
+                            : fileUri.path.split('/').last.split('\\').last;
+
+                        setState(() {
+                          _files2.add(
+                            _FileItem(
+                              name: fileName,
+                              state: CarbonFileUploaderItemState.uploading,
+                            ),
+                          );
+                        });
+
+                        // Simulate upload completion
+                        Future.delayed(const Duration(seconds: 2), () {
+                          if (mounted) {
+                            setState(() {
+                              final fileItem = _files2.firstWhere(
+                                (f) => f.name == fileName,
+                                orElse: () => _files2.last,
+                              );
+                              fileItem.state =
+                                  CarbonFileUploaderItemState.complete;
+                            });
+                          }
+                        });
+                      }
+                    }, onError: (error) {
+                      debugPrint('Error reading file: $error');
+                    });
+                  }
+                }
+              },
+              child: GestureDetector(
+                onTap: () => _simulateFileUpload(_files2),
+                child: CarbonFileUploaderDropZone(
+                  isDragging: _isDragging,
+                  onBrowseFiles: () => _simulateFileUpload(_files2),
+                ),
               ),
             ),
           ),
