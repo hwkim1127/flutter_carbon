@@ -10,5 +10,5 @@
   <rect x="8" y="22" width="8" height="2"/>
   <rect x="8" y="16" width="10" height="2"/>
   <path d="M16,28H6V4h8v6a2.0058,2.0058,0,0,0,2,2h6v3h2V10a.9092.9092,0,0,0-.3-.7l-7-7A.9087.9087,0,0,0,16,2H6A2.0058,2.0058,0,0,0,4,4V28a2.0058,2.0058,0,0,0,2,2H16ZM16,4.4,21.6,10H16Z"/>
-  <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/>
+  
 </svg>

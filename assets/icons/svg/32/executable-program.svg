@@ -17,5 +17,5 @@
   <circle cx="9" cy="8" r="1"/>
   <circle cx="6" cy="8" r="1"/>
   <path d="M21,26H4V12H28v7h2V6c0-1.1025-.8972-2-2-2H4c-1.1028,0-2,.8975-2,2V26c0,1.1025,.8972,2,2,2H21v-2ZM4,6H28v4H4V6Z"/>
-  <rect id="_Transparent_Rectangle_" data-name="&amp;lt;Transparent Rectangle&amp;gt;" class="cls-1" width="32" height="32"/>
+  
 </svg>

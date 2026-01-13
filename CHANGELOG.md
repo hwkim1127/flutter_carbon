@@ -1,3 +1,7 @@
+## 1.0.1+1
+
+* Fixed issue with inverted colors in generated icons (e.g., `4k-filled`, `checkbox-checked-filled`) caused by transparent bounding box elements in SVGs.
+
 ## 1.0.1
 
 * Refactored `G100Theme` to use a constant theme definition with a private constructor for consistency.

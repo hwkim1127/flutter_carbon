@@ -1,6 +1,6 @@
 name: flutter_carbon
 description: "A comprehensive Flutter implementation of IBM's Carbon Design System V11. Features 48 components, 4 theme variants, and seamless Material Design integration."
-version: 1.0.1
+version: 1.0.1+1
 homepage: https://hyunwookim.net
 repository: https://github.com/hwkim1127/flutter_carbon.git
 

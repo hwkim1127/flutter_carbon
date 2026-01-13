@@ -10,5 +10,5 @@
   <polygon points="19.59 16 17 18.59 18.42 20 22.42 16 18.42 12 17 13.41 19.59 16"/>
   <polygon points="10.41 16 13 13.41 11.58 12 7.58 16 11.58 20 13 18.59 10.41 16"/>
   <path d="M4,9H26v7h2V4a2,2,0,0,0-2-2H4A2,2,0,0,0,2,4V24a2,2,0,0,0,2,2H16V24H4ZM4,4H26V7H4Z"/>
-  <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/>
+  
 </svg>

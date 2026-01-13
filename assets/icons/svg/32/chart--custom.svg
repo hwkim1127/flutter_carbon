@@ -12,5 +12,5 @@
   <rect x="12" y="14" width="6" height="2" transform="translate(0 30) rotate(-90)"/>
   <rect x="6" y="12" width="10" height="2" transform="translate(-2 24) rotate(-90)"/>
   <path d="M12,30H6a2.0021,2.0021,0,0,1-2-2V4A2.0021,2.0021,0,0,1,6,2H22a2.0021,2.0021,0,0,1,2,2V14H22V4H6V28h6Z"/>
-  <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/>
+  
 </svg>
