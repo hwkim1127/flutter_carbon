@@ -1,3 +1,7 @@
+## 1.0.1
+
+* Refactored `G100Theme` to use a constant theme definition with a private constructor for consistency.
+
 ## 1.0.0+4
 
 * Updated `ButtonsDemoPage` to correctly document `ElevatedButton` as the Carbon secondary button variant.
