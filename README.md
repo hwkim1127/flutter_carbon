@@ -48,6 +48,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - `CarbonPagination` - Page navigation with configurable sizes
 - `CarbonUIShell` - Complete application shell (header nav, side nav, content, right panel)
 - `CarbonPageHeader` - Page header with breadcrumbs, actions, tabs
+- `CarbonTabs` - Tab navigation with Line and Contained styles
 
 **Overlays & Dialogs**
 - `CarbonModal` - 5 modal types (passive, transactional, danger, input, custom)
@@ -81,7 +82,7 @@ All standard Material widgets are automatically themed to match Carbon Design Sy
 
 - `FilledButton` (Primary), `ElevatedButton` (Secondary), `OutlinedButton` (Tertiary), `TextButton` (Ghost)
 - `TextField`, `Checkbox`, `Radio`, `Switch`, `Slider`
-- `ExpansionTile` (Accordion), `TabBar` (Tabs), `Chip` (Tag), `Tooltip`
+- `ExpansionTile` (Accordion), `Chip` (Tag), `Tooltip`
 - `SearchBar`, `DropdownMenu`, `DataTable`
 - Material date and time pickers
 
@@ -208,6 +209,19 @@ CarbonNotification(
   title: 'Success!',
   subtitle: 'Your changes have been saved.',
   onClose: () {},
+)
+
+// Tabs
+CarbonTabs(
+  tabs: [
+    CarbonTab(label: 'Tab 1', icon: Icon(Icons.home)),
+    CarbonTab(label: 'Tab 2', icon: Icon(Icons.settings)),
+    CarbonTab(label: 'Tab 3', disabled: true),
+  ],
+  type: CarbonTabsType.contained, // or CarbonTabsType.line
+  onTabChanged: (index) {
+     print('Selected tab: $index');
+  },
 )
 ```
 

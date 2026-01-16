@@ -3,6 +3,7 @@
 * Deprecated `onSideNavItemTap` (will be removed in v2.0.0). Use individual `onTap` callbacks on `CarbonNavItem` instead.
 * Added support for `onTap` on `CarbonNavItem` children and menu headers.
 * Updated `CarbonContentSwitcher` to support generic value types (previously restricted to `String`).
+* Added `CarbonTabs` widget for explicit Carbon Design System tab styling (Line and Contained).
 
 ## 1.0.1+1
 
