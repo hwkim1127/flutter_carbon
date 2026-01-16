@@ -5,8 +5,8 @@ homepage: https://hyunwookim.net
 repository: https://github.com/hwkim1127/flutter_carbon.git
 
 environment:
-  sdk: ^3.6.0
-  flutter: ">=3.27.0"
+  sdk: ">=3.3.4 <4.0.0"
+  flutter: ">=3.27.0 <4.0.0"
 
 dependencies:
   flutter:

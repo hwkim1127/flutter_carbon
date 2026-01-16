@@ -80,8 +80,12 @@ class CarbonUIShell extends StatefulWidget {
   /// Callback when side nav expand state changes.
   final ValueChanged<bool>? onSideNavExpandedChanged;
 
-  /// Called when a header nav item is tapped.s
+  /// Called when a header nav item is tapped.
   final ValueChanged<int>? onHeaderNavItemTap;
+
+  /// Called when a side nav item is tapped.
+  @Deprecated('Use CarbonNavItem.onTap instead. This will be removed in v2.0.0')
+  final ValueChanged<int>? onSideNavItemTap;
 
   const CarbonUIShell({
     super.key,
@@ -97,6 +101,7 @@ class CarbonUIShell extends StatefulWidget {
     this.initialRightPanelOpen = false,
     this.onSideNavExpandedChanged,
     this.onHeaderNavItemTap,
+    this.onSideNavItemTap,
   });
 
   @override
@@ -159,6 +164,7 @@ class _CarbonUIShellState extends State<CarbonUIShell> {
                       setState(() => _expandedSideNavMenuIndex = index);
                     },
                     theme: carbon.uiShell,
+                    onItemTap: widget.onSideNavItemTap,
                   ),
                 Expanded(child: widget.child),
                 if (widget.rightPanel != null && _rightPanelOpen)
@@ -307,8 +313,8 @@ class _HeaderNavItemState extends State<_HeaderNavItem> {
     final backgroundColor = widget.item.isSelected
         ? widget.theme.headerNavItemBackgroundSelected
         : _isHovered
-        ? widget.theme.headerNavItemBackgroundHover
-        : widget.theme.headerNavItemBackground;
+            ? widget.theme.headerNavItemBackgroundHover
+            : widget.theme.headerNavItemBackground;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -353,6 +359,7 @@ class _SideNav extends StatelessWidget {
   final int? expandedMenuIndex;
   final ValueChanged<int?> onExpandedMenuChanged;
   final CarbonUIShellThemeData theme;
+  final ValueChanged<int>? onItemTap;
 
   const _SideNav({
     required this.items,
@@ -361,6 +368,7 @@ class _SideNav extends StatelessWidget {
     required this.expandedMenuIndex,
     required this.onExpandedMenuChanged,
     required this.theme,
+    this.onItemTap,
   });
 
   double get _width {
@@ -393,8 +401,7 @@ class _SideNav extends StatelessWidget {
                   return _SideNavMenu(
                     item: item,
                     expanded: expandedMenuIndex == index,
-                    showLabel:
-                        expanded ||
+                    showLabel: expanded ||
                         collapseMode == CarbonSideNavCollapseMode.fixed,
                     onToggle: () {
                       onExpandedMenuChanged(
@@ -402,14 +409,17 @@ class _SideNav extends StatelessWidget {
                       );
                     },
                     theme: theme,
+                    onItemTap: () => onItemTap?.call(index),
                   );
                 }
                 return _SideNavItem(
                   item: item,
-                  showLabel:
-                      expanded ||
+                  showLabel: expanded ||
                       collapseMode == CarbonSideNavCollapseMode.fixed,
-                  onTap: item.onTap ?? () {},
+                  onTap: () {
+                    item.onTap?.call();
+                    onItemTap?.call(index);
+                  },
                   theme: theme,
                 );
               },
@@ -503,6 +513,7 @@ class _SideNavMenu extends StatelessWidget {
   final bool showLabel;
   final VoidCallback onToggle;
   final CarbonUIShellThemeData theme;
+  final VoidCallback? onItemTap;
 
   const _SideNavMenu({
     required this.item,
@@ -510,6 +521,7 @@ class _SideNavMenu extends StatelessWidget {
     required this.showLabel,
     required this.onToggle,
     required this.theme,
+    this.onItemTap,
   });
 
   @override
@@ -525,6 +537,7 @@ class _SideNavMenu extends StatelessWidget {
           showLabel: showLabel,
           onTap: () {
             item.onTap?.call();
+            onItemTap?.call();
             onToggle();
           },
           theme: theme,
@@ -536,7 +549,10 @@ class _SideNavMenu extends StatelessWidget {
               child: _SideNavItem(
                 item: child,
                 showLabel: true,
-                onTap: child.onTap ?? () {},
+                onTap: () {
+                  child.onTap?.call();
+                  onItemTap?.call();
+                },
                 theme: theme,
               ),
             ),
