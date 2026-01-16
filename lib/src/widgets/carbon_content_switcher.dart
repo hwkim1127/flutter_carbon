@@ -10,7 +10,7 @@ enum CarbonContentSwitcherSize {
 }
 
 /// Carbon Design System content switcher item.
-class CarbonContentSwitcherItem {
+class CarbonContentSwitcherItem<T> {
   /// The text label or icon to display.
   final String? label;
 
@@ -18,7 +18,7 @@ class CarbonContentSwitcherItem {
   final Widget? icon;
 
   /// The value associated with this item.
-  final String value;
+  final T value;
 
   /// Whether this item is disabled.
   final bool disabled;
@@ -54,15 +54,15 @@ class CarbonContentSwitcherItem {
 ///   onChanged: (value) => print('Selected: $value'),
 /// )
 /// ```
-class CarbonContentSwitcher extends StatefulWidget {
+class CarbonContentSwitcher<T> extends StatefulWidget {
   /// The list of items in the content switcher.
-  final List<CarbonContentSwitcherItem> items;
+  final List<CarbonContentSwitcherItem<T>> items;
 
   /// The currently selected value.
-  final String selectedValue;
+  final T selectedValue;
 
   /// Called when the selection changes.
-  final ValueChanged<String>? onChanged;
+  final ValueChanged<T>? onChanged;
 
   /// The size of the content switcher.
   final CarbonContentSwitcherSize size;
@@ -80,10 +80,11 @@ class CarbonContentSwitcher extends StatefulWidget {
   }) : assert(items.length >= 2, 'Content switcher must have at least 2 items');
 
   @override
-  State<CarbonContentSwitcher> createState() => _CarbonContentSwitcherState();
+  State<CarbonContentSwitcher<T>> createState() =>
+      _CarbonContentSwitcherState<T>();
 }
 
-class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
+class _CarbonContentSwitcherState<T> extends State<CarbonContentSwitcher<T>> {
   int? _hoveredIndex;
 
   @override
@@ -125,7 +126,7 @@ class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
                   ),
                 Expanded(
                   flex: widget.fullWidth ? 1 : 0,
-                  child: _ContentSwitcherButton(
+                  child: _ContentSwitcherButton<T>(
                     item: item,
                     isSelected: isSelected,
                     isIconOnly: isIconOnly,
@@ -163,8 +164,8 @@ class _CarbonContentSwitcherState extends State<CarbonContentSwitcher> {
 }
 
 /// Internal button widget for content switcher items.
-class _ContentSwitcherButton extends StatefulWidget {
-  final CarbonContentSwitcherItem item;
+class _ContentSwitcherButton<T> extends StatefulWidget {
+  final CarbonContentSwitcherItem<T> item;
   final bool isSelected;
   final bool isIconOnly;
   final CarbonContentSwitcherSize size;
@@ -181,10 +182,11 @@ class _ContentSwitcherButton extends StatefulWidget {
   });
 
   @override
-  State<_ContentSwitcherButton> createState() => _ContentSwitcherButtonState();
+  State<_ContentSwitcherButton<T>> createState() =>
+      _ContentSwitcherButtonState<T>();
 }
 
-class _ContentSwitcherButtonState extends State<_ContentSwitcherButton> {
+class _ContentSwitcherButtonState<T> extends State<_ContentSwitcherButton<T>> {
   bool _isHovered = false;
 
   @override
