@@ -80,11 +80,8 @@ class CarbonUIShell extends StatefulWidget {
   /// Callback when side nav expand state changes.
   final ValueChanged<bool>? onSideNavExpandedChanged;
 
-  /// Called when a header nav item is tapped.
+  /// Called when a header nav item is tapped.s
   final ValueChanged<int>? onHeaderNavItemTap;
-
-  /// Called when a side nav item is tapped.
-  final ValueChanged<int>? onSideNavItemTap;
 
   const CarbonUIShell({
     super.key,
@@ -100,7 +97,6 @@ class CarbonUIShell extends StatefulWidget {
     this.initialRightPanelOpen = false,
     this.onSideNavExpandedChanged,
     this.onHeaderNavItemTap,
-    this.onSideNavItemTap,
   });
 
   @override
@@ -163,7 +159,6 @@ class _CarbonUIShellState extends State<CarbonUIShell> {
                       setState(() => _expandedSideNavMenuIndex = index);
                     },
                     theme: carbon.uiShell,
-                    onItemTap: widget.onSideNavItemTap,
                   ),
                 Expanded(child: widget.child),
                 if (widget.rightPanel != null && _rightPanelOpen)
@@ -312,8 +307,8 @@ class _HeaderNavItemState extends State<_HeaderNavItem> {
     final backgroundColor = widget.item.isSelected
         ? widget.theme.headerNavItemBackgroundSelected
         : _isHovered
-            ? widget.theme.headerNavItemBackgroundHover
-            : widget.theme.headerNavItemBackground;
+        ? widget.theme.headerNavItemBackgroundHover
+        : widget.theme.headerNavItemBackground;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -358,7 +353,6 @@ class _SideNav extends StatelessWidget {
   final int? expandedMenuIndex;
   final ValueChanged<int?> onExpandedMenuChanged;
   final CarbonUIShellThemeData theme;
-  final ValueChanged<int>? onItemTap;
 
   const _SideNav({
     required this.items,
@@ -367,7 +361,6 @@ class _SideNav extends StatelessWidget {
     required this.expandedMenuIndex,
     required this.onExpandedMenuChanged,
     required this.theme,
-    this.onItemTap,
   });
 
   double get _width {
@@ -400,7 +393,8 @@ class _SideNav extends StatelessWidget {
                   return _SideNavMenu(
                     item: item,
                     expanded: expandedMenuIndex == index,
-                    showLabel: expanded ||
+                    showLabel:
+                        expanded ||
                         collapseMode == CarbonSideNavCollapseMode.fixed,
                     onToggle: () {
                       onExpandedMenuChanged(
@@ -412,9 +406,10 @@ class _SideNav extends StatelessWidget {
                 }
                 return _SideNavItem(
                   item: item,
-                  showLabel: expanded ||
+                  showLabel:
+                      expanded ||
                       collapseMode == CarbonSideNavCollapseMode.fixed,
-                  onTap: () => onItemTap?.call(index),
+                  onTap: item.onTap ?? () {},
                   theme: theme,
                 );
               },
@@ -525,10 +520,13 @@ class _SideNavMenu extends StatelessWidget {
           item: CarbonNavItem(
             label: item.label,
             icon: item.icon,
-            onTap: onToggle,
+            onTap: item.onTap,
           ),
           showLabel: showLabel,
-          onTap: onToggle,
+          onTap: () {
+            item.onTap?.call();
+            onToggle();
+          },
           theme: theme,
         ),
         if (expanded && showLabel)

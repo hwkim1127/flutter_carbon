@@ -1,3 +1,8 @@
+## 1.0.2
+* Fixed `CarbonNavItem` interaction handling.
+* Removed `onSideNavItemTap` in favor of individual `onTap` callbacks on `CarbonNavItem`.
+* Added support for `onTap` on `CarbonNavItem` children and menu headers.
+
 ## 1.0.1+1
 
 * Fixed issue with inverted colors in generated icons (e.g., `4k-filled`, `checkbox-checked-filled`) caused by transparent bounding box elements in SVGs.
