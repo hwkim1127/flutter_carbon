@@ -40,8 +40,16 @@ class CarbonToggle extends StatefulWidget {
     this.offText = 'Off',
     this.size = CarbonToggleSize.regular,
     this.hideLabel = false,
+    this.hideStateText = false,
     this.readOnly = false,
-  });
+  })  : assert(
+          !hideStateText || size == CarbonToggleSize.small,
+          'hideStateText can only be true for small toggles',
+        ),
+        assert(
+          labelText != null || !hideStateText,
+          'If hideStateText is true, labelText must be provided for accessibility',
+        );
 
   /// Whether the toggle is on (checked).
   final bool value;
@@ -63,6 +71,10 @@ class CarbonToggle extends StatefulWidget {
 
   /// Whether to hide the label text visually (still accessible).
   final bool hideLabel;
+
+  /// Whether to hide the state text (On/Off) next to the toggle.
+  /// Only supported for small toggles.
+  final bool hideStateText;
 
   /// Whether the toggle is read-only (cannot be changed).
   final bool readOnly;
@@ -178,18 +190,20 @@ class _CarbonToggleState extends State<CarbonToggle>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _buildSwitch(toggleTheme),
-                  const SizedBox(width: 8),
-                  Text(
-                    widget.value ? widget.onText : widget.offText,
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 1.43,
-                      letterSpacing: 0.16,
-                      color: widget.enabled
-                          ? toggleTheme.stateTextColor
-                          : toggleTheme.textDisabled,
+                  if (!widget.hideStateText) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      widget.value ? widget.onText : widget.offText,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.43,
+                        letterSpacing: 0.16,
+                        color: widget.enabled
+                            ? toggleTheme.stateTextColor
+                            : toggleTheme.textDisabled,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

@@ -252,7 +252,7 @@ ThemeData carbonTheme({
         if (states.contains(WidgetState.selected)) {
           return carbon.button.buttonPrimary;
         }
-        return carbon.text.textSecondary;
+        return Colors.transparent;
       }),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       side: BorderSide(color: carbon.text.textSecondary, width: 1),
