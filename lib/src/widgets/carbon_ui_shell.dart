@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../foundation/motion.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/component_themes/ui_shell_theme_data.dart';
 
@@ -136,6 +137,30 @@ class _CarbonUIShellState extends State<CarbonUIShell> {
   @override
   Widget build(BuildContext context) {
     final carbon = context.carbon;
+
+    assert(() {
+      if (widget.onSideNavItemTap != null && widget.sideNavItems != null) {
+        for (final item in widget.sideNavItems!) {
+          if (item.onTap != null) {
+            throw FlutterError(
+              'Cannot use both CarbonUIShell.onSideNavItemTap and CarbonNavItem.onTap.\n'
+              'CarbonUIShell.onSideNavItemTap is deprecated. Please remove it and use CarbonNavItem.onTap for each item instead.',
+            );
+          }
+          if (item.children != null) {
+            for (final child in item.children!) {
+              if (child.onTap != null) {
+                throw FlutterError(
+                  'Cannot use both CarbonUIShell.onSideNavItemTap and CarbonNavItem.onTap.\n'
+                  'CarbonUIShell.onSideNavItemTap is deprecated. Please remove it and use CarbonNavItem.onTap for each item instead.',
+                );
+              }
+            }
+          }
+        }
+      }
+      return true;
+    }());
 
     return Scaffold(
       body: Column(
@@ -528,13 +553,10 @@ class _SideNavMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _SideNavItem(
-          item: CarbonNavItem(
-            label: item.label,
-            icon: item.icon,
-            onTap: item.onTap,
-          ),
+        _SideNavMenuItem(
+          item: item,
           showLabel: showLabel,
+          expanded: expanded,
           onTap: () {
             item.onTap?.call();
             onItemTap?.call();
@@ -558,6 +580,92 @@ class _SideNavMenu extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _SideNavMenuItem extends StatefulWidget {
+  final CarbonNavItem item;
+  final bool showLabel;
+  final bool expanded;
+  final VoidCallback onTap;
+  final CarbonUIShellThemeData theme;
+
+  const _SideNavMenuItem({
+    required this.item,
+    required this.showLabel,
+    required this.expanded,
+    required this.onTap,
+    required this.theme,
+  });
+
+  @override
+  State<_SideNavMenuItem> createState() => _SideNavMenuItemState();
+}
+
+class _SideNavMenuItemState extends State<_SideNavMenuItem> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final backgroundColor = _isHovered
+        ? widget.theme.sideNavItemBackgroundHover
+        : widget.theme.sideNavItemBackground;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          height: 48,
+          padding: EdgeInsets.symmetric(horizontal: widget.showLabel ? 12 : 8),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            border: widget.item.isSelected
+                ? Border(
+                    left: BorderSide(
+                      color: widget.theme.sideNavItemBorderActive,
+                      width: 4,
+                    ),
+                  )
+                : null,
+          ),
+          child: Row(
+            children: [
+              if (widget.item.icon != null)
+                Icon(
+                  widget.item.icon,
+                  color: widget.theme.sideNavItemIcon,
+                  size: 20,
+                ),
+              if (widget.showLabel && widget.item.icon != null)
+                const SizedBox(width: 16),
+              if (widget.showLabel)
+                Expanded(
+                  child: Text(
+                    widget.item.label,
+                    style: TextStyle(
+                      color: widget.theme.sideNavItemText,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              if (widget.showLabel)
+                Icon(
+                  widget.expanded
+                      ? CarbonIcons.chevronUp
+                      : CarbonIcons.chevronDown,
+                  color: widget.theme.sideNavItemIcon,
+                  size: 16,
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
