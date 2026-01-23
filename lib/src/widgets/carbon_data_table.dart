@@ -11,7 +11,7 @@ import '../../flutter_carbon.dart';
 /// - Sortable headers
 /// - flexible column sizing
 /// - Horizontal scrolling (via [minWidth])
-class CarbonDataTable<T> extends StatefulWidget {
+class CarbonDataTable extends StatefulWidget {
   /// The headers of the table.
   final List<CarbonDataTableHeader> headers;
 
@@ -36,10 +36,10 @@ class CarbonDataTable<T> extends StatefulWidget {
   });
 
   @override
-  State<CarbonDataTable> createState() => _CarbonDataTableState<T>();
+  State<CarbonDataTable> createState() => _CarbonDataTableState();
 }
 
-class _CarbonDataTableState<T> extends State<CarbonDataTable<T>> {
+class _CarbonDataTableState extends State<CarbonDataTable> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -103,16 +103,19 @@ class _CarbonDataTableState<T> extends State<CarbonDataTable<T>> {
               flex: header.flex,
               width: header.width,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: DefaultTextStyle(
-                  style: TextStyle(
-                    color: theme.headerTextColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+              child: Row(
+                mainAxisAlignment: header.mainAxisAlignment,
+                crossAxisAlignment: header.crossAxisAlignment,
+                children: [
+                  DefaultTextStyle(
+                    style: TextStyle(
+                      color: theme.headerTextColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    child: header.child ?? Text(header.label ?? ''),
                   ),
-                  child: Text(header.label),
-                ),
+                ],
               ),
             );
           }),
@@ -148,19 +151,28 @@ class _CarbonDataTableState<T> extends State<CarbonDataTable<T>> {
 
 /// Header definition for [CarbonDataTable].
 class CarbonDataTableHeader {
-  final String label;
+  final String? label;
+  final Widget? child;
   final int flex;
   final double? width;
   final VoidCallback? onSort;
   final bool sortable;
+  final MainAxisAlignment mainAxisAlignment;
+  final CrossAxisAlignment crossAxisAlignment;
 
   const CarbonDataTableHeader({
-    required this.label,
+    this.label,
+    this.child,
     this.flex = 1,
     this.width,
     this.onSort,
     this.sortable = false,
-  });
+    this.mainAxisAlignment = MainAxisAlignment.start,
+    this.crossAxisAlignment = CrossAxisAlignment.center,
+  })  : assert(label != null || child != null,
+            'Either label or child must be provided'),
+        assert(label == null || child == null,
+            'Cannot provide both label and child');
 }
 
 /// Row definition for [CarbonDataTable].
@@ -237,16 +249,19 @@ class _CarbonDataTableRowState extends State<CarbonDataTableRow> {
               width: cell.width,
               padding:
                   cell.padding ?? const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: DefaultTextStyle(
-                  style: TextStyle(
-                    color: theme.rowTextColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+              child: Row(
+                mainAxisAlignment: cell.mainAxisAlignment,
+                crossAxisAlignment: cell.crossAxisAlignment,
+                children: [
+                  DefaultTextStyle(
+                    style: TextStyle(
+                      color: theme.rowTextColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    child: cell.child,
                   ),
-                  child: cell.child,
-                ),
+                ],
               ),
             );
           }),
@@ -334,11 +349,15 @@ class CarbonDataTableCell {
   final int flex;
   final double? width;
   final EdgeInsetsGeometry? padding;
+  final MainAxisAlignment mainAxisAlignment;
+  final CrossAxisAlignment crossAxisAlignment;
 
   const CarbonDataTableCell({
     required this.child,
     this.flex = 1,
     this.width,
     this.padding,
+    this.mainAxisAlignment = MainAxisAlignment.start,
+    this.crossAxisAlignment = CrossAxisAlignment.center,
   });
 }

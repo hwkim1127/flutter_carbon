@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../theme/carbon_theme.dart';
 
+/// Size variants for [CarbonStructuredList].
+enum CarbonStructuredListSize {
+  /// Regular size (default).
+  normal,
+
+  /// Condensed size for compact layouts.
+  condensed,
+}
+
 /// Carbon Design System structured list (table-like list with rows/columns).
 ///
 /// A structured list that follows Carbon Design System specifications with:
@@ -9,10 +18,12 @@ import '../theme/carbon_theme.dart';
 /// - Optional header row
 /// - Hover and selection states
 /// - Sharp corners (zero border radius)
+/// - Normal and condensed sizes
 ///
 /// Example:
 /// ```dart
 /// CarbonStructuredList(
+///   size: CarbonStructuredListSize.condensed,
 ///   headers: [
 ///     CarbonStructuredListHeader(label: 'Name'),
 ///     CarbonStructuredListHeader(label: 'Status'),
@@ -46,6 +57,9 @@ class CarbonStructuredList extends StatefulWidget {
   /// Called when a row is selected.
   final ValueChanged<int>? onRowSelected;
 
+  /// The size of the rows (normal or condensed).
+  final CarbonStructuredListSize size;
+
   const CarbonStructuredList({
     super.key,
     this.headers,
@@ -54,6 +68,7 @@ class CarbonStructuredList extends StatefulWidget {
     this.selectable = false,
     this.selectedIndex,
     this.onRowSelected,
+    this.size = CarbonStructuredListSize.normal,
   });
 
   @override
@@ -67,6 +82,12 @@ class _CarbonStructuredListState extends State<CarbonStructuredList> {
   Widget build(BuildContext context) {
     final carbon = context.carbon;
     final theme = carbon.structuredList;
+
+    // Calculate padding based on size
+    final verticalPadding =
+        widget.size == CarbonStructuredListSize.normal ? 16.0 : 8.0;
+    final padding =
+        EdgeInsets.symmetric(horizontal: 16.0, vertical: verticalPadding);
 
     return Container(
       decoration: BoxDecoration(
@@ -99,14 +120,20 @@ class _CarbonStructuredListState extends State<CarbonStructuredList> {
                   return Expanded(
                     flex: header.flex,
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: DefaultTextStyle(
-                        style: TextStyle(
-                          color: theme.headerTextColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        child: header.child ?? Text(header.label ?? ''),
+                      padding: padding,
+                      child: Row(
+                        mainAxisAlignment: header.mainAxisAlignment,
+                        crossAxisAlignment: header.crossAxisAlignment,
+                        children: [
+                          DefaultTextStyle(
+                            style: TextStyle(
+                              color: theme.headerTextColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            child: header.child ?? Text(header.label ?? ''),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -149,14 +176,20 @@ class _CarbonStructuredListState extends State<CarbonStructuredList> {
                       return Expanded(
                         flex: cell.flex,
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: DefaultTextStyle(
-                            style: TextStyle(
-                              color: theme.rowTextColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            child: cell.child,
+                          padding: padding,
+                          child: Row(
+                            mainAxisAlignment: cell.mainAxisAlignment,
+                            crossAxisAlignment: cell.crossAxisAlignment,
+                            children: [
+                              DefaultTextStyle(
+                                style: TextStyle(
+                                  color: theme.rowTextColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                child: cell.child,
+                              ),
+                            ],
                           ),
                         ),
                       );
@@ -181,12 +214,21 @@ class CarbonStructuredListHeader {
   final Widget? child;
 
   /// Flex value for column width.
+  /// Width flex factor.
   final int flex;
+
+  /// Alignment of content along the cross axis.
+  final CrossAxisAlignment crossAxisAlignment;
+
+  /// Alignment of content along the main axis.
+  final MainAxisAlignment mainAxisAlignment;
 
   const CarbonStructuredListHeader({
     this.label,
     this.child,
     this.flex = 1,
+    this.crossAxisAlignment = CrossAxisAlignment.center,
+    this.mainAxisAlignment = MainAxisAlignment.start,
   }) : assert(label != null || child != null,
             'Either label or child must be provided');
 }
@@ -211,10 +253,19 @@ class CarbonStructuredListCell {
   final Widget child;
 
   /// Flex value for cell width.
+  /// Flex value for cell width.
   final int flex;
+
+  /// Alignment of content along the cross axis.
+  final CrossAxisAlignment crossAxisAlignment;
+
+  /// Alignment of content along the main axis.
+  final MainAxisAlignment mainAxisAlignment;
 
   const CarbonStructuredListCell({
     required this.child,
     this.flex = 1,
+    this.crossAxisAlignment = CrossAxisAlignment.center,
+    this.mainAxisAlignment = MainAxisAlignment.start,
   });
 }

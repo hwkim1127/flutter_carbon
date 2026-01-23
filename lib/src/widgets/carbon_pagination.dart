@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'carbon_dropdown.dart';
 import '../theme/carbon_theme.dart';
 
 /// Defines the localized labels and formatters for [CarbonPagination].
@@ -19,13 +20,12 @@ class CarbonPaginationLabels {
   /// Example return: "1–10 of 100"
   final String Function(int start, int end, int total) itemsRange;
 
-  /// Function to format the page progress text.
+  /// Function to format the page range text.
   ///
-  /// [current] - The current page number.
   /// [total] - The total number of pages.
   ///
-  /// Example return: "1 of 10 pages"
-  final String Function(int current, int total) pageRange;
+  /// Example return: "of 10 pages"
+  final String Function(int total) pageRange;
 
   /// Tooltip label for the "Previous Page" button (for accessibility).
   final String? previousPageLabel;
@@ -37,14 +37,15 @@ class CarbonPaginationLabels {
     this.itemsPerPage = 'Items per page:',
     required this.itemsRange,
     required this.pageRange,
-    this.previousPageLabel = 'Prev',
+    this.previousPageLabel = 'Previous',
     this.nextPageLabel = 'Next',
   });
 
   /// Default English labels
   factory CarbonPaginationLabels.en() => CarbonPaginationLabels(
-        itemsRange: (start, end, total) => '$start–$end of $total',
-        pageRange: (current, total) => '$current of $total pages',
+        itemsRange: (start, end, total) => '$start-$end of $total items',
+        pageRange: (total) =>
+            '{current} of $total page${total <= 1 ? '' : 's'}',
       );
 }
 
@@ -70,7 +71,7 @@ class CarbonPaginationLabels {
 ///   labels: CarbonPaginationLabels(
 ///     itemsPerPage: '페이지당 항목:',
 ///     itemsRange: (start, end, total) => '전체 $total개 중 $start–$end',
-///     pageRange: (current, total) => '$total페이지 중 $current페이지',
+///     pageRange: (total) => '$total 중 $current 페이지',
 ///     previousPageLabel: '이전',
 ///     nextPageLabel: '다음',
 ///   ),
@@ -130,6 +131,7 @@ class CarbonPagination extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
+        color: carbon.layer.layer01,
         border: Border(
           top: BorderSide(color: carbon.layer.borderSubtle01, width: 1),
         ),
@@ -137,16 +139,7 @@ class CarbonPagination extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Items info (e.g., "1-10 of 100")
-          Flexible(
-            child: Text(
-              _getItemsText(effectiveLabels),
-              style: TextStyle(color: carbon.text.textSecondary, fontSize: 14),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          // Navigation controls
+          // LEFT SECTION: Items per page + range of items
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -157,14 +150,46 @@ class CarbonPagination extends StatelessWidget {
                   sizes: pageSizes,
                   onChanged: onPageSizeChanged,
                 ),
-                const SizedBox(width: 16),
+                Container(
+                  width: 1,
+                  height: 32,
+                  color: carbon.layer.borderSubtle01,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                ),
               ],
+              const SizedBox(width: 8),
               Text(
-                effectiveLabels.pageRange(currentPage, totalPages),
-                style: TextStyle(color: carbon.text.textPrimary, fontSize: 14),
+                _getItemsText(effectiveLabels),
+                style:
+                    TextStyle(color: carbon.text.textSecondary, fontSize: 14),
+              ),
+            ],
+          ),
+
+          // RIGHT SECTION: Page selector + prev/next buttons
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _PageSelector(
+                currentPage: currentPage,
+                totalPages: totalPages,
+                onChanged: onPageChanged,
               ),
               const SizedBox(width: 8),
+              Text(
+                effectiveLabels.pageRange(totalPages),
+                style:
+                    TextStyle(color: carbon.text.textSecondary, fontSize: 14),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 1,
+                height: 32,
+                color: carbon.layer.borderSubtle01,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+              ),
               IconButton(
+                visualDensity: VisualDensity.compact,
                 tooltip: effectiveLabels.previousPageLabel,
                 onPressed: currentPage > 1
                     ? () => onPageChanged?.call(currentPage - 1)
@@ -178,6 +203,7 @@ class CarbonPagination extends StatelessWidget {
                 iconSize: 20,
               ),
               IconButton(
+                visualDensity: VisualDensity.compact,
                 tooltip: effectiveLabels.nextPageLabel,
                 onPressed: currentPage < totalPages
                     ? () => onPageChanged?.call(currentPage + 1)
@@ -227,30 +253,64 @@ class _PageSizeSelector extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           label,
           style: TextStyle(color: carbon.text.textSecondary, fontSize: 14),
         ),
         const SizedBox(width: 8),
-        DropdownButton<int>(
+        CarbonDropdown<int>(
+          showBorder: false,
           value: currentSize,
+          items: sizes
+              .map((size) => CarbonDropdownItem(
+                    value: size,
+                    child: Text(size.toString()),
+                  ))
+              .toList(),
           onChanged: onChanged == null
               ? null
               : (int? value) {
                   if (value != null) onChanged!(value);
                 },
-          underline: const SizedBox.shrink(),
-          icon: Icon(Icons.arrow_drop_down, color: carbon.text.iconPrimary),
-          style: TextStyle(color: carbon.text.textPrimary, fontSize: 14),
-          items: sizes.map((size) {
-            return DropdownMenuItem<int>(
-              value: size,
-              child: Text(size.toString()),
-            );
-          }).toList(),
+          size: CarbonDropdownSize.small,
         ),
       ],
+    );
+  }
+}
+
+/// Internal page selector widget.
+class _PageSelector extends StatelessWidget {
+  final int currentPage;
+  final int totalPages;
+  final ValueChanged<int>? onChanged;
+
+  const _PageSelector({
+    required this.currentPage,
+    required this.totalPages,
+    this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CarbonDropdown<int>(
+      showBorder: false,
+      value: currentPage,
+      items: List.generate(
+        totalPages,
+        (index) => CarbonDropdownItem(
+          value: index + 1,
+          child: Text((index + 1).toString()),
+        ),
+      ),
+      onChanged: onChanged == null
+          ? null
+          : (int? value) {
+              if (value != null) onChanged!(value);
+            },
+      size: CarbonDropdownSize.small,
     );
   }
 }
