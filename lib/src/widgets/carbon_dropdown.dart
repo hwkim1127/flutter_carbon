@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/carbon_theme.dart';
+import '../theme/carbon_theme_data.dart';
 
 /// Size variants for [CarbonDropdown].
 enum CarbonDropdownSize {
@@ -113,12 +114,15 @@ class CarbonDropdown<T> extends StatefulWidget {
 class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();
+  final GlobalKey _triggerKey = GlobalKey();
   bool _isOpen = false;
   T? _highlightedValue;
 
   @override
   void dispose() {
-    _closeDropdown();
+    // Remove overlay without calling setState since widget is being disposed
+    _overlayEntry?.remove();
+    _overlayEntry = null;
     super.dispose();
   }
 
@@ -135,19 +139,23 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
 
     _overlayEntry = _createOverlayEntry();
     Overlay.of(context).insert(_overlayEntry!);
-    setState(() {
-      _isOpen = true;
-      _highlightedValue = widget.value;
-    });
+    if (mounted) {
+      setState(() {
+        _isOpen = true;
+        _highlightedValue = widget.value;
+      });
+    }
   }
 
   void _closeDropdown() {
     _overlayEntry?.remove();
     _overlayEntry = null;
-    setState(() {
-      _isOpen = false;
-      _highlightedValue = null;
-    });
+    if (mounted) {
+      setState(() {
+        _isOpen = false;
+        _highlightedValue = null;
+      });
+    }
   }
 
   void _selectItem(T value) {
@@ -156,10 +164,26 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   OverlayEntry _createOverlayEntry() {
-    final renderBox = context.findRenderObject() as RenderBox;
+    // Get the render box of the trigger specifically, not the whole widget
+    final renderBox =
+        _triggerKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) {
+      // Fallback to context if key not ready
+      final fallbackBox = context.findRenderObject() as RenderBox;
+      return _createOverlayEntryWithBox(fallbackBox);
+    }
+    return _createOverlayEntryWithBox(renderBox);
+  }
+
+  OverlayEntry _createOverlayEntryWithBox(RenderBox renderBox) {
     final size = renderBox.size;
-    final menuWidth = widget.width ?? size.width;
     final offset = renderBox.localToGlobal(Offset.zero);
+
+    // Capture theme and items snapshot to avoid context access after disposal
+    final carbon = context.carbon;
+    final items = widget.items;
+    final currentValue = widget.value;
+    final currentHighlighted = _highlightedValue;
 
     // Calculate available space below and above
     final screenHeight = MediaQuery.of(context).size.height;
@@ -184,7 +208,6 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
             ),
             // The actual dropdown menu
             Positioned(
-              width: menuWidth,
               child: CompositedTransformFollower(
                 link: _layerLink,
                 showWhenUnlinked: false,
@@ -192,7 +215,13 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
                 child: Material(
                   elevation: 2,
                   color: Colors.transparent,
-                  child: _buildDropdownMenu(),
+                  child: _buildDropdownMenu(
+                    width: size.width,
+                    carbon: carbon,
+                    items: items,
+                    currentValue: currentValue,
+                    highlightedValue: currentHighlighted,
+                  ),
                 ),
               ),
             ),
@@ -202,10 +231,15 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     );
   }
 
-  Widget _buildDropdownMenu() {
-    final carbon = context.carbon;
-
+  Widget _buildDropdownMenu({
+    required double width,
+    required CarbonThemeData carbon,
+    required List<CarbonDropdownItem<T>> items,
+    required T? currentValue,
+    required T? highlightedValue,
+  }) {
     return Container(
+      width: width,
       constraints: const BoxConstraints(maxHeight: 300),
       decoration: BoxDecoration(
         color: carbon.layer.layer01,
@@ -215,11 +249,12 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
       child: ListView(
         padding: EdgeInsets.zero,
         shrinkWrap: true,
-        children: widget.items.map((item) {
-          final isSelected = item.value == widget.value;
-          final isHighlighted = item.value == _highlightedValue;
+        children: items.map((item) {
+          final isSelected = item.value == currentValue;
+          final isHighlighted = item.value == highlightedValue;
 
           return _buildMenuItem(
+            carbon: carbon,
             item: item,
             isSelected: isSelected,
             isHighlighted: isHighlighted,
@@ -230,15 +265,14 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   Widget _buildMenuItem({
+    required CarbonThemeData carbon,
     required CarbonDropdownItem<T> item,
     required bool isSelected,
     required bool isHighlighted,
   }) {
-    final carbon = context.carbon;
-
     return MouseRegion(
       onEnter: (_) {
-        if (item.enabled) {
+        if (item.enabled && mounted) {
           setState(() {
             _highlightedValue = item.value;
           });
@@ -296,7 +330,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
                   child: Icon(
                     Icons.check,
                     size: 16,
-                    color: carbon.text.iconPrimary,
+                    color: carbon.text.iconInteractive,
                   ),
                 ),
             ],
@@ -337,56 +371,34 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
         // Dropdown trigger
         CompositedTransformTarget(
           link: _layerLink,
-          child: SizedBox(
-            width: widget.width,
-            child: GestureDetector(
-              onTap: _toggleDropdown,
-              child: Container(
-                height: widget.size.height,
-                decoration: BoxDecoration(
-                  color: widget.enabled
-                      ? carbon.layer.field01
-                      : carbon.layer.layerSelectedDisabled,
-                  border: widget.showBorder
-                      ? Border.all(
-                          color: hasError
-                              ? carbon.layer.supportError
-                              : _isOpen
-                                  ? carbon.button.buttonPrimary
-                                  : carbon.layer.borderStrong01,
-                          width: hasError || _isOpen ? 2 : 1,
-                        )
-                      : null,
-                  borderRadius: BorderRadius.zero,
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  children: [
-                    if (widget.width != null)
-                      Expanded(
-                        child: selectedItem != null
-                            ? DefaultTextStyle(
-                                style: TextStyle(
-                                  color: widget.enabled
-                                      ? carbon.text.textPrimary
-                                      : carbon.text.textDisabled,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                                child: selectedItem.child,
-                              )
-                            : widget.hint != null
-                                ? Text(
-                                    widget.hint!,
-                                    style: TextStyle(
-                                      color: carbon.text.textPlaceholder,
-                                      fontSize: 14,
-                                    ),
-                                  )
-                                : const SizedBox.shrink(),
+          child: GestureDetector(
+            key: _triggerKey,
+            onTap: _toggleDropdown,
+            child: Container(
+              width: widget.width,
+              height: widget.size.height,
+              decoration: BoxDecoration(
+                color: widget.enabled
+                    ? carbon.layer.field01
+                    : carbon.layer.layerSelectedDisabled,
+                border: widget.showBorder
+                    ? Border.all(
+                        color: hasError
+                            ? carbon.layer.supportError
+                            : _isOpen
+                                ? carbon.button.buttonPrimary
+                                : carbon.layer.borderStrong01,
+                        width: hasError || _isOpen ? 2 : 1,
                       )
-                    else
-                      selectedItem != null
+                    : null,
+                borderRadius: BorderRadius.zero,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                children: [
+                  if (widget.width != null)
+                    Expanded(
+                      child: selectedItem != null
                           ? DefaultTextStyle(
                               style: TextStyle(
                                 color: widget.enabled
@@ -401,26 +413,49 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
                               ? Text(
                                   widget.hint!,
                                   style: TextStyle(
-                                    color: carbon.text.textPlaceholder,
+                                    color: widget.enabled
+                                        ? carbon.text.textPlaceholder
+                                        : carbon.text.textInverse,
                                     fontSize: 14,
                                   ),
                                 )
                               : const SizedBox.shrink(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: widget.icon ??
-                          Icon(
-                            _isOpen
-                                ? Icons.keyboard_arrow_up
-                                : Icons.keyboard_arrow_down,
-                            color: widget.enabled
-                                ? carbon.text.iconPrimary
-                                : carbon.text.iconDisabled,
-                            size: 16,
-                          ),
-                    ),
-                  ],
-                ),
+                    )
+                  else
+                    selectedItem != null
+                        ? DefaultTextStyle(
+                            style: TextStyle(
+                              color: widget.enabled
+                                  ? carbon.text.textPrimary
+                                  : carbon.text.textDisabled,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            child: selectedItem.child,
+                          )
+                        : widget.hint != null
+                            ? Text(
+                                widget.hint!,
+                                style: TextStyle(
+                                  color: carbon.text.textPlaceholder,
+                                  fontSize: 14,
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: widget.icon ??
+                        Icon(
+                          _isOpen
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          color: widget.enabled
+                              ? carbon.text.iconPrimary
+                              : carbon.text.iconDisabled,
+                          size: 16,
+                        ),
+                  ),
+                ],
               ),
             ),
           ),
