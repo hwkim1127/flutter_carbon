@@ -9,14 +9,40 @@
 ### New Features
 
 * **CarbonDataTable**
-  * Added `CarbonDataTable` widget with comprehensive features:
-    * Supports expandable rows with custom content (native expansion behavior).
-    * Supports horizontal scrolling via `minWidth` property.
-    * Flexible column sizing with `flex` and `width` support.
-    * Sortable headers support.
-    * Added custom alignment support (`mainAxisAlignment`, `crossAxisAlignment`) for headers and cells.
-    * Added `child` property to `CarbonDataTableHeader` for custom header widgets (e.g., Select All checkbox).
-    * Removed unused generic type parameter `<T>` from `CarbonDataTable` class definition.
+  * Added `CarbonDataTable` widget with comprehensive features following Carbon Design System specifications:
+    * **Expandable rows**: Supports custom expandable content with chevron indicators
+    * **Selectable rows**: Multi-select with checkboxes or single-select with radio buttons
+    * **Radio mode**: Single-row selection using radio buttons (`radio: true`)
+    * **Batch selection**: Select-all checkbox in header with indeterminate state support
+    * **Size variants**: Four density options via `CarbonDataTableSize` enum (tall, medium, short, compact)
+    * **Sortable columns**: Full sort state management with ascending/descending/none states
+      * Sort indicators with up/down arrows
+      * Per-column sortable control
+      * Programmatic sort control via `sortKey` and `sortDirection`
+      * Click-to-sort with automatic direction cycling
+    * **Zebra striping**: Alternating row colors for better visual separation (`zebra: true`)
+    * **Toolbar support**: Built-in support for title, description, and custom toolbar widgets
+    * **Skeleton loading state**: Animated loading placeholders with configurable row count
+    * **Efficient architecture**: Uses `InheritedWidget` for configuration distribution (no row copying or iteration)
+    * **Horizontal scrolling**: Via `minWidth` property
+    * **Flexible column sizing**: With `flex` and fixed `width` support
+    * **Custom alignment**: `mainAxisAlignment` and `crossAxisAlignment` for headers and cells
+    * **Required header keys**: Headers now require unique `key` property for sorting and column identification
+
+* **CarbonToolbar**
+  * Added comprehensive toolbar component system for data tables:
+    * **CarbonToolbar**: Main container with automatic switching between regular and batch actions
+    * **CarbonToolbarContent**: Wrapper for search, filters, and action buttons
+    * **CarbonToolbarBatchActions**: Batch actions toolbar shown when items are selected
+      * Shows selected count
+      * Cancel button to clear selection
+      * Flexible action buttons for bulk operations
+      * Highlighted background to indicate active state
+    * **CarbonToolbarSearch**: Styled search field component
+      * Search icon prefix
+      * Clear button when text entered
+      * Expandable or fixed width modes
+      * Carbon-styled borders and colors
 
 * **CarbonTabs**
   * Added `CarbonTabs` widget for explicit Carbon Design System tab styling (Line and Contained).

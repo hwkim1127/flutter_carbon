@@ -4,12 +4,12 @@
 
 # Flutter Carbon
 
-A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **50 components** (33 pure Carbon + 17 Material equivalents), 4 theme variants, and seamless Material Design integration.
+A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **51 components** (34 pure Carbon + 17 Material equivalents), 4 theme variants, and seamless Material Design integration.
 
 #### 🔗 [Live Demo](https://hwkim1127.github.io/flutter_carbon/)
 
-**Component Coverage**: 100% Practical Coverage (50 production-ready components)
-> **Note**: We implement 50 out of 60 Carbon components. The 10 omitted components are architectural concepts (like Grid) or better served by standard Flutter widgets, ensuring 100% coverage of practical UI needs.
+**Component Coverage**: 100% Practical Coverage (51 production-ready components)
+> **Note**: We implement 51 out of 60 Carbon components. The 9 omitted components are architectural concepts (like Grid) or better served by standard Flutter widgets, ensuring 100% coverage of practical UI needs.
 
 ## Overview
 
@@ -26,9 +26,9 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - **Motion System**: Duration and easing values for animations
 - **Layering System**: Background, layer, field, and border tokens for proper visual hierarchy
 
-### 🧩 50 Components
+### 🧩 51 Components
 
-#### 33 Pure Carbon Widgets
+#### 34 Pure Carbon Widgets
 
 **Buttons & Actions**
 - `CarbonComboButton` - Split button with primary action and dropdown menu
@@ -61,7 +61,15 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - `CarbonCodeSnippet` - Syntax-highlighted code display (single-line, multi-line, inline)
 - `CarbonContentSwitcher` - Tab-like content switcher
 - `CarbonStructuredList` - Table-like list with selectable rows
-- `CarbonDataTable` - Data table with expandable rows, sorting, and custom column sizing
+- `CarbonDataTable` - Comprehensive data table with:
+  - Expandable/selectable rows (radio or checkbox modes)
+  - Batch selection with select-all
+  - Sortable columns with indicators
+  - Size variants (tall/medium/short/compact)
+  - Zebra striping
+  - Toolbar support
+  - Skeleton loading state
+- `CarbonToolbar` - Toolbar system for data tables (regular actions and batch actions)
 - `CarbonTreeView` - Hierarchical tree with expand/collapse
 - `CarbonLink` - Styled hyperlinks with visited state
 - `CarbonTile` - Clickable/selectable/expandable tiles
@@ -226,22 +234,56 @@ CarbonTabs(
   },
 )
 
-// Data Table
+// Data Table with Toolbar
 CarbonDataTable(
-  headers: [
-    CarbonDataTableHeader(label: 'Name', width: 200),
-    CarbonDataTableHeader(label: 'Status', flex: 1),
-    CarbonDataTableHeader(label: 'Actions', width: 100),
-  ],
-  rows: [
-    CarbonDataTableRow(
-      cells: [
-        CarbonDataTableCell(child: Text('John Doe')),
-        CarbonDataTableCell(child: Text('Active')),
-        CarbonDataTableCell(child: Icon(Icons.more_vert)),
+  title: 'Users',
+  description: 'Manage user accounts',
+  sortable: true,
+  hasSelectableRows: true,
+  batchSelection: true,
+  zebra: true,
+  size: CarbonDataTableSize.medium,
+  toolbar: CarbonToolbar(
+    selectedCount: selectedIds.length,
+    content: CarbonToolbarContent(
+      children: [
+        CarbonToolbarSearch(
+          onChanged: (value) => filterUsers(value),
+        ),
+        ElevatedButton.icon(
+          onPressed: () => addUser(),
+          icon: Icon(CarbonIcons.add),
+          label: Text('Add User'),
+        ),
       ],
     ),
+    batchActions: CarbonToolbarBatchActions(
+      selectedCount: selectedIds.length,
+      onCancel: () => clearSelection(),
+      actions: [
+        TextButton.icon(
+          onPressed: () => deleteSelected(),
+          icon: Icon(CarbonIcons.delete),
+          label: Text('Delete'),
+        ),
+      ],
+    ),
+  ),
+  headers: [
+    CarbonDataTableHeader(key: 'name', label: 'Name'),
+    CarbonDataTableHeader(key: 'status', label: 'Status'),
+    CarbonDataTableHeader(key: 'role', label: 'Role', sortable: false),
   ],
+  rows: users.map((user) => CarbonDataTableRow(
+    cells: [
+      CarbonDataTableCell(child: Text(user.name)),
+      CarbonDataTableCell(child: Text(user.status)),
+      CarbonDataTableCell(child: Text(user.role)),
+    ],
+    selected: selectedIds.contains(user.id),
+    onSelectChanged: (selected) => toggleSelection(user.id, selected),
+    expandedContent: Text('Additional details for ${user.name}'),
+  )).toList(),
 )
 ```
 
@@ -364,7 +406,7 @@ CarbonSpacing.spacing13  // 160px
 
 ## 📱 Example App
 
-A comprehensive example app showcasing all 48 components is included in the `example/` directory. It features:
+A comprehensive example app showcasing all 51 components is included in the `example/` directory. It features:
 
 - **51 demo pages** with interactive examples
 - **All 4 theme variants** with live switching
@@ -404,10 +446,12 @@ lib/
 │   │   ├── typography.dart            # Typography system
 │   │   ├── spacing.dart               # Spacing constants
 │   │   └── motion.dart                # Animation durations
-│   ├── widgets/                       # 31 Custom components
+│   ├── widgets/                       # 34 Custom components
 │   │   ├── carbon_modal.dart
 │   │   ├── carbon_dropdown.dart
 │   │   ├── carbon_tile.dart
+│   │   ├── carbon_data_table.dart
+│   │   ├── carbon_toolbar.dart
 │   │   ├── carbon_multi_select.dart
 │   │   ├── carbon_contained_list.dart
 │   │   ├── carbon_floating_menu.dart
@@ -431,13 +475,13 @@ This implementation follows the official Carbon Design System V11 specifications
 - ✅ Components match Carbon web component behavior
 - ✅ All 4 official themes (White, G10, G90, G100) supported
 - ✅ Spacing, motion, and layering follow Carbon guidelines
-- ✅ 83% component coverage (50/60 components)
+- ✅ 85% component coverage (51/60 components)
 
 **Reference**: https://carbondesignsystem.com/
 
-### Components Not Included (10 - Intentionally Omitted)
+### Components Not Included (9 - Intentionally Omitted)
 
-The remaining ~17% (10/60 components) are **intentionally omitted** for valid reasons. Here's the complete list:
+The remaining ~15% (9/60 components) are **intentionally omitted** for valid reasons. Here's the complete list:
 
 #### 1. Already Covered by Existing Widgets (2)
 - **Copy** - Already implemented as `CarbonCopyButton`
@@ -467,7 +511,7 @@ The remaining ~17% (10/60 components) are **intentionally omitted** for valid re
 - ✅ No duplicate work for components with good Material equivalents
 - ✅ Focus on unique Carbon patterns that need custom implementation
 
-**Bottom Line**: We focus on high-quality, native Flutter implementations. The 10 omitted components are either architectural concepts (Grid, Layer) or are better served by standard Flutter widgets (like `ListView` or `Form`), ensuring **100% coverage of practical UI needs**.
+**Bottom Line**: We focus on high-quality, native Flutter implementations. The 9 omitted components are either architectural concepts (Grid, Layer) or are better served by standard Flutter widgets (like `ListView` or `Form`), ensuring **100% coverage of practical UI needs**.
 
 ## 🤝 Contributing
 
