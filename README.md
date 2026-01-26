@@ -4,12 +4,12 @@
 
 # Flutter Carbon
 
-A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **48 components** (31 pure Carbon + 17 Material equivalents), 4 theme variants, and seamless Material Design integration.
+A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **50 components** (33 pure Carbon + 17 Material equivalents), 4 theme variants, and seamless Material Design integration.
 
 #### 🔗 [Live Demo](https://hwkim1127.github.io/flutter_carbon/)
 
-**Component Coverage**: 100% Practical Coverage (48 production-ready components)
-> **Note**: We implement 48 out of 60 Carbon components. The 12 omitted components are architectural concepts (like Grid) or better served by standard Flutter widgets, ensuring 100% coverage of practical UI needs.
+**Component Coverage**: 100% Practical Coverage (50 production-ready components)
+> **Note**: We implement 50 out of 60 Carbon components. The 10 omitted components are architectural concepts (like Grid) or better served by standard Flutter widgets, ensuring 100% coverage of practical UI needs.
 
 ## Overview
 
@@ -26,9 +26,9 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - **Motion System**: Duration and easing values for animations
 - **Layering System**: Background, layer, field, and border tokens for proper visual hierarchy
 
-### 🧩 48 Components
+### 🧩 50 Components
 
-#### 31 Pure Carbon Widgets
+#### 33 Pure Carbon Widgets
 
 **Buttons & Actions**
 - `CarbonComboButton` - Split button with primary action and dropdown menu
@@ -61,6 +61,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - `CarbonCodeSnippet` - Syntax-highlighted code display (single-line, multi-line, inline)
 - `CarbonContentSwitcher` - Tab-like content switcher
 - `CarbonStructuredList` - Table-like list with selectable rows
+- `CarbonDataTable` - Data table with expandable rows, sorting, and custom column sizing
 - `CarbonTreeView` - Hierarchical tree with expand/collapse
 - `CarbonLink` - Styled hyperlinks with visited state
 - `CarbonTile` - Clickable/selectable/expandable tiles
@@ -222,6 +223,24 @@ CarbonTabs(
   onTabChanged: (index) {
      print('Selected tab: $index');
   },
+)
+
+// Data Table
+CarbonDataTable(
+  headers: [
+    CarbonDataTableHeader(label: 'Name', width: 200),
+    CarbonDataTableHeader(label: 'Status', flex: 1),
+    CarbonDataTableHeader(label: 'Actions', width: 100),
+  ],
+  rows: [
+    CarbonDataTableRow(
+      cells: [
+        CarbonDataTableCell(child: Text('John Doe')),
+        CarbonDataTableCell(child: Text('Active')),
+        CarbonDataTableCell(child: Icon(Icons.more_vert)),
+      ],
+    ),
+  ],
 )
 ```
 
@@ -411,13 +430,13 @@ This implementation follows the official Carbon Design System V11 specifications
 - ✅ Components match Carbon web component behavior
 - ✅ All 4 official themes (White, G10, G90, G100) supported
 - ✅ Spacing, motion, and layering follow Carbon guidelines
-- ✅ 80% component coverage (48/60 components)
+- ✅ 83% component coverage (50/60 components)
 
 **Reference**: https://carbondesignsystem.com/
 
-### Components Not Included (12 - Intentionally Omitted)
+### Components Not Included (10 - Intentionally Omitted)
 
-The remaining 20% (12/60 components) are **intentionally omitted** for valid reasons. Here's the complete list:
+The remaining ~17% (10/60 components) are **intentionally omitted** for valid reasons. Here's the complete list:
 
 #### 1. Already Covered by Existing Widgets (2)
 - **Copy** - Already implemented as `CarbonCopyButton`
@@ -447,7 +466,7 @@ The remaining 20% (12/60 components) are **intentionally omitted** for valid rea
 - ✅ No duplicate work for components with good Material equivalents
 - ✅ Focus on unique Carbon patterns that need custom implementation
 
-**Bottom Line**: We focus on high-quality, native Flutter implementations. The 12 omitted components are either architectural concepts (Grid, Layer) or are better served by standard Flutter widgets (like `ListView` or `Form`), ensuring **100% coverage of practical UI needs**.
+**Bottom Line**: We focus on high-quality, native Flutter implementations. The 10 omitted components are either architectural concepts (Grid, Layer) or are better served by standard Flutter widgets (like `ListView` or `Form`), ensuring **100% coverage of practical UI needs**.
 
 ## 🤝 Contributing
 
