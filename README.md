@@ -220,6 +220,7 @@ CarbonTabs(
     CarbonTab(label: 'Tab 3', disabled: true),
   ],
   type: CarbonTabsType.contained, // or CarbonTabsType.line
+  extendLine: true, // optional: extends bottom border to full width (Line type only)
   onTabChanged: (index) {
      print('Selected tab: $index');
   },

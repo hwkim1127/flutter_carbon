@@ -20,6 +20,8 @@
 
 * **CarbonTabs**
   * Added `CarbonTabs` widget for explicit Carbon Design System tab styling (Line and Contained).
+  * Added `extendLine` parameter to extend the bottom border across the full width (Line type only).
+  * Added auto-scroll behavior to center the selected tab when it changes.
 
 
 ### Component Updates

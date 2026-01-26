@@ -56,6 +56,9 @@ class CarbonTabs extends StatefulWidget {
   /// Whether to expand tabs to fill the available width.
   final bool scrollable;
 
+  /// Whether to extend the bottom border line to the full width (Line type only).
+  final bool extendLine;
+
   const CarbonTabs({
     super.key,
     required this.tabs,
@@ -63,7 +66,9 @@ class CarbonTabs extends StatefulWidget {
     this.onTabChanged,
     this.type = CarbonTabsType.line,
     this.scrollable = true,
-  });
+    this.extendLine = false,
+  }) : assert(!extendLine || type == CarbonTabsType.line,
+            'extendLine can only be used with CarbonTabsType.line');
 
   @override
   State<CarbonTabs> createState() => _CarbonTabsState();
@@ -72,22 +77,38 @@ class CarbonTabs extends StatefulWidget {
 class _CarbonTabsState extends State<CarbonTabs> {
   late int _selectedIndex;
   final ScrollController _scrollController = ScrollController();
+  List<GlobalKey> _tabKeys = [];
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+    _generateKeys();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToIndex(_selectedIndex);
+    });
   }
 
   @override
   void didUpdateWidget(CarbonTabs oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.tabs.length != oldWidget.tabs.length) {
+      _generateKeys();
+    }
+
     if (widget.initialIndex != oldWidget.initialIndex &&
         widget.initialIndex != _selectedIndex) {
       setState(() {
         _selectedIndex = widget.initialIndex;
       });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToIndex(_selectedIndex);
+      });
     }
+  }
+
+  void _generateKeys() {
+    _tabKeys = List.generate(widget.tabs.length, (_) => GlobalKey());
   }
 
   void _handleTabTap(int index) {
@@ -98,12 +119,30 @@ class _CarbonTabsState extends State<CarbonTabs> {
         _selectedIndex = index;
       });
       widget.onTabChanged?.call(index);
+      _scrollToIndex(index);
+    }
+  }
+
+  void _scrollToIndex(int index) {
+    if (!widget.scrollable || index >= _tabKeys.length) return;
+
+    final key = _tabKeys[index];
+    final context = key.currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        alignment: 0.5, // Center the item
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    final carbon = context.carbon;
+
+    Widget content = SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       controller: _scrollController,
       child: IntrinsicHeight(
@@ -114,17 +153,37 @@ class _CarbonTabsState extends State<CarbonTabs> {
             final isSelected = index == _selectedIndex;
 
             return _CarbonTabItem(
+              key: _tabKeys[index],
               label: tab.label,
               icon: tab.icon,
               disabled: tab.disabled,
               selected: isSelected,
               type: widget.type,
+              extendLine: widget.extendLine,
               onTap: () => _handleTabTap(index),
             );
           }),
         ),
       ),
     );
+
+    // If extendLine is true and type is line, wrap in a Stack with a bottom border line
+    if (widget.extendLine && widget.type == CarbonTabsType.line) {
+      content = Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: carbon.layer.borderSubtle01,
+              width: 1.0,
+            ),
+          ),
+        ),
+        child: content,
+      );
+    }
+
+    return content;
   }
 }
 
@@ -134,16 +193,20 @@ class _CarbonTabItem extends StatefulWidget {
   final bool disabled;
   final bool selected;
   final CarbonTabsType type;
+  final bool extendLine;
   final VoidCallback onTap;
 
   const _CarbonTabItem({
+    super.key,
     required this.label,
     required this.icon,
     required this.disabled,
     required this.selected,
     required this.type,
+    this.extendLine = false,
     required this.onTap,
-  });
+  }) : assert(!extendLine || type == CarbonTabsType.line,
+            'extendLine can only be used with CarbonTabsType.line');
 
   @override
   State<_CarbonTabItem> createState() => _CarbonTabItemState();
@@ -189,7 +252,9 @@ class _CarbonTabItemState extends State<_CarbonTabItem> {
       // Line Tabs (Default)
       if (widget.disabled) {
         textColor = carbon.text.textDisabled;
-        borderColor = carbon.text.textDisabled; // Or specific disabled border
+        if (!widget.extendLine) {
+          borderColor = carbon.text.textDisabled; // Or specific disabled border
+        }
       } else if (widget.selected) {
         textColor = carbon.text.textPrimary;
         borderColor = carbon.button.buttonPrimary;
@@ -221,12 +286,14 @@ class _CarbonTabItemState extends State<_CarbonTabItem> {
           decoration: BoxDecoration(
             color: backgroundColor,
             border: widget.type == CarbonTabsType.line
-                ? Border(
-                    bottom: BorderSide(
-                      color: borderColor,
-                      width: borderThickness,
-                    ),
-                  )
+                ? (widget.selected || !widget.extendLine)
+                    ? Border(
+                        bottom: BorderSide(
+                          color: borderColor,
+                          width: borderThickness,
+                        ),
+                      )
+                    : null
                 : null, // Contained styles handled differently if complex
           ),
           child: Stack(
