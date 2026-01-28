@@ -69,6 +69,9 @@ class CarbonTile extends StatefulWidget {
   /// Padding inside the tile.
   final EdgeInsetsGeometry? padding;
 
+  /// Optional custom background color. If not provided, uses theme default.
+  final Color? backgroundColor;
+
   const CarbonTile({
     super.key,
     required this.child,
@@ -85,6 +88,7 @@ class CarbonTile extends StatefulWidget {
     this.subtitle,
     this.disabled = false,
     this.padding,
+    this.backgroundColor,
   });
 
   /// Creates a clickable tile.
@@ -98,6 +102,7 @@ class CarbonTile extends StatefulWidget {
     String? subtitle,
     bool disabled = false,
     EdgeInsetsGeometry? padding,
+    Color? backgroundColor,
   }) {
     return CarbonTile(
       key: key,
@@ -109,6 +114,7 @@ class CarbonTile extends StatefulWidget {
       subtitle: subtitle,
       disabled: disabled,
       padding: padding,
+      backgroundColor: backgroundColor,
       child: child,
     );
   }
@@ -124,6 +130,7 @@ class CarbonTile extends StatefulWidget {
     String? subtitle,
     bool disabled = false,
     EdgeInsetsGeometry? padding,
+    Color? backgroundColor,
   }) {
     return CarbonTile(
       key: key,
@@ -135,6 +142,7 @@ class CarbonTile extends StatefulWidget {
       subtitle: subtitle,
       disabled: disabled,
       padding: padding,
+      backgroundColor: backgroundColor,
       child: child,
     );
   }
@@ -151,6 +159,7 @@ class CarbonTile extends StatefulWidget {
     String? subtitle,
     bool disabled = false,
     EdgeInsetsGeometry? padding,
+    Color? backgroundColor,
   }) {
     return CarbonTile(
       key: key,
@@ -163,6 +172,7 @@ class CarbonTile extends StatefulWidget {
       subtitle: subtitle,
       disabled: disabled,
       padding: padding,
+      backgroundColor: backgroundColor,
       child: child,
     );
   }
@@ -178,6 +188,11 @@ class _CarbonTileState extends State<CarbonTile> {
       widget.kind != CarbonTileKind.base && !widget.disabled;
 
   Color _getBackgroundColor(CarbonThemeData carbon) {
+    // If custom backgroundColor is provided, use it
+    if (widget.backgroundColor != null) {
+      return widget.backgroundColor!;
+    }
+
     final theme = CarbonTileThemeData(
       background: carbon.layer.layer01,
       backgroundHover: carbon.layer.layerHover01,

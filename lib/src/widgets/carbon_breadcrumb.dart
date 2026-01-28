@@ -63,7 +63,7 @@ class CarbonBreadcrumb extends StatelessWidget {
     super.key,
     required this.items,
     this.size = CarbonBreadcrumbSize.medium,
-    this.noTrailingSlash = false,
+    this.noTrailingSlash = true,
   }) : assert(items.length >= 1, 'Breadcrumb must have at least 1 item');
 
   @override

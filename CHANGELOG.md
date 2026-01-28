@@ -60,8 +60,16 @@
   * Added `size` property to support `normal` (default) and `condensed` sizes.
   * Added custom alignment support (`mainAxisAlignment`, `crossAxisAlignment`) for headers and cells.
 
+* **CarbonBreadcrumb**
+  * Fixed default behavior to omit trailing slash after the last item (`noTrailingSlash` now defaults to `true`).
+
 * **CarbonContentSwitcher**
+  * Fixed `G10` theme visibility issue where selected text was white on white background (changed text color to `gray100`).
+  * Fixed `G10` theme border visibility issue (changed divider color to `gray30`).
   * Updated to support generic value types (previously restricted to `String`).
+
+* **CarbonTile**
+  * Added optional `backgroundColor` parameter to allow custom background color override.
 
 * **CarbonToggle**
   * Enhanced `CarbonToggle`:

@@ -6,8 +6,8 @@ class G10ContentSwitcherThemeData extends CarbonContentSwitcherThemeData {
   const G10ContentSwitcherThemeData()
       : super(
           contentSwitcherSelected: CarbonPalette.white,
-          contentSwitcherDivider: CarbonPalette.white,
-          contentSwitcherTextOnColor: CarbonPalette.white,
+          contentSwitcherDivider: CarbonPalette.gray30,
+          contentSwitcherTextOnColor: CarbonPalette.gray100,
           contentSwitcherBackground: CarbonPalette.gray20,
           contentSwitcherBackgroundHover: CarbonPalette.gray20Hover,
         );

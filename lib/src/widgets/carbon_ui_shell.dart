@@ -478,9 +478,11 @@ class _SideNavItemState extends State<_SideNavItem> {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = _isHovered
+    final backgroundColor = widget.item.isSelected
         ? widget.theme.sideNavItemBackgroundHover
-        : widget.theme.sideNavItemBackground;
+        : _isHovered
+            ? widget.theme.sideNavItemBackgroundHover
+            : widget.theme.sideNavItemBackground;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
