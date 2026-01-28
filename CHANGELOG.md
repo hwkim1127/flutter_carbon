@@ -108,6 +108,9 @@
     * Added vertical dividers between sections.
   * Updated visual spacing and alignment for compact appearance.
 
+* **CarbonTearsheet**
+  * Added responsive width logic: Automatically adapts to screen width on smaller devices (e.g., mobile) while respecting the maximum width defined by `CarbonTearsheetWidth` (narrow/wide).
+
 
 ## 1.0.1+1
 

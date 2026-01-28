@@ -78,6 +78,10 @@ class CarbonUIShell extends StatefulWidget {
   /// Whether the right panel is initially open.
   final bool initialRightPanelOpen;
 
+  /// Whether the right panel is open. When provided, this overrides the internal state
+  /// and allows external control of the right panel visibility.
+  final bool? rightPanelOpen;
+
   /// Callback when side nav expand state changes.
   final ValueChanged<bool>? onSideNavExpandedChanged;
 
@@ -100,6 +104,7 @@ class CarbonUIShell extends StatefulWidget {
     this.headerActions,
     this.rightPanel,
     this.initialRightPanelOpen = false,
+    this.rightPanelOpen,
     this.onSideNavExpandedChanged,
     this.onHeaderNavItemTap,
     this.onSideNavItemTap,
@@ -119,6 +124,18 @@ class _CarbonUIShellState extends State<CarbonUIShell> {
     super.initState();
     _sideNavExpanded = widget.initialSideNavExpanded;
     _rightPanelOpen = widget.initialRightPanelOpen;
+  }
+
+  @override
+  void didUpdateWidget(CarbonUIShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Sync internal state with external rightPanelOpen control
+    if (widget.rightPanelOpen != null &&
+        widget.rightPanelOpen != oldWidget.rightPanelOpen) {
+      setState(() {
+        _rightPanelOpen = widget.rightPanelOpen!;
+      });
+    }
   }
 
   void _toggleSideNav() {
@@ -192,7 +209,8 @@ class _CarbonUIShellState extends State<CarbonUIShell> {
                     onItemTap: widget.onSideNavItemTap,
                   ),
                 Expanded(child: widget.child),
-                if (widget.rightPanel != null && _rightPanelOpen)
+                if (widget.rightPanel != null &&
+                    (widget.rightPanelOpen ?? _rightPanelOpen))
                   _RightPanel(
                     onClose: _toggleRightPanel,
                     theme: carbon.uiShell,

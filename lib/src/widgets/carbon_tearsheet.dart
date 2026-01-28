@@ -164,6 +164,11 @@ class CarbonTearsheet extends StatelessWidget {
     final isWide = width == CarbonTearsheetWidth.wide;
     final hasInfluencer = influencer != null && isWide;
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final targetWidth = isWide ? 960.0 : 512.0;
+    final effectiveWidth =
+        screenWidth < targetWidth ? screenWidth : targetWidth;
+
     return Material(
       color: tearsheetTheme.background,
       elevation: 16,
@@ -172,7 +177,7 @@ class CarbonTearsheet extends StatelessWidget {
         topRight: Radius.circular(0),
       ),
       child: SizedBox(
-        width: isWide ? 960 : 512,
+        width: effectiveWidth,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -427,6 +432,8 @@ class _CarbonTearsheetRoute<T> extends PageRoute<T> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -435,19 +442,23 @@ class _CarbonTearsheetRoute<T> extends PageRoute<T> {
           child: Column(
             children: [
               const Spacer(),
-              CarbonTearsheet(
-                title: title,
-                description: description,
-                label: label,
-                width: width,
-                showCloseButton: showCloseButton,
-                actions: actions,
-                headerActions: headerActions,
-                headerNavigation: headerNavigation,
-                influencer: influencer,
-                influencerPlacement: influencerPlacement,
-                influencerWidth: influencerWidth,
-                child: builder(context),
+              ConstrainedBox(
+                // Limit to 90% of screen height
+                constraints: BoxConstraints(maxHeight: screenHeight * 0.9),
+                child: CarbonTearsheet(
+                  title: title,
+                  description: description,
+                  label: label,
+                  width: width,
+                  showCloseButton: showCloseButton,
+                  actions: actions,
+                  headerActions: headerActions,
+                  headerNavigation: headerNavigation,
+                  influencer: influencer,
+                  influencerPlacement: influencerPlacement,
+                  influencerWidth: influencerWidth,
+                  child: builder(context),
+                ),
               ),
             ],
           ),
