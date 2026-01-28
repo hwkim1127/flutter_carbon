@@ -116,6 +116,16 @@ class CarbonToolbarBatchActions extends StatelessWidget {
   /// Callback when "Select all" button is pressed.
   final VoidCallback? onSelectAll;
 
+  /// Label generator for "Select all" button.
+  ///
+  /// Defaults to "Select all (N)".
+  final String Function(int total)? selectAllLabel;
+
+  /// Label for the cancel button.
+  ///
+  /// Defaults to "Cancel".
+  final String? cancelLabel;
+
   /// Formatter for selected items count.
   ///
   /// Defaults to "X item" or "X items" depending on count.
@@ -128,6 +138,8 @@ class CarbonToolbarBatchActions extends StatelessWidget {
     this.onCancel,
     this.totalRowsCount,
     this.onSelectAll,
+    this.selectAllLabel,
+    this.cancelLabel,
     this.formatSelectedItemsCount,
   });
 
@@ -141,7 +153,7 @@ class CarbonToolbarBatchActions extends StatelessWidget {
     return Container(
       constraints: const BoxConstraints(minHeight: 48),
       color: carbon.layer.backgroundBrand,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.only(left: 16),
       child: Row(
         children: [
           // Batch summary
@@ -182,7 +194,8 @@ class CarbonToolbarBatchActions extends StatelessWidget {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     child: Text(
-                      'Select all ($totalRowsCount)',
+                      selectAllLabel?.call(totalRowsCount!) ??
+                          'Select all ($totalRowsCount)',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -202,13 +215,13 @@ class CarbonToolbarBatchActions extends StatelessWidget {
               for (int i = 0; i < actions.length; i++) ...[
                 actions[i],
               ],
-
               // Cancel button with divider
               if (onCancel != null) ...[
                 const SizedBox(width: 1),
                 _CancelButton(
                   onPressed: onCancel!,
                   textColor: carbon.text.textOnColor,
+                  label: cancelLabel,
                 ),
               ],
             ],
@@ -223,10 +236,12 @@ class CarbonToolbarBatchActions extends StatelessWidget {
 class _CancelButton extends StatefulWidget {
   final VoidCallback onPressed;
   final Color textColor;
+  final String? label;
 
   const _CancelButton({
     required this.onPressed,
     required this.textColor,
+    this.label,
   });
 
   @override
@@ -234,55 +249,42 @@ class _CancelButton extends StatefulWidget {
 }
 
 class _CancelButtonState extends State<_CancelButton> {
-  bool _isHovered = false;
-
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Divider
-          if (!_isHovered)
-            Positioned(
-              left: 0,
-              top: 15,
-              bottom: 15,
-              child: Container(
-                width: 1,
-                color: widget.textColor,
-              ),
-            ),
-          // Button
-          Container(
-            height: 48,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Center(
-              child: TextButton(
-                onPressed: widget.onPressed,
-                style: TextButton.styleFrom(
-                  foregroundColor: widget.textColor,
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: widget.textColor,
-                    height: 1.29,
-                    letterSpacing: 0.16,
-                  ),
-                ),
-              ),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // Divider (always visible)
+        Positioned(
+          left: 0,
+          top: 15,
+          bottom: 15,
+          child: Container(
+            width: 1,
+            color: widget.textColor,
+          ),
+        ),
+        // Button
+        TextButton(
+          onPressed: widget.onPressed,
+          style: TextButton.styleFrom(
+            foregroundColor: widget.textColor,
+            // padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            // tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            widget.label ?? 'Cancel',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: widget.textColor,
+              height: 1.29,
+              letterSpacing: 0.16,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

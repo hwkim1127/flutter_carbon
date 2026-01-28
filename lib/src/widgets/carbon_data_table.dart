@@ -179,7 +179,8 @@ class CarbonDataTable extends StatefulWidget {
   /// 1. Updating [sortKey] and [sortDirection]
   /// 2. Sorting the [rows] data
   /// 3. Rebuilding the table with sorted data
-  final void Function(String key, CarbonDataTableSortDirection direction)? onSort;
+  final void Function(String key, CarbonDataTableSortDirection direction)?
+      onSort;
 
   /// Whether to apply zebra striping to rows.
   ///
@@ -244,8 +245,7 @@ class CarbonDataTable extends StatefulWidget {
     this.skeleton = false,
     this.skeletonRowCount = 5,
   })  : assert(
-          hasExpandableRows ||
-              !rows.any((row) => row.expandedContent != null),
+          hasExpandableRows || !rows.any((row) => row.expandedContent != null),
           'Cannot have rows with expandedContent when hasExpandableRows is false. '
           'Set hasExpandableRows: true on CarbonDataTable to enable expandable rows.',
         ),
@@ -421,8 +421,10 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
       }
     }
 
-    final bool allSelected = selectableCount > 0 && selectedCount == selectableCount;
-    final bool someSelected = selectedCount > 0 && selectedCount < selectableCount;
+    final bool allSelected =
+        selectableCount > 0 && selectedCount == selectableCount;
+    final bool someSelected =
+        selectedCount > 0 && selectedCount < selectableCount;
 
     return Container(
       height: widget.size.headerHeight,
@@ -440,7 +442,9 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
       child: Row(
         children: [
           // Batch selection checkbox in header
-          if (widget.hasSelectableRows && widget.batchSelection && !widget.radio)
+          if (widget.hasSelectableRows &&
+              widget.batchSelection &&
+              !widget.radio)
             GestureDetector(
               onTap: widget.onSelectAll != null
                   ? () => widget.onSelectAll!(!allSelected)
@@ -455,9 +459,8 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
                     tristate: true,
                     onChanged: widget.onSelectAll != null
                         ? (value) {
-                            // If indeterminate (null) or unchecked (false), select all
-                            // If checked (true), deselect all
-                            widget.onSelectAll!(value != true);
+                            // If fully selected, deselect all. Otherwise, select all.
+                            widget.onSelectAll!(!allSelected);
                           }
                         : null,
                   ),
@@ -472,17 +475,18 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
           if (widget.hasExpandableRows) const SizedBox(width: 48),
 
           // Build header cells efficiently
-          for (final header in widget.headers)
-            _buildHeaderCell(header, carbon),
+          for (final header in widget.headers) _buildHeaderCell(header, carbon),
         ],
       ),
     );
   }
 
-  Widget _buildHeaderCell(CarbonDataTableHeader header, CarbonThemeData carbon) {
+  Widget _buildHeaderCell(
+      CarbonDataTableHeader header, CarbonThemeData carbon) {
     final bool isSortable = widget.sortable && header.sortable;
     final bool isSorted = widget.sortKey == header.key;
-    final sortDirection = isSorted ? widget.sortDirection : CarbonDataTableSortDirection.none;
+    final sortDirection =
+        isSorted ? widget.sortDirection : CarbonDataTableSortDirection.none;
 
     Widget headerContent = Row(
       mainAxisAlignment: header.mainAxisAlignment,
@@ -735,8 +739,7 @@ class _CarbonDataTableConfig extends InheritedWidget {
   });
 
   static _CarbonDataTableConfig? maybeOf(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<_CarbonDataTableConfig>();
+    return context.dependOnInheritedWidgetOfExactType<_CarbonDataTableConfig>();
   }
 
   static _CarbonDataTableConfig of(BuildContext context) {
@@ -1140,7 +1143,8 @@ class _CustomRadioButton extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: selected ? effectiveColor : effectiveColor.withValues(alpha: 0.5),
+          color:
+              selected ? effectiveColor : effectiveColor.withValues(alpha: 0.5),
           width: selected ? 2 : 1.5,
         ),
         color: selected ? Colors.transparent : Colors.transparent,
