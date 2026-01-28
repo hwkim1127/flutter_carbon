@@ -273,17 +273,11 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     return MouseRegion(
       onEnter: (_) {
         if (item.enabled && mounted) {
-          setState(() {
-            _highlightedValue = item.value;
-          });
+          setState(() => _highlightedValue = item.value);
         }
       },
       child: GestureDetector(
-        onTap: item.enabled
-            ? () {
-                _selectItem(item.value);
-              }
-            : null,
+        onTap: item.enabled ? () => _selectItem(item.value) : null,
         child: Container(
           height: widget.size == CarbonDropdownSize.small
               ? 32
