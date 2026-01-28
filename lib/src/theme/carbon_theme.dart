@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../foundation/layout.dart';
 import 'carbon_theme_data.dart';
 
 /// Extensions to access [CarbonThemeData] from the [BuildContext].
@@ -234,6 +235,7 @@ ThemeData carbonTheme({
     // Icon Button
     iconButtonTheme: IconButtonThemeData(
       style: ButtonStyle(
+        iconSize: WidgetStateProperty.all(CarbonIconSizes.iconSize01),
         foregroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
             return carbon.text.textDisabled;
@@ -364,8 +366,14 @@ ThemeData carbonTheme({
       backgroundColor: carbon.layer.background,
       foregroundColor: carbon.text.textPrimary,
       elevation: 0,
-      iconTheme: IconThemeData(color: carbon.text.iconPrimary),
-      actionsIconTheme: IconThemeData(color: carbon.text.iconPrimary),
+      iconTheme: IconThemeData(
+        color: carbon.text.iconPrimary,
+        size: CarbonIconSizes.iconSize01,
+      ),
+      actionsIconTheme: IconThemeData(
+        color: carbon.text.iconPrimary,
+        size: CarbonIconSizes.iconSize01,
+      ),
       centerTitle: false,
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -380,9 +388,15 @@ ThemeData carbonTheme({
       indicatorColor: carbon.layer.layerSelected01,
       iconTheme: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return IconThemeData(color: carbon.button.buttonPrimary);
+          return IconThemeData(
+            color: carbon.button.buttonPrimary,
+            size: CarbonIconSizes.iconSize01,
+          );
         }
-        return IconThemeData(color: carbon.text.textSecondary);
+        return IconThemeData(
+          color: carbon.text.textSecondary,
+          size: CarbonIconSizes.iconSize01,
+        );
       }),
     ),
     bottomAppBarTheme: BottomAppBarThemeData(
@@ -401,8 +415,14 @@ ThemeData carbonTheme({
     ),
     navigationRailTheme: NavigationRailThemeData(
       backgroundColor: carbon.layer.layer01,
-      selectedIconTheme: IconThemeData(color: carbon.button.buttonPrimary),
-      unselectedIconTheme: IconThemeData(color: carbon.text.textSecondary),
+      selectedIconTheme: IconThemeData(
+        color: carbon.button.buttonPrimary,
+        size: CarbonIconSizes.iconSize01,
+      ),
+      unselectedIconTheme: IconThemeData(
+        color: carbon.text.textSecondary,
+        size: CarbonIconSizes.iconSize01,
+      ),
       selectedLabelTextStyle: TextStyle(color: carbon.button.buttonPrimary),
       unselectedLabelTextStyle: TextStyle(color: carbon.text.textSecondary),
       indicatorColor: carbon.layer.layerSelected01,
@@ -418,9 +438,15 @@ ThemeData carbonTheme({
       indicatorColor: carbon.layer.layerSelected01,
       iconTheme: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return IconThemeData(color: carbon.button.buttonPrimary);
+          return IconThemeData(
+            color: carbon.button.buttonPrimary,
+            size: CarbonIconSizes.iconSize01,
+          );
         }
-        return IconThemeData(color: carbon.text.textSecondary);
+        return IconThemeData(
+          color: carbon.text.textSecondary,
+          size: CarbonIconSizes.iconSize01,
+        );
       }),
     ),
 
@@ -540,14 +566,32 @@ ThemeData carbonTheme({
       minVerticalPadding: 0,
       minLeadingWidth: 0,
     ),
-    iconTheme: IconThemeData(color: carbon.text.iconPrimary),
-    actionIconTheme: ActionIconThemeData(
-      backButtonIconBuilder: (context) => const Icon(Icons.arrow_back),
-      closeButtonIconBuilder: (context) => const Icon(Icons.close),
-      drawerButtonIconBuilder: (context) => const Icon(Icons.menu),
-      endDrawerButtonIconBuilder: (context) => const Icon(Icons.menu),
+    iconTheme: IconThemeData(
+      color: carbon.text.iconPrimary,
+      size: CarbonIconSizes.iconSize01,
     ),
-    primaryIconTheme: IconThemeData(color: carbon.text.iconPrimary),
+    actionIconTheme: ActionIconThemeData(
+      backButtonIconBuilder: (context) => const Icon(
+        Icons.arrow_back,
+        size: CarbonIconSizes.iconSize01,
+      ),
+      closeButtonIconBuilder: (context) => const Icon(
+        Icons.close,
+        size: CarbonIconSizes.iconSize01,
+      ),
+      drawerButtonIconBuilder: (context) => const Icon(
+        Icons.menu,
+        size: CarbonIconSizes.iconSize01,
+      ),
+      endDrawerButtonIconBuilder: (context) => const Icon(
+        Icons.menu,
+        size: CarbonIconSizes.iconSize01,
+      ),
+    ),
+    primaryIconTheme: IconThemeData(
+      color: carbon.text.iconPrimary,
+      size: CarbonIconSizes.iconSize01,
+    ),
 
     // Menus
     popupMenuTheme: PopupMenuThemeData(

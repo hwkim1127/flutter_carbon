@@ -7,7 +7,18 @@
 
 
 ### New Features
-
+ 
+* **Foundation & Theme Updates**
+  * Standardized icon sizes across all components using `CarbonIconSizes` tokens.
+  * Added `CarbonIconSizes.iconSize03` (24px) and `CarbonIconSizes.iconSize04` (32px) constants.
+  * Set default icon size to 16px (`iconSize01`) for:
+    * `IconThemeData` (global default)
+    * `IconButtonThemeData`
+    * `AppBarTheme` (back and action icons)
+    * `NavigationBarTheme`
+    * `NavigationRailTheme`
+    * `NavigationDrawerTheme`
+ 
 * **CarbonDataTable**
   * Added `CarbonDataTable` widget with comprehensive features following Carbon Design System specifications:
     * **Expandable rows**: Supports custom expandable content with chevron indicators

@@ -100,11 +100,17 @@ class CarbonSizes {
 class CarbonIconSizes {
   const CarbonIconSizes._();
 
-  /// 16px (1rem)
+  /// Extra small icon size: 16px (1rem)
   static const double iconSize01 = 16.0;
 
-  /// 20px (1.25rem)
+  /// Small icon size: 20px (1.25rem)
   static const double iconSize02 = 20.0;
+
+  /// Medium icon size: 24px (1.5rem)
+  static const double iconSize03 = 24.0;
+
+  /// Large icon size: 32px (2rem)
+  static const double iconSize04 = 32.0;
 }
 
 /// Carbon Design System Breakpoints and Grid System.
