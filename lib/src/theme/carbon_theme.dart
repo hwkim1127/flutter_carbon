@@ -235,6 +235,7 @@ ThemeData carbonTheme({
     // Icon Button
     iconButtonTheme: IconButtonThemeData(
       style: ButtonStyle(
+        visualDensity: VisualDensity.compact,
         iconSize: WidgetStateProperty.all(CarbonIconSizes.iconSize01),
         foregroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
@@ -258,6 +259,8 @@ ThemeData carbonTheme({
       }),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       side: BorderSide(color: carbon.text.textSecondary, width: 1),
+      visualDensity: VisualDensity(vertical: -4.0, horizontal: -4.0),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     ),
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith((states) {
@@ -266,6 +269,8 @@ ThemeData carbonTheme({
         }
         return carbon.button.buttonPrimary;
       }),
+      visualDensity: VisualDensity(vertical: -4.0, horizontal: -4.0),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     ),
     // Switch/Toggle - Following Carbon Design System toggle specs
     // ON state: Primary color track, white thumb
@@ -321,6 +326,7 @@ ThemeData carbonTheme({
     // 1. Default/Outlined: transparent background with bottom border (this one)
     // 2. Filled: filled background with full border (use InputDecoration.filled explicitly)
     inputDecorationTheme: InputDecorationTheme(
+      isDense: true,
       filled: false, // Default is outlined/underline style
       fillColor: Colors.transparent,
 
@@ -532,18 +538,27 @@ ThemeData carbonTheme({
       alignment: AlignmentDirectional.topEnd,
       offset: const Offset(8, 8),
     ),
-
     // Content Themes
+    // Note: ChipTheme is mapped to Carbon Tag component
+    // Carbon Tags are pill-shaped with specific sizing and colors
     chipTheme: ChipThemeData(
-      backgroundColor: carbon.layer.layer01,
+      backgroundColor: carbon.layer.layerAccent01,
       disabledColor: carbon.layer.layerSelectedDisabled,
       selectedColor: carbon.layer.layerSelected01,
       secondarySelectedColor: carbon.layer.layerSelected01,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      labelStyle: TextStyle(color: carbon.text.textPrimary),
-      secondaryLabelStyle: TextStyle(color: carbon.text.textPrimary),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: -4.0),
+      labelStyle: TextStyle(
+        color: carbon.text.textPrimary,
+        fontSize: 12,
+        letterSpacing: 0.32,
+      ),
+      secondaryLabelStyle: TextStyle(
+        color: carbon.text.textPrimary,
+        fontSize: 12,
+        letterSpacing: 0.32,
+      ),
       brightness: Brightness.light,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      shape: const StadiumBorder(),
     ),
     dataTableTheme: DataTableThemeData(
       headingRowColor: WidgetStateProperty.all(carbon.layer.layer01),
@@ -618,6 +633,7 @@ ThemeData carbonTheme({
     dropdownMenuTheme: DropdownMenuThemeData(
       textStyle: TextStyle(color: carbon.text.textPrimary, fontSize: 14),
       inputDecorationTheme: InputDecorationTheme(
+        isDense: true,
         filled: true,
         fillColor: carbon.layer.field01,
         contentPadding: const EdgeInsets.symmetric(
@@ -901,6 +917,7 @@ class CarbonInputDecorationHelper {
     final carbon = context.carbon;
 
     return InputDecoration(
+      isDense: true,
       labelText: labelText,
       hintText: hintText,
       helperText: helperText,
@@ -966,6 +983,7 @@ class CarbonInputDecorationHelper {
     final carbon = context.carbon;
 
     return InputDecoration(
+      isDense: true,
       labelText: labelText,
       hintText: hintText,
       helperText: helperText,
@@ -1042,6 +1060,7 @@ class CarbonInputDecorationHelper {
     final carbon = context.carbon;
 
     return InputDecoration(
+      isDense: true,
       labelText: labelText,
       hintText: hintText,
       errorText: errorText,

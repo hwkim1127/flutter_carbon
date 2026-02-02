@@ -9,6 +9,9 @@
 ### New Features
  
 * **Foundation & Theme Updates**
+  * Updated `CheckboxThemeData` and `RadioThemeData` to use `VisualDensity(vertical: -4.0, horizontal: -4.0)` and `MaterialTapTargetSize.shrinkWrap` for better Carbon compliance.
+  * Updated `ChipThemeData` to use `StadiumBorder` (pill shape) and adjusted `labelPadding` (with negative vertical values) to achieve compact Carbon Tag sizing.
+  * Added `isDense: true` to global `InputDecorationTheme` to prevent excessive height in text fields.
   * Standardized icon sizes across all components using `CarbonIconSizes` tokens.
   * Added `CarbonIconSizes.iconSize03` (24px) and `CarbonIconSizes.iconSize04` (32px) constants.
   * Set default icon size to 16px (`iconSize01`) for:

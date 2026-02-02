@@ -77,7 +77,6 @@ class CarbonToolbarContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(minHeight: 48),
-      // padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: children,
@@ -409,6 +408,7 @@ class _CarbonToolbarSearchState extends State<CarbonToolbarSearch> {
         onChanged: widget.onChanged,
         onSubmitted: widget.onSubmitted,
         decoration: InputDecoration(
+          isCollapsed: true,
           hintText: widget.placeholder,
           hintStyle: TextStyle(
             color: carbon.text.textPlaceholder,
