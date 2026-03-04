@@ -7,6 +7,7 @@ export 'src/theme/carbon_theme.dart';
 export 'src/theme/carbon_theme_data.dart';
 
 // Widgets
+export 'src/widgets/carbon_button.dart';
 export 'src/widgets/carbon_skeleton.dart';
 export 'src/widgets/carbon_combo_box.dart';
 export 'src/widgets/carbon_copy_button.dart';

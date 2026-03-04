@@ -7,7 +7,7 @@
 
 
 ### New Features
- 
+
 * **Foundation & Theme Updates**
   * Updated `CheckboxThemeData` and `RadioThemeData` to use `VisualDensity(vertical: -4.0, horizontal: -4.0)` and `MaterialTapTargetSize.shrinkWrap` for better Carbon compliance.
   * Updated `ChipThemeData` to use `StadiumBorder` (pill shape) and adjusted `labelPadding` (with negative vertical values) to achieve compact Carbon Tag sizing.
@@ -21,6 +21,24 @@
     * `NavigationBarTheme`
     * `NavigationRailTheme`
     * `NavigationDrawerTheme`
+
+* **CarbonButton**
+  * Added `CarbonButton` widget following Carbon Design System button specifications:
+    * **Seven kind variants** via `CarbonButtonKind` enum:
+      * `primary` — filled, for primary actions
+      * `secondary` — filled, for secondary actions
+      * `tertiary` — outlined, for less-prominent actions
+      * `ghost` — transparent, for low-emphasis actions
+      * `danger` — filled red, for destructive primary actions
+      * `dangerTertiary` — outlined red, for destructive secondary actions
+      * `dangerGhost` — transparent red, for destructive ghost actions
+    * **Five size variants** via `CarbonButtonSize` enum: `sm` (32 px), `md` (40 px), `lg` (48 px, default), `xl` (64 px), `twoXl` (80 px)
+    * **Icon support**: optional trailing icon via `icon` parameter; omitting `child` produces a square icon-only button
+    * **Disabled state**: passing `onPressed: null` disables the button with correct Carbon disabled colors
+    * **Hover and press states** with animated background transitions (`durationFast01`)
+    * **Focus ring**: 2 px focus outline extending outside the button bounds, using `borderInteractive` token
+    * **Keyboard accessibility**: Space and Enter key activation
+    * Typography follows Carbon type scale — `bodyCompact01` (14 px) for sm/md/lg and `bodyCompact02` (16 px) for xl/2xl
  
 * **CarbonDataTable**
   * Added `CarbonDataTable` widget with comprehensive features following Carbon Design System specifications:

@@ -4,12 +4,12 @@
 
 # Flutter Carbon
 
-A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **51 components** (34 pure Carbon + 17 Material equivalents), 4 theme variants, and seamless Material Design integration.
+A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **52 components** (35 pure Carbon + 17 Material equivalents), 4 theme variants, and seamless Material Design integration.
 
 #### 🔗 [Live Demo](https://hwkim1127.github.io/flutter_carbon/)
 
-**Component Coverage**: 100% Practical Coverage (51 production-ready components)
-> **Note**: We implement 51 out of 60 Carbon components. The 9 omitted components are architectural concepts (like Grid) or better served by standard Flutter widgets, ensuring 100% coverage of practical UI needs.
+**Component Coverage**: 100% Practical Coverage (52 production-ready components)
+> **Note**: We implement 52 out of 60 Carbon components. The 8 omitted components are architectural concepts (like Grid) or better served by standard Flutter widgets, ensuring 100% coverage of practical UI needs.
 
 ## Overview
 
@@ -26,11 +26,12 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - **Motion System**: Duration and easing values for animations
 - **Layering System**: Background, layer, field, and border tokens for proper visual hierarchy
 
-### 🧩 51 Components
+### 🧩 52 Components
 
-#### 34 Pure Carbon Widgets
+#### 35 Pure Carbon Widgets
 
 **Buttons & Actions**
+- `CarbonButton` - Full-spec button with 7 kind variants (primary, secondary, tertiary, ghost, danger, dangerTertiary, dangerGhost) and 5 size variants (sm/md/lg/xl/2xl); supports text, text+icon, and icon-only modes
 - `CarbonComboButton` - Split button with primary action and dropdown menu
 - `CarbonCopyButton` - Copy to clipboard with visual feedback
 - `CarbonChatButton` - Specialized button for chat interfaces with quick actions
@@ -171,6 +172,35 @@ Widget build(BuildContext context) {
 ### 3. Use Carbon Components
 
 ```dart
+// Button — all 7 kinds
+CarbonButton(
+  child: Text('Save'),
+  onPressed: _handleSave,
+  kind: CarbonButtonKind.primary,
+  size: CarbonButtonSize.lg,
+)
+
+CarbonButton(
+  child: Text('Cancel'),
+  onPressed: () => Navigator.pop(context),
+  kind: CarbonButtonKind.ghost,
+)
+
+CarbonButton(
+  child: Text('Delete'),
+  icon: Icon(CarbonIcons.trash_can),
+  onPressed: _handleDelete,
+  kind: CarbonButtonKind.danger,
+)
+
+// Icon-only button
+CarbonButton(
+  icon: Icon(CarbonIcons.add),
+  onPressed: _handleAdd,
+  kind: CarbonButtonKind.primary,
+  size: CarbonButtonSize.sm,
+)
+
 // Dropdown
 CarbonDropdown<String>(
   label: 'Select an option',
@@ -446,7 +476,8 @@ lib/
 │   │   ├── typography.dart            # Typography system
 │   │   ├── spacing.dart               # Spacing constants
 │   │   └── motion.dart                # Animation durations
-│   ├── widgets/                       # 34 Custom components
+│   ├── widgets/                       # 35 Custom components
+│   │   ├── carbon_button.dart
 │   │   ├── carbon_modal.dart
 │   │   ├── carbon_dropdown.dart
 │   │   ├── carbon_tile.dart
@@ -475,17 +506,16 @@ This implementation follows the official Carbon Design System V11 specifications
 - ✅ Components match Carbon web component behavior
 - ✅ All 4 official themes (White, G10, G90, G100) supported
 - ✅ Spacing, motion, and layering follow Carbon guidelines
-- ✅ 85% component coverage (51/60 components)
+- ✅ 87% component coverage (52/60 components)
 
 **Reference**: https://carbondesignsystem.com/
 
-### Components Not Included (9 - Intentionally Omitted)
+### Components Not Included (8 - Intentionally Omitted)
 
-The remaining ~15% (9/60 components) are **intentionally omitted** for valid reasons. Here's the complete list:
+The remaining ~13% (8/60 components) are **intentionally omitted** for valid reasons. Here's the complete list:
 
-#### 1. Already Covered by Existing Widgets (2)
+#### 1. Already Covered by Existing Widgets (1)
 - **Copy** - Already implemented as `CarbonCopyButton`
-- **Button** - Fully covered by Material buttons with Carbon theming
 
 #### 2. Architectural/Structural Concepts (2)
 - **Form** - Structural wrapper, not a visual component (use Form widget)
@@ -511,7 +541,7 @@ The remaining ~15% (9/60 components) are **intentionally omitted** for valid rea
 - ✅ No duplicate work for components with good Material equivalents
 - ✅ Focus on unique Carbon patterns that need custom implementation
 
-**Bottom Line**: We focus on high-quality, native Flutter implementations. The 9 omitted components are either architectural concepts (Grid, Layer) or are better served by standard Flutter widgets (like `ListView` or `Form`), ensuring **100% coverage of practical UI needs**.
+**Bottom Line**: We focus on high-quality, native Flutter implementations. The 8 omitted components are either architectural concepts (Grid, Layer) or are better served by standard Flutter widgets (like `ListView` or `Form`), ensuring **100% coverage of practical UI needs**.
 
 ## 🤝 Contributing
 
