@@ -210,7 +210,12 @@ class CarbonTearsheet extends StatelessWidget {
                 thickness: 1,
                 color: tearsheetTheme.dividerColor,
               ),
-              _buildActions(tearsheetTheme, isWide),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: actions!.map((a) => Expanded(child: a)).toList(),
+                ),
+              ),
             ],
           ],
         ),
@@ -351,25 +356,6 @@ class CarbonTearsheet extends StatelessWidget {
     );
   }
 
-  Widget _buildActions(CarbonTearsheetThemeData theme, bool isWide) {
-    // Button size based on width
-    final buttonHeight = isWide ? 64.0 : 48.0;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: actions!
-            .map(
-              (action) => Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: SizedBox(height: buttonHeight, child: action),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
 }
 
 /// Route for displaying a tearsheet with slide-from-bottom animation.

@@ -54,7 +54,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 **Overlays & Dialogs**
 - `CarbonModal` - 5 modal types (passive, transactional, danger, input, custom)
 - `CarbonSidePanel` - Slide-in panel from left/right with 5 size variants
-- `CarbonTearsheet` - Bottom sheet with full-height content
+- `CarbonTearsheet` - Bottom sheet with full-height content; action buttons fill the footer width equally — use `CarbonButtonSize.xl` for narrow and `CarbonButtonSize.twoXl` for wide tearsheets
 - `CarbonPopover` - Floating content panel with positioning
 - `CarbonToggleTip` - Interactive tooltip that stays open on click
 
@@ -90,7 +90,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 
 All standard Material widgets are automatically themed to match Carbon Design System:
 
-- `FilledButton` (Primary), `ElevatedButton` (Secondary), `OutlinedButton` (Tertiary), `TextButton` (Ghost)
+- `FilledButton` (Primary), `ElevatedButton` (Secondary), `OutlinedButton` (Tertiary), `TextButton` (Ghost) — prefer `CarbonButton` for full Carbon spec compliance
 - `TextField`, `Checkbox`, `Radio`, `Switch`, `Slider`
 - `ExpansionTile` (Accordion), `Chip` (Tag), `Tooltip`
 - `SearchBar`, `DropdownMenu`, `DataTable`
@@ -280,10 +280,10 @@ CarbonDataTable(
         CarbonToolbarSearch(
           onChanged: (value) => filterUsers(value),
         ),
-        ElevatedButton.icon(
+        CarbonButton(
           onPressed: () => addUser(),
           icon: Icon(CarbonIcons.add),
-          label: Text('Add User'),
+          child: Text('Add User'),
         ),
       ],
     ),
@@ -291,10 +291,11 @@ CarbonDataTable(
       selectedCount: selectedIds.length,
       onCancel: () => clearSelection(),
       actions: [
-        TextButton.icon(
+        CarbonButton(
+          kind: CarbonButtonKind.ghost,
           onPressed: () => deleteSelected(),
-          icon: Icon(CarbonIcons.delete),
-          label: Text('Delete'),
+          icon: Icon(CarbonIcons.trashCan),
+          child: Text('Delete'),
         ),
       ],
     ),
