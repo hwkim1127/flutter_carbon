@@ -113,7 +113,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
         (item) => item.value == widget.value,
         orElse: () => widget.items.first,
       );
-      _searchController.text = selectedItem.label;
+      _searchController.text = selectedItem.filterText;
     } else {
       _searchController.clear();
     }
@@ -151,7 +151,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
       } else {
         _filteredItems = widget.items
             .where((item) =>
-                item.label.toLowerCase().contains(query.toLowerCase()))
+                item.filterText.toLowerCase().contains(query.toLowerCase()))
             .toList();
       }
     });
@@ -228,8 +228,8 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                                     color: isSelected
                                         ? theme.menuItemSelected
                                         : null,
-                                    child: Text(
-                                      item.label,
+                                    child: item.child ?? Text(
+                                      item.label!,
                                       style: TextStyle(
                                         color: item.enabled
                                             ? theme.menuItemText
@@ -389,19 +389,34 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
 }
 
 /// A menu item for use in a [CarbonComboBox].
+///
+/// Exactly one of [label] or [child] must be provided.
+/// - [label]: displays as text and is used for filtering.
+/// - [child]: displays as a custom widget; filtering falls back to
+///   `value.toString()`.
 class CarbonComboBoxItem<T> {
   /// The value this item represents.
   final T value;
 
-  /// The display label for this item.
-  final String label;
+  /// Text to display and filter by. Mutually exclusive with [child].
+  final String? label;
+
+  /// Custom widget to display. Mutually exclusive with [label].
+  final Widget? child;
 
   /// Whether this item is enabled.
   final bool enabled;
 
   const CarbonComboBoxItem({
     required this.value,
-    required this.label,
+    this.label,
+    this.child,
     this.enabled = true,
-  });
+  }) : assert(
+          (label != null) ^ (child != null),
+          'Exactly one of label or child must be provided.',
+        );
+
+  /// The string used for filtering, regardless of display mode.
+  String get filterText => label ?? value.toString();
 }

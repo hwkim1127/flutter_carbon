@@ -355,7 +355,6 @@ class CarbonTearsheet extends StatelessWidget {
             ],
     );
   }
-
 }
 
 /// Route for displaying a tearsheet with slide-from-bottom animation.

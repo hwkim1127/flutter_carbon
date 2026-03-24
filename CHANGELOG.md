@@ -134,6 +134,13 @@
   * Fixed action button layout to match Carbon action-set specification: buttons now fill the full footer width equally with no padding or gaps between them (previously right-aligned with 16px container padding and 8px gaps).
   * Action buttons should be sized by callers: use `CarbonButtonSize.xl` (64px) for narrow tearsheets and `CarbonButtonSize.twoXl` (80px) for wide tearsheets, matching the Carbon web component behavior.
 
+* **CarbonComboBox**
+  * `CarbonComboBoxItem` now supports an optional `child` (Widget) parameter as an alternative to `label` (String).
+    * Exactly one of `label` or `child` must be provided — enforced by assert.
+    * When `child` is provided, it is rendered as the dropdown item instead of `Text(label)`.
+    * Filtering falls back to `value.toString()` when `label` is absent.
+    * Added `filterText` getter on `CarbonComboBoxItem` for consistent filter logic.
+
 
 ## 1.0.1+1
 
