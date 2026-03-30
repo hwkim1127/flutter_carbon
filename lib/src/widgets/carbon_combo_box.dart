@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/carbon_theme.dart';
 
@@ -9,6 +10,7 @@ import '../theme/carbon_theme.dart';
 /// - Sharp corners (zero border radius)
 /// - Proper Carbon colors and states
 /// - Filtering capabilities
+/// - Keyboard navigation (↑ ↓ Enter Escape)
 ///
 /// Example:
 /// ```dart
@@ -54,6 +56,13 @@ class CarbonComboBox<T> extends StatefulWidget {
   /// Whether to allow clearing the selection.
   final bool allowClear;
 
+  /// Called when the user types in the search field.
+  ///
+  /// When provided, client-side filtering is disabled — the parent is
+  /// responsible for updating [items] in response to the query (e.g. by
+  /// querying a database).
+  final ValueChanged<String>? onSearch;
+
   const CarbonComboBox({
     super.key,
     required this.value,
@@ -65,6 +74,7 @@ class CarbonComboBox<T> extends StatefulWidget {
     this.enabled = true,
     this.placeholder,
     this.allowClear = true,
+    this.onSearch,
   });
 
   @override
@@ -75,9 +85,13 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final LayerLink _layerLink = LayerLink();
+  final ScrollController _scrollController = ScrollController();
   OverlayEntry? _overlayEntry;
   List<CarbonComboBoxItem<T>> _filteredItems = [];
   bool _isOpen = false;
+  int _highlightedIndex = -1;
+
+  static const double _itemHeight = 44.0;
 
   @override
   void initState() {
@@ -85,6 +99,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     _filteredItems = widget.items;
     _updateSearchText();
     _focusNode.addListener(_onFocusChange);
+    _focusNode.onKeyEvent = _handleKeyEvent;
   }
 
   @override
@@ -95,7 +110,17 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     }
     if (oldWidget.items != widget.items) {
       _filteredItems = widget.items;
-      _filterItems(_searchController.text);
+      _highlightedIndex = -1;
+      if (widget.onSearch == null) {
+        _filterItems(_searchController.text);
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {});
+            _overlayEntry?.markNeedsBuild();
+          }
+        });
+      }
     }
   }
 
@@ -104,6 +129,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     _closeDropdown();
     _searchController.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -125,10 +151,69 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     }
   }
 
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      if (!_isOpen) _openDropdown();
+      if (_filteredItems.isEmpty) return KeyEventResult.handled;
+      setState(() {
+        _highlightedIndex =
+            (_highlightedIndex + 1).clamp(0, _filteredItems.length - 1);
+      });
+      _overlayEntry?.markNeedsBuild();
+      _scrollToHighlighted();
+      return KeyEventResult.handled;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      if (!_isOpen || _filteredItems.isEmpty) return KeyEventResult.ignored;
+      setState(() {
+        _highlightedIndex =
+            (_highlightedIndex - 1).clamp(0, _filteredItems.length - 1);
+      });
+      _overlayEntry?.markNeedsBuild();
+      _scrollToHighlighted();
+      return KeyEventResult.handled;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      if (_isOpen &&
+          _highlightedIndex >= 0 &&
+          _highlightedIndex < _filteredItems.length) {
+        final item = _filteredItems[_highlightedIndex];
+        if (item.enabled) _selectItem(item.value);
+        return KeyEventResult.handled;
+      }
+      return KeyEventResult.ignored;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      if (_isOpen) {
+        _closeDropdown();
+        return KeyEventResult.handled;
+      }
+      return KeyEventResult.ignored;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  void _scrollToHighlighted() {
+    if (!_scrollController.hasClients || _highlightedIndex < 0) return;
+    final offset = _highlightedIndex * _itemHeight;
+    final maxOffset = _scrollController.position.maxScrollExtent;
+    _scrollController.jumpTo(offset.clamp(0.0, maxOffset));
+  }
+
   void _openDropdown() {
     if (!widget.enabled || _isOpen) return;
 
     _isOpen = true;
+    _highlightedIndex = -1;
     _filterItems(_searchController.text);
 
     _overlayEntry = _createOverlayEntry();
@@ -139,22 +224,26 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     if (!_isOpen) return;
 
     _isOpen = false;
+    _highlightedIndex = -1;
     _overlayEntry?.remove();
     _overlayEntry = null;
     _updateSearchText();
   }
 
   void _filterItems(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredItems = widget.items;
-      } else {
-        _filteredItems = widget.items
-            .where((item) =>
-                item.filterText.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
+    if (widget.onSearch != null) {
+      setState(() => _filteredItems = widget.items);
+      widget.onSearch!(query);
+    } else {
+      setState(() {
+        _filteredItems = query.isEmpty
+            ? widget.items
+            : widget.items
+                .where((item) =>
+                    item.filterText.toLowerCase().contains(query.toLowerCase()))
+                .toList();
+      });
+    }
     _overlayEntry?.markNeedsBuild();
   }
 
@@ -208,12 +297,16 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                               ),
                             )
                           : ListView.builder(
+                              controller: _scrollController,
                               padding: EdgeInsets.zero,
                               shrinkWrap: true,
                               itemCount: _filteredItems.length,
+                              itemExtent: _itemHeight,
                               itemBuilder: (context, index) {
                                 final item = _filteredItems[index];
                                 final isSelected = item.value == widget.value;
+                                final isHighlighted =
+                                    index == _highlightedIndex;
 
                                 return InkWell(
                                   onTap: item.enabled
@@ -225,21 +318,24 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                                       horizontal: 16,
                                       vertical: 12,
                                     ),
-                                    color: isSelected
-                                        ? theme.menuItemSelected
-                                        : null,
-                                    child: item.child ?? Text(
-                                      item.label!,
-                                      style: TextStyle(
-                                        color: item.enabled
-                                            ? theme.menuItemText
-                                            : theme.menuItemTextDisabled,
-                                        fontSize: 14,
-                                        fontWeight: isSelected
-                                            ? FontWeight.w600
-                                            : FontWeight.w400,
-                                      ),
-                                    ),
+                                    color: isHighlighted
+                                        ? theme.menuItemHover
+                                        : isSelected
+                                            ? theme.menuItemSelected
+                                            : null,
+                                    child: item.child ??
+                                        Text(
+                                          item.label!,
+                                          style: TextStyle(
+                                            color: item.enabled
+                                                ? theme.menuItemText
+                                                : theme.menuItemTextDisabled,
+                                            fontSize: 14,
+                                            fontWeight: isSelected
+                                                ? FontWeight.w600
+                                                : FontWeight.w400,
+                                          ),
+                                        ),
                                   ),
                                 );
                               },
@@ -319,6 +415,11 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                         fontSize: 14,
                       ),
                       border: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                      focusedErrorBorder: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 10,

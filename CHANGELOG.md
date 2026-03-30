@@ -140,6 +140,17 @@
     * When `child` is provided, it is rendered as the dropdown item instead of `Text(label)`.
     * Filtering falls back to `value.toString()` when `label` is absent.
     * Added `filterText` getter on `CarbonComboBoxItem` for consistent filter logic.
+  * Added `onSearch` callback for external/database-driven search.
+    * When `onSearch` is provided, client-side filtering is disabled — the parent is responsible for updating `items` in response to the query.
+    * Useful for large datasets where items should be fetched on demand (e.g. SQLite full-text search).
+  * Added keyboard navigation support.
+    * **↓ / ↑ Arrow**: moves highlight through dropdown items; opens the dropdown if closed.
+    * **Enter / Numpad Enter**: selects the currently highlighted item.
+    * **Escape**: closes the dropdown.
+    * Holding an arrow key repeats navigation (`KeyRepeatEvent` handled).
+    * Dropdown list auto-scrolls to keep the highlighted item visible.
+    * Highlighted item is visually indicated using `menuItemHover` color.
+  * Removed Material underline border from the internal `TextField` (all border variants set to `InputBorder.none`).
 
 * **CarbonFileUploaderDropZone**
   * Added `dragText` parameter to customize the primary drop zone label (defaults to `'Drag and drop files here or'`).
