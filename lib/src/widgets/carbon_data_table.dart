@@ -847,6 +847,10 @@ class CarbonDataTableRow extends StatefulWidget {
 
   final VoidCallback? onTap;
 
+  /// Called when the row's expansion state changes.
+  /// Receives `true` when expanded, `false` when collapsed.
+  final ValueChanged<bool>? onExpansionChanged;
+
   const CarbonDataTableRow({
     super.key,
     required this.cells,
@@ -854,6 +858,7 @@ class CarbonDataTableRow extends StatefulWidget {
     this.selected = false,
     this.onSelectChanged,
     this.onTap,
+    this.onExpansionChanged,
   });
 
   @override
@@ -940,7 +945,10 @@ class _CarbonDataTableRowState extends State<CarbonDataTableRow> {
       if (isExpandable) {
         rowChildren.add(
           GestureDetector(
-            onTap: () => setState(() => _expanded = !_expanded),
+            onTap: () {
+              setState(() => _expanded = !_expanded);
+              widget.onExpansionChanged?.call(_expanded);
+            },
             behavior: HitTestBehavior.opaque,
             child: SizedBox(
               width: 48,

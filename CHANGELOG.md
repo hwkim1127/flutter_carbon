@@ -141,6 +141,11 @@
     * Filtering falls back to `value.toString()` when `label` is absent.
     * Added `filterText` getter on `CarbonComboBoxItem` for consistent filter logic.
 
+* **CarbonFileUploaderDropZone**
+  * Added `dragText` parameter to customize the primary drop zone label (defaults to `'Drag and drop files here or'`).
+  * Added `browseText` parameter to customize the secondary browse label (defaults to `'click to upload'`).
+  * Both parameters are ignored when a custom `child` widget is provided.
+
 
 ## 1.0.1+1
 

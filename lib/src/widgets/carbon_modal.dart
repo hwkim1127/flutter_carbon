@@ -61,8 +61,8 @@ class CarbonModal {
     String? title,
     required Widget content,
     Widget? image,
-    String primaryButtonText = '확인',
-    String secondaryButtonText = '취소',
+    String primaryButtonText = 'Confirm',
+    String secondaryButtonText = 'Cancel',
     bool dismissible = false,
   }) async {
     return await Navigator.of(context).push(
@@ -99,8 +99,8 @@ class CarbonModal {
     BuildContext context, {
     String? title,
     required Widget content,
-    String primaryButtonText = '삭제',
-    String secondaryButtonText = '취소',
+    String primaryButtonText = 'Delete',
+    String secondaryButtonText = 'Cancel',
     bool dismissible = false,
   }) async {
     return await Navigator.of(context).push(
@@ -139,8 +139,8 @@ class CarbonModal {
     String? hintText,
     String? helperText,
     String? initialValue,
-    String primaryButtonText = '입력',
-    String secondaryButtonText = '취소',
+    String primaryButtonText = 'Enter',
+    String secondaryButtonText = 'Cancel',
     bool dismissible = false,
     TextInputType? keyboardType,
     int? maxLines,

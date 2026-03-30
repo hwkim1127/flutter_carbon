@@ -230,6 +230,8 @@ class CarbonFileUploaderDropZone extends StatelessWidget {
     required this.onBrowseFiles,
     this.child,
     this.disabled = false,
+    this.dragText = 'Drag and drop files here or',
+    this.browseText = 'click to upload',
   });
 
   /// Whether files are currently being dragged over the drop zone.
@@ -239,11 +241,17 @@ class CarbonFileUploaderDropZone extends StatelessWidget {
   /// Callback to open file picker dialog.
   final VoidCallback? onBrowseFiles;
 
-  /// Drop zone content widget.
+  /// Drop zone content widget. When provided, [dragText] and [browseText] are ignored.
   final Widget? child;
 
   /// Whether the drop zone is disabled.
   final bool disabled;
+
+  /// Primary label shown in the default drop zone content.
+  final String dragText;
+
+  /// Secondary label shown in the default drop zone content (bold).
+  final String browseText;
 
   @override
   Widget build(BuildContext context) {
@@ -289,10 +297,10 @@ class CarbonFileUploaderDropZone extends StatelessWidget {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Drag and drop files here or'),
+                  Text(dragText),
                   const SizedBox(height: 8),
                   Text(
-                    'click to upload',
+                    browseText,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: fileUploaderTheme.dropZoneLabelColor,
