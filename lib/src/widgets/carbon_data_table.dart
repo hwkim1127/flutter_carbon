@@ -1019,6 +1019,7 @@ class _CarbonDataTableRowState extends State<CarbonDataTableRow> {
         onTap: () {
           if (isExpandable) {
             setState(() => _expanded = !_expanded);
+            widget.onExpansionChanged?.call(_expanded);
           } else {
             widget.onTap?.call();
           }

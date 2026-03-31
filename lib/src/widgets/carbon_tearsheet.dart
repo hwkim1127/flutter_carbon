@@ -75,6 +75,7 @@ class CarbonTearsheet extends StatelessWidget {
     this.influencerPlacement = CarbonTearsheetInfluencerPlacement.right,
     this.influencerWidth = CarbonTearsheetInfluencerWidth.narrow,
     required this.child,
+    this.scrollable = true,
     this.onClose,
   });
 
@@ -113,6 +114,10 @@ class CarbonTearsheet extends StatelessWidget {
 
   /// Tearsheet content.
   final Widget child;
+
+  /// Whether the content area is scrollable. Set to `false` when the child
+  /// manages its own scrolling (e.g. [TabBarView]).
+  final bool scrollable;
 
   /// Callback when the tearsheet is closed.
   final VoidCallback? onClose;
@@ -179,7 +184,7 @@ class CarbonTearsheet extends StatelessWidget {
       child: SizedBox(
         width: effectiveWidth,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: scrollable ? MainAxisSize.min : MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Header
@@ -193,15 +198,18 @@ class CarbonTearsheet extends StatelessWidget {
             ),
 
             // Body with optional influencer
-            Flexible(
-              fit: FlexFit.loose,
-              child: hasInfluencer
-                  ? _buildBodyWithInfluencer(tearsheetTheme)
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: child,
-                    ),
-            ),
+            if (scrollable)
+              Flexible(
+                fit: FlexFit.loose,
+                child: hasInfluencer
+                    ? _buildBodyWithInfluencer(tearsheetTheme)
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: child,
+                      ),
+              )
+            else
+              Expanded(child: child),
 
             // Actions
             if (actions != null && actions!.isNotEmpty) ...[

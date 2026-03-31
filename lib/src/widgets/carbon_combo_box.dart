@@ -134,15 +134,16 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   }
 
   void _updateSearchText() {
-    if (widget.value != null) {
+    if (widget.value != null && widget.items.isNotEmpty) {
       final selectedItem = widget.items.firstWhere(
         (item) => item.value == widget.value,
         orElse: () => widget.items.first,
       );
       _searchController.text = selectedItem.filterText;
-    } else {
+    } else if (widget.value == null) {
       _searchController.clear();
     }
+    // If value is set but items is empty (e.g. still loading), leave text as-is.
   }
 
   void _onFocusChange() {

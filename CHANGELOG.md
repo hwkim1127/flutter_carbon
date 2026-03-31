@@ -120,6 +120,7 @@
   * Added hover effects with proper Carbon colors (`layerHover01`).
   * Added checkmark icon for selected items.
   * Improved menu item styling with proper selection and disabled states.
+  * Fixed chevron icon appearing immediately after text instead of at the trailing edge. The trigger row now uses `LayoutBuilder` to detect bounded constraints: uses `Expanded` for the label when width is constrained (e.g. inside `Expanded` parent), and falls back to natural sizing when unconstrained (e.g. inside `Row(mainAxisSize: MainAxisSize.min)`).
 
 * **CarbonPagination**
   * Refactored to match Carbon Design System specifications:
@@ -133,6 +134,7 @@
   * Added responsive width logic: Automatically adapts to screen width on smaller devices (e.g., mobile) while respecting the maximum width defined by `CarbonTearsheetWidth` (narrow/wide).
   * Fixed action button layout to match Carbon action-set specification: buttons now fill the full footer width equally with no padding or gaps between them (previously right-aligned with 16px container padding and 8px gaps).
   * Action buttons should be sized by callers: use `CarbonButtonSize.xl` (64px) for narrow tearsheets and `CarbonButtonSize.twoXl` (80px) for wide tearsheets, matching the Carbon web component behavior.
+  * Added `scrollable` parameter (defaults to `true`). When set to `false`, the content area uses `Expanded` instead of `SingleChildScrollView`, allowing children that manage their own scrolling (e.g. `TabBarView`) to lay out correctly.
 
 * **CarbonComboBox**
   * `CarbonComboBoxItem` now supports an optional `child` (Widget) parameter as an alternative to `label` (String).
@@ -155,6 +157,11 @@
 * **CarbonFileUploaderDropZone**
   * Added `dragText` parameter to customize the primary drop zone label (defaults to `'Drag and drop files here or'`).
   * Added `browseText` parameter to customize the secondary browse label (defaults to `'click to upload'`).
+
+### Bug Fixes
+
+* **CarbonDataTableRow**
+  * Fixed: clicking the row body on an expandable row toggled the visual expansion state but did not fire `onExpansionChanged`. The callback is now called consistently whether the row is expanded via the chevron or by tapping the row body.
   * Both parameters are ignored when a custom `child` widget is provided.
 
 

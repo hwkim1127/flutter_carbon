@@ -388,68 +388,52 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
                 borderRadius: BorderRadius.zero,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                children: [
-                  if (widget.width != null)
-                    Expanded(
-                      child: selectedItem != null
-                          ? DefaultTextStyle(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final textWidget = selectedItem != null
+                      ? DefaultTextStyle(
+                          style: TextStyle(
+                            color: widget.enabled
+                                ? carbon.text.textPrimary
+                                : carbon.text.textDisabled,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          child: selectedItem.child,
+                        )
+                      : widget.hint != null
+                          ? Text(
+                              widget.hint!,
                               style: TextStyle(
                                 color: widget.enabled
-                                    ? carbon.text.textPrimary
-                                    : carbon.text.textDisabled,
+                                    ? carbon.text.textPlaceholder
+                                    : carbon.text.textInverse,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w400,
                               ),
-                              child: selectedItem.child,
                             )
-                          : widget.hint != null
-                              ? Text(
-                                  widget.hint!,
-                                  style: TextStyle(
-                                    color: widget.enabled
-                                        ? carbon.text.textPlaceholder
-                                        : carbon.text.textInverse,
-                                    fontSize: 14,
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                    )
-                  else
-                    selectedItem != null
-                        ? DefaultTextStyle(
-                            style: TextStyle(
+                          : const SizedBox.shrink();
+                  return Row(
+                    children: [
+                      if (constraints.hasBoundedWidth)
+                        Expanded(child: textWidget)
+                      else
+                        textWidget,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: widget.icon ??
+                            Icon(
+                              _isOpen
+                                  ? Icons.keyboard_arrow_up
+                                  : Icons.keyboard_arrow_down,
                               color: widget.enabled
-                                  ? carbon.text.textPrimary
-                                  : carbon.text.textDisabled,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
+                                  ? carbon.text.iconPrimary
+                                  : carbon.text.iconDisabled,
+                              size: 16,
                             ),
-                            child: selectedItem.child,
-                          )
-                        : widget.hint != null
-                            ? Text(
-                                widget.hint!,
-                                style: TextStyle(
-                                  color: carbon.text.textPlaceholder,
-                                  fontSize: 14,
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: widget.icon ??
-                        Icon(
-                          _isOpen
-                              ? Icons.keyboard_arrow_up
-                              : Icons.keyboard_arrow_down,
-                          color: widget.enabled
-                              ? carbon.text.iconPrimary
-                              : carbon.text.iconDisabled,
-                          size: 16,
-                        ),
-                  ),
-                ],
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
