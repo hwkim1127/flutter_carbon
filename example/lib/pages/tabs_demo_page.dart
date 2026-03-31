@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
 import '../widgets/demo_page_template.dart';
 
-/// Demo page for Tabs functionality using Material's TabBar.
+/// Demo page for CarbonTabs and Material TabBar components.
 class TabsDemoPage extends StatefulWidget {
   const TabsDemoPage({super.key});
 
@@ -13,6 +13,9 @@ class TabsDemoPage extends StatefulWidget {
 class _TabsDemoPageState extends State<TabsDemoPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _carbonLineTab = 0;
+  int _carbonContainedTab = 0;
+  int _carbonExtendedTab = 0;
 
   @override
   void initState() {
@@ -30,19 +33,116 @@ class _TabsDemoPageState extends State<TabsDemoPage>
   Widget build(BuildContext context) {
     return DemoPageTemplate(
       title: 'Tabs',
-      description: 'Tabs organize content across different screens or views. '
-          'Built using Material TabBar with Carbon theming.',
+      description:
+          'Tabs organize content across different screens or views. '
+          'CarbonTabs is a native Carbon Design System implementation with Line and Contained variants. '
+          'Material TabBar is also available with Carbon theming.',
       sections: [
+        // ── CarbonTabs ────────────────────────────────────────────────────
+
         DemoSection(
-          title: 'Basic Tabs',
-          description: 'Simple tab navigation with three tabs.',
+          title: 'CarbonTabs — Line (default)',
+          description:
+              'Line tabs use an underline indicator. '
+              'The selected tab is highlighted with a 2px bottom border.',
+          builder: (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CarbonTabs(
+                initialIndex: _carbonLineTab,
+                tabs: const [
+                  CarbonTab(label: 'Overview'),
+                  CarbonTab(label: 'Details'),
+                  CarbonTab(label: 'Settings'),
+                ],
+                onTabChanged: (i) => setState(() => _carbonLineTab = i),
+              ),
+              Container(
+                height: 120,
+                alignment: Alignment.center,
+                child: Text(
+                  ['Overview content', 'Details content', 'Settings content'][_carbonLineTab],
+                  style: TextStyle(color: context.carbon.text.textSecondary),
+                ),
+              ),
+            ],
+          ),
+        ),
+        DemoSection(
+          title: 'CarbonTabs — Line with extendLine',
+          description:
+              'The extendLine parameter stretches the bottom border across the full container width.',
+          builder: (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CarbonTabs(
+                initialIndex: _carbonExtendedTab,
+                tabs: const [
+                  CarbonTab(label: 'Tab One'),
+                  CarbonTab(label: 'Tab Two'),
+                  CarbonTab(label: 'Tab Three'),
+                  CarbonTab(label: 'Tab Four'),
+                ],
+                extendLine: true,
+                onTabChanged: (i) => setState(() => _carbonExtendedTab = i),
+              ),
+              Container(
+                height: 100,
+                alignment: Alignment.center,
+                child: Text(
+                  'Content for Tab ${_carbonExtendedTab + 1}',
+                  style: TextStyle(color: context.carbon.text.textSecondary),
+                ),
+              ),
+            ],
+          ),
+        ),
+        DemoSection(
+          title: 'CarbonTabs — Contained',
+          description:
+              'Contained tabs use a filled background indicator for higher visual emphasis.',
+          builder: (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CarbonTabs(
+                initialIndex: _carbonContainedTab,
+                tabs: const [
+                  CarbonTab(label: 'Overview'),
+                  CarbonTab(label: 'Details'),
+                  CarbonTab(label: 'Settings'),
+                ],
+                type: CarbonTabsType.contained,
+                onTabChanged: (i) => setState(() => _carbonContainedTab = i),
+              ),
+              Container(
+                height: 120,
+                alignment: Alignment.center,
+                child: Text(
+                  ['Overview content', 'Details content', 'Settings content'][_carbonContainedTab],
+                  style: TextStyle(color: context.carbon.text.textSecondary),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // ── Material TabBar (with Carbon theming) ─────────────────────────
+
+        DemoSection(
+          title: 'Material TabBar (with Carbon theming)',
+          description:
+              'Standard Material TabBar styled via Carbon\'s TabBarTheme. '
+              'Use when you need Material\'s swipe-to-navigate behaviour.',
           builder: (context) => DefaultTabController(
             length: 3,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TabBar(
-                  tabs: const [
+                const TabBar(
+                  tabs: [
                     Tab(text: 'Overview'),
                     Tab(text: 'Details'),
                     Tab(text: 'Settings'),
@@ -84,15 +184,15 @@ class _TabsDemoPageState extends State<TabsDemoPage>
           ),
         ),
         DemoSection(
-          title: 'Tabs with Icons',
+          title: 'Material TabBar — With Icons',
           description: 'Tabs can include icons alongside text.',
           builder: (context) => DefaultTabController(
             length: 4,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TabBar(
-                  tabs: const [
+                const TabBar(
+                  tabs: [
                     Tab(icon: Icon(Icons.home), text: 'Home'),
                     Tab(icon: Icon(Icons.search), text: 'Search'),
                     Tab(icon: Icon(Icons.person), text: 'Profile'),
@@ -124,7 +224,7 @@ class _TabsDemoPageState extends State<TabsDemoPage>
           ),
         ),
         DemoSection(
-          title: 'Scrollable Tabs',
+          title: 'Material TabBar — Scrollable',
           description: 'When there are many tabs, they become scrollable.',
           builder: (context) => DefaultTabController(
             length: 8,
@@ -159,8 +259,8 @@ class _TabsDemoPageState extends State<TabsDemoPage>
           ),
         ),
         DemoSection(
-          title: 'Controlled Tabs',
-          description: 'Programmatically control tab selection.',
+          title: 'Material TabBar — Programmatic Control',
+          description: 'Programmatically control tab selection via TabController.',
           builder: (context) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -199,49 +299,6 @@ class _TabsDemoPageState extends State<TabsDemoPage>
                 ),
               ),
             ],
-          ),
-        ),
-        DemoSection(
-          title: 'Icon-Only Tabs',
-          description: 'Tabs with only icons, no text labels.',
-          builder: (context) => DefaultTabController(
-            length: 5,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TabBar(
-                  tabs: const [
-                    Tab(icon: Icon(Icons.dashboard)),
-                    Tab(icon: Icon(Icons.article)),
-                    Tab(icon: Icon(Icons.analytics)),
-                    Tab(icon: Icon(Icons.notifications)),
-                    Tab(icon: Icon(Icons.settings)),
-                  ],
-                ),
-                SizedBox(
-                  height: 100,
-                  child: TabBarView(
-                    children: [
-                      'Dashboard',
-                      'Articles',
-                      'Analytics',
-                      'Notifications',
-                      'Settings',
-                    ].map((name) {
-                      return Center(
-                        child: Text(
-                          name,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: context.carbon.text.textPrimary,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ],

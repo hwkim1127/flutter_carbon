@@ -4,12 +4,16 @@
 
 # Flutter Carbon
 
-A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **52 components** (35 pure Carbon + 17 Material equivalents), 4 theme variants, and seamless Material Design integration.
+A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **36 custom Carbon components**, 4 theme variants, and automatic Carbon styling for standard Material widgets.
 
 #### 🔗 [Live Demo](https://hwkim1127.github.io/flutter_carbon/)
 
-**Component Coverage**: 100% Practical Coverage (52 production-ready components)
-> **Note**: We implement 52 out of 60 Carbon components. The 8 omitted components are architectural concepts (like Grid) or better served by standard Flutter widgets, ensuring 100% coverage of practical UI needs.
+**Carbon Design System has 74 components.** Here is how Flutter Carbon covers them:
+
+- **36 custom `Carbon*` widgets** — full spec implementations
+- **12 via Material theming** — standard Material widgets auto-styled by `carbonTheme()`
+- **10 architectural / utilities** — layout/structural concepts mapped to Flutter primitives
+- **16 not yet implemented** — planned for future releases
 
 ## Overview
 
@@ -26,9 +30,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - **Motion System**: Duration and easing values for animations
 - **Layering System**: Background, layer, field, and border tokens for proper visual hierarchy
 
-### 🧩 52 Components
-
-#### 35 Pure Carbon Widgets
+### 🧩 36 Carbon Components
 
 **Buttons & Actions**
 - `CarbonButton` - Full-spec button with 7 kind variants (primary, secondary, tertiary, ghost, danger, dangerTertiary, dangerGhost) and 5 size variants (sm/md/lg/xl/2xl); supports text, text+icon, and icon-only modes
@@ -81,20 +83,75 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - `CarbonLoading` - Loading spinner (small, default, large)
 - `CarbonSkeleton` - Skeleton loading states (text, rectangle, circle)
 
+**Tags & Labels**
+- `CarbonTag` - Carbon tag component with 12 color variants (red, magenta, purple, blue, cyan, teal, green, gray, coolGray, warmGray, highContrast, outline), 3 size variants (sm/md/lg), and optional dismiss button; uses fixed palette colors independent of the active theme
+
 **Other Components**
 - `CarbonOverflowMenu` - Kebab menu with actions
 - `CarbonAILabel` - AI-generated content indicator with gradient
 - `CarbonFloatingMenu` - Expandable floating action menu with animations
 
-#### 17 Material Widget Equivalents (Fully Themed)
+#### Handled via Material Theming (12)
 
-All standard Material widgets are automatically themed to match Carbon Design System:
+These Carbon components are covered by standard Material widgets that automatically receive Carbon styling through `carbonTheme()` — no extra wrappers needed:
 
-- `FilledButton` (Primary), `ElevatedButton` (Secondary), `OutlinedButton` (Tertiary), `TextButton` (Ghost) — prefer `CarbonButton` for full Carbon spec compliance
-- `TextField`, `Checkbox`, `Radio`, `Switch`, `Slider`
-- `ExpansionTile` (Accordion), `Chip` (Tag), `Tooltip`
-- `SearchBar`, `DropdownMenu`, `DataTable`
-- Material date and time pickers
+| Carbon Component | Flutter Equivalent |
+|---|---|
+| `accordion` | `ExpansionTile` |
+| `checkbox` | `Checkbox` |
+| `inline-loading` | `CircularProgressIndicator` |
+| `list` | `ListTile` |
+| `progress-bar` | `LinearProgressIndicator` |
+| `progress-indicator` | `CircularProgressIndicator` |
+| `radio-button` | `Radio` |
+| `search` | `SearchBar` |
+| `slider` | `Slider` |
+| `text-input` | `TextField` |
+| `textarea` | `TextField(maxLines: null)` |
+| `tooltip` | `Tooltip` |
+
+> For buttons, prefer `CarbonButton` over Material variants (`FilledButton`, `ElevatedButton`, etc.) — it implements the full Carbon spec with 7 kind variants and 5 size variants.
+> For tags, prefer `CarbonTag` over `Chip` — it implements the full Carbon tag spec with 12 color types and proper sizing.
+
+#### Architectural / Utilities (10)
+
+These are not renderable widgets — they are structural concepts, token systems, or deprecated entries:
+
+| Carbon Component | Flutter Equivalent |
+|---|---|
+| `feature-flags` | Runtime configuration, not a UI component |
+| `form` | Flutter `Form` widget |
+| `form-group` | Flutter layout (`Column`, `Padding`) |
+| `grid` | Flutter layout (`Row`, `Column`, `Wrap`, `GridView`) |
+| `heading` | `CarbonTypography` text styles |
+| `icon` | `CarbonIcons` icon font |
+| `layer` | Theme layering tokens (`carbon.layer.*`) |
+| `skip-to-content` | Accessibility helper — no visual widget needed |
+| `slug` | Deprecated — use `CarbonAILabel` |
+| `stack` | Deprecated utility |
+
+#### Not Yet Implemented (16)
+
+These components do not have a dedicated `Carbon*` widget yet:
+
+| Carbon Component | Notes |
+|---|---|
+| `badge-indicator` | No current equivalent |
+| `date-picker` | Use Material `showDatePicker()` (auto-themed) |
+| `fluid-search` | Fluid/expressive variant — not yet implemented |
+| `fluid-select` | Fluid/expressive variant — not yet implemented |
+| `fluid-text-input` | Fluid/expressive variant — not yet implemented |
+| `fluid-textarea` | Fluid/expressive variant — not yet implemented |
+| `icon-button` | Use `CarbonButton` with icon-only mode |
+| `icon-indicator` | No current equivalent |
+| `menu` | Use Material `MenuBar` / `DropdownMenu` (auto-themed) |
+| `menu-button` | Use Material `MenuAnchor` (auto-themed) |
+| `password-input` | Use `TextField(obscureText: true)` (auto-themed) |
+| `shape-indicator` | No current equivalent |
+| `time-picker` | Use Material `showTimePicker()` (auto-themed) |
+| `ai-skeleton` | Use `CarbonSkeleton` |
+| `select` | Use `CarbonDropdown` |
+| `copy` | Use `CarbonCopyButton` |
 
 ### 📱 51 Demo Pages
 
@@ -262,6 +319,20 @@ CarbonTabs(
   onTabChanged: (index) {
      print('Selected tab: $index');
   },
+)
+
+// Tag
+CarbonTag(
+  text: 'Design',
+  type: CarbonTagType.blue,
+  size: CarbonTagSize.md,
+)
+
+// Dismissible tag
+CarbonTag(
+  text: 'Removable',
+  type: CarbonTagType.gray,
+  onDismiss: () => removeTag(),
 )
 
 // Data Table with Toolbar
@@ -477,11 +548,12 @@ lib/
 │   │   ├── typography.dart            # Typography system
 │   │   ├── spacing.dart               # Spacing constants
 │   │   └── motion.dart                # Animation durations
-│   ├── widgets/                       # 35 Custom components
+│   ├── widgets/                       # 36 Carbon components
 │   │   ├── carbon_button.dart
 │   │   ├── carbon_modal.dart
 │   │   ├── carbon_dropdown.dart
 │   │   ├── carbon_tile.dart
+│   │   ├── carbon_tag.dart
 │   │   ├── carbon_data_table.dart
 │   │   ├── carbon_toolbar.dart
 │   │   ├── carbon_multi_select.dart
@@ -507,42 +579,12 @@ This implementation follows the official Carbon Design System V11 specifications
 - ✅ Components match Carbon web component behavior
 - ✅ All 4 official themes (White, G10, G90, G100) supported
 - ✅ Spacing, motion, and layering follow Carbon guidelines
-- ✅ 87% component coverage (52/60 components)
+- ✅ 36 custom `Carbon*` widgets with full spec compliance
+- ✅ 12 Carbon components covered via automatic Material theming
+- ✅ All 4 official themes (White, G10, G90, G100) supported
+- 🚧 16 components not yet implemented (see table above)
 
 **Reference**: https://carbondesignsystem.com/
-
-### Components Not Included (8 - Intentionally Omitted)
-
-The remaining ~13% (8/60 components) are **intentionally omitted** for valid reasons. Here's the complete list:
-
-#### 1. Already Covered by Existing Widgets (1)
-- **Copy** - Already implemented as `CarbonCopyButton`
-
-#### 2. Architectural/Structural Concepts (2)
-- **Form** - Structural wrapper, not a visual component (use Form widget)
-- **Layer** - UI depth architectural concept, not a renderable widget
-
-#### 3. Better Served by Material Widgets (4)
-- **Inline Loading** - Use Material `CircularProgressIndicator` inline
-- **Progress Indicator** - Already themed via `CircularProgressIndicator`  
-- **Progress Bar** - Already themed via `LinearProgressIndicator`
-- **List** - Use Material `ListTile` with Carbon theming
-
-#### 4. Accessibility Helpers (1)
-- **Skip to Content** - Accessibility navigation helper, no visual widget
-
-#### 5. Specialized/Context-Specific (3)
-- **Menu** - Covered by `MenuBar`/`MenuButton` with Carbon theme
-- **Date Picker** - Fully themed Material `DatePicker`
-- **Text Area** - Use `TextField` with `maxLines: null`
-
-**Why This Approach Works**:
-- ✅ **100% of visual, practical components** are available
-- ✅ Material widgets provide excellent functionality when themed
-- ✅ No duplicate work for components with good Material equivalents
-- ✅ Focus on unique Carbon patterns that need custom implementation
-
-**Bottom Line**: We focus on high-quality, native Flutter implementations. The 8 omitted components are either architectural concepts (Grid, Layer) or are better served by standard Flutter widgets (like `ListView` or `Form`), ensuring **100% coverage of practical UI needs**.
 
 ## 🤝 Contributing
 

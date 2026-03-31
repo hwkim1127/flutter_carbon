@@ -1,17 +1,17 @@
 # Carbon Flutter Example App
 
-This example app demonstrates all **48 Carbon components** from the Flutter Carbon package (31 pure Carbon + 17 Material equivalents) with comprehensive, interactive demos across **47+ pages**.
+This example app demonstrates the Flutter Carbon package with **36 custom `Carbon*` widgets** and **Material theming coverage** across **12 categories and 48+ demo pages**.
 
 ## Overview
 
-The example app provides complete demonstrations of IBM's Carbon Design System implementation in Flutter, featuring:
+The example app provides interactive demonstrations of IBM's Carbon Design System implementation in Flutter, featuring:
 
-- **100% Component Coverage**: All 48 production-ready components
-- **47+ Interactive Demo Pages**: Dedicated demos for every component
+- **36 Custom Carbon Widgets**: Native `Carbon*` implementations following Carbon Design System specifications
+- **Material Theming**: Standard Flutter widgets (TabBar, Checkbox, ExpansionTile, etc.) automatically styled to match Carbon
+- **48+ Interactive Demo Pages**: Dedicated demos for every component
 - **4 Theme Variants**: Live switching between White, G10, G90, and G100 themes
-- **Real-World Examples**: Practical usage patterns for each component
-- **Multiple Variants**: Different sizes, states, and configurations for every component
-- **Categorized Navigation**: Components organized by type (Buttons, Forms, Overlays, etc.)
+- **Real-World Examples**: Practical usage patterns and all variants per component
+- **Categorized Navigation**: Components organized into 12 logical categories
 
 ## Features
 
@@ -19,110 +19,108 @@ The example app provides complete demonstrations of IBM's Carbon Design System i
 - **Categorized Navigation**: Components organized into 12 logical categories
 - **Component Cards**: Each component with description and direct navigation
 - **Foundation Section**: Access to Colors, Typography, Icons, and Layering demos
-- **View All**: Quick link to see all components in one scrollable page
 
 ### Component Demo Pages
-Each of the 48 components has a dedicated demo page featuring:
-- **Comprehensive Examples**: Multiple interactive examples per component
+Each demo page features:
+- **Multiple Examples**: Several interactive sections per component
 - **All Variants**: Different sizes, styles, and types
-- **State Demonstrations**: Enabled, disabled, loading, error, and focus states
-- **Edge Cases**: Long text, empty data, many items
-- **Integration Examples**: Components used together
-- **Clear Documentation**: Descriptions and usage notes
+- **State Demonstrations**: Enabled, disabled, error, and focus states
+- **Clear Descriptions**: Usage notes per section
 
 ### Theme Switcher
 - **Global Access**: Floating action button (bottom right) on every page
 - **4 Themes**:
-  - **White** - Light theme for optimal readability
-  - **G10** - Slightly darker than White
-  - **G90** - Dark theme for low-light environments
-  - **G100** - Darkest theme with maximum contrast
-- **Instant Switching**: Changes apply immediately across the app
-- **Bottom Sheet UI**: Clean, accessible theme selection interface
+  - **White** — Light theme for optimal readability
+  - **G10** — Slightly darker than White
+  - **G90** — Dark theme for low-light environments
+  - **G100** — Darkest theme with maximum contrast
+- **Instant Switching**: Changes apply immediately across the entire app
 
 ## Component Categories
 
 ### Foundation (4 pages)
-Fundamental design elements that form the basis of the system:
-- **Colors** - Complete color palette with theme tokens
-- **Typography** - All 24 type styles with specifications
-- **Icons** - Carbon icon font showcase
-- **Layering** - Background, layers, fields, and borders
+Core design tokens and styles:
+- **Colors** — Complete color palette with theme tokens
+- **Typography** — All 24 type styles with specifications
+- **Icons** — Carbon icon font showcase
+- **Layering** — Background, layers, fields, and borders
 
 ### Buttons (4 components)
-Action triggers and interactive elements:
-- **Button** - Primary, secondary, tertiary, ghost, danger
-- **Combo Button** - Split button with dropdown menu
-- **Copy Button** - Copy to clipboard with feedback
-- **Chat Button** - Chat interface specialized buttons
+Custom `Carbon*` button implementations:
+- **Button** — `CarbonButton`: primary, secondary, tertiary, ghost, danger — 5 kinds × 5 sizes
+- **Combo Button** — `CarbonComboButton`: split button with dropdown menu
+- **Copy Button** — `CarbonCopyButton`: copy to clipboard with feedback animation
+- **Chat Button** — `CarbonChatButton`: chat interface specialized buttons
 
 ### Forms (7 components)
-Input components for data collection:
-- **Text Input** - Text fields with validation
-- **Number Input** - Numeric input with steppers
-- **Dropdown** - Select dropdown menu
-- **Combo Box** - Searchable dropdown
-- **Date & Time Picker** - Material pickers with Carbon theming
-- **Toggle** - On/off switch control
-- **File Uploader** - File upload with drag & drop
+Input and selection components:
+- **Text Input** — Material `TextField` with Carbon theming
+- **Number Input** — `CarbonNumberInput`: numeric input with steppers
+- **Dropdown** — `CarbonDropdown`: custom overlay dropdown with smart positioning
+- **Combo Box** — `CarbonComboBox`: searchable dropdown with keyboard navigation
+- **Date & Time Picker** — Material pickers with Carbon theming
+- **Toggle** — `CarbonToggle`: on/off switch with label
+- **File Uploader** — `CarbonFileUploader`: drag & drop file upload
 
 ### Notifications (2 components)
-Feedback and status:
-- **Notification** - Toast and inline notifications
-- **Status** - Status indicators
+Feedback and alerts:
+- **Notification** — `CarbonNotification`: toast and inline notifications
+- **Status** — Status indicator icons and colors
 
 ### Content (5 components)
 Content display and organization:
-- **Content Switcher** - Toggle between content views
-- **Skeleton** - Loading placeholders
-- **Code Snippet** - Code display with copy
-- **Structured List** - Organized data lists
-- **Tree View** - Hierarchical tree structure
+- **Content Switcher** — `CarbonContentSwitcher`: toggle between content views
+- **Skeleton** — `CarbonSkeleton`: animated loading placeholders
+- **Code Snippet** — `CarbonCodeSnippet`: code display with copy
+- **Structured List** — `CarbonStructuredList`: organized data lists
+- **Tree View** — `CarbonTreeView`: hierarchical tree structure
 
 ### Navigation (3 components)
 Navigation patterns:
-- **Breadcrumb** - Navigation trail
-- **Pagination** - Page navigation
-- **UI Shell** - Application shell layout
+- **Breadcrumb** — `CarbonBreadcrumb`: navigation trail
+- **Pagination** — `CarbonPagination`: page navigation with items-per-page selector
+- **UI Shell** — `CarbonUIShell`: application shell with side nav and header
 
 ### Overlays (5 components)
 Modal and floating content:
-- **Modal** - Dialog overlays
-- **Side Panel** - Slide-in side drawer
-- **Tearsheet** - Full-height slide-in panel
-- **Popover** - Contextual popup
-- **Toggle Tip** - Toggleable tooltip
+- **Modal** — `CarbonModal`: dialog overlays
+- **Side Panel** — `CarbonSidePanel`: slide-in side drawer
+- **Tearsheet** — `CarbonTearsheet`: full-height slide-in panel (narrow and wide)
+- **Popover** — `CarbonPopover`: contextual popup
+- **Toggle Tip** — `CarbonToggleTip`: toggleable informational tooltip
 
 ### Data Display (2 components)
-Data presentation:
-- **Loading** - Loading indicators
-- **Link** - Hyperlinks
+Inline data presentation:
+- **Loading** — `CarbonLoading`: spinner loading indicators
+- **Link** — `CarbonLink`: inline hyperlinks
 
 ### AI & Syntax (2 components)
 AI and code features:
-- **AI Label** - AI-generated content labels
-- **Syntax Highlighting** - Code syntax themes
+- **AI Label** — `CarbonAiLabel`: AI-generated content labels
+- **Syntax Highlighting** — Code syntax themes for `CarbonCodeSnippet`
 
 ### Other (2 components)
 Additional components:
-- **Overflow Menu** - Actions menu
-- **Page Header** - Page title and actions
+- **Overflow Menu** — `CarbonOverflowMenu`: actions menu
+- **Page Header** — `CarbonPageHeader`: page title with actions
 
-### Material Equivalents (Fully Themed)
-All standard Material widgets are automatically themed to match Carbon Design System. This includes **comprehensive coverage** of:
-- **Inputs**: `TextField`, `Checkbox`, `Radio`, `Switch`, `Slider`, `InputDecoration`
-- **Navigation**: `AppBar`, `BottomNavigationBar`, `NavigationRail`, `NavigationDrawer`, `TabBar`
-- **Surfaces**: `Card`, `Dialog`, `BottomSheet`, `ExpansionTile`
-- **Feedback**: `SnackBar`, `ProgressIndicator` (Linear/Circular), `Tooltip`, `Banner`
-- **Content**: `Chip`, `DataTable`, `ListTile`, `Icon`, `Divider`
-- **Interactions**: `FloatingActionButton`, `TextSelection`, `Scrollbar`, `IconButton`
-- **Pickers**: `DatePicker`, `TimePicker`, `SearchBar`, `DropdownMenu`
+### Carbon Components (7 components)
+Custom `Carbon*` implementations with dedicated demo pages:
+- **Tag** — `CarbonTag`: 12 color variants, 3 sizes (sm/md/lg), dismissible, disabled
+- **Tabs** — `CarbonTabs`: Line and Contained variants; also shows Material `TabBar` with Carbon theming
+- **Data Table** — `CarbonDataTable`: sort, multi-select, radio-select, expand, batch actions, toolbar, skeleton, zebra stripes
+- **Tile** — `CarbonTile`: clickable and selectable tile variants
+- **Multi-Select** — `CarbonMultiSelect`: multi-selection dropdown with `CarbonTag` chips
+- **Contained List** — `CarbonContainedList`: list container for small spaces
+- **Floating Menu** — `CarbonFloatingMenu`: expandable floating action menu
 
-### Carbon Widgets (3 components)
-Custom Carbon implementations:
-- **Multi-Select** - Multi-selection dropdown
-- **Contained List** - specialized list container
-- **Floating Menu** - Expandable FAB menu
+### Material Theming (5 demos)
+Carbon components covered via Material widget theming (no custom `Carbon*` class):
+- **Accordion** — `ExpansionTile` with Carbon theme
+- **Tooltip** — `Tooltip` with Carbon theme
+- **Search** — `SearchBar` with Carbon theme
+- **Select** — `DropdownMenu` with Carbon theme
+- **Selection Controls** — `Checkbox`, `Radio`, `Switch`, `Slider` with Carbon theme
 
 ## Running the Example
 
@@ -154,17 +152,10 @@ Custom Carbon implementations:
 ### Exploring Components
 
 1. **Start at Home**: Launch the app to see the categorized component list
-2. **Browse by Category**: Select a category (Buttons, Forms, Overlays, etc.)
+2. **Browse by Category**: Select a category (Buttons, Forms, Carbon Components, etc.)
 3. **Open Component Demo**: Tap a component card to view its demo page
-4. **Try Interactions**: Most demos are interactive - tap buttons, select items, etc.
-5. **Switch Themes**: Use the theme FAB (bottom right) to see components in different themes
-
-### Testing Theme Variants
-
-1. **Tap the palette icon** (floating button, bottom right)
-2. **Select a theme**: WHITE, G10, G90, or G100
-3. **Observe changes**: All components update immediately
-4. **Compare variants**: Switch between themes to see color differences
+4. **Try Interactions**: Most demos are interactive — tap buttons, select items, etc.
+5. **Switch Themes**: Use the palette FAB (bottom right) to see components in all 4 themes
 
 ### Understanding Demo Pages
 
@@ -172,21 +163,19 @@ Each demo page follows a consistent structure:
 
 ```dart
 DemoPageTemplate(
-  title: 'Component Name',           // Page title
-  description: 'Component purpose',  // What it does
-  sections: [                        // Multiple demo sections
+  title: 'Component Name',
+  description: 'Component purpose',
+  sections: [
     DemoSection(
-      title: 'Section Name',         // Example type
-      description: 'What this shows', // Section purpose
-      builder: (context) => Widget(),  // The actual demo
+      title: 'Section Name',
+      description: 'What this shows',
+      builder: (context) => Widget(),
     ),
   ],
 )
 ```
 
 ## Adding New Demo Pages
-
-To add a new component demo:
 
 ### 1. Create the Demo Page
 
@@ -205,29 +194,16 @@ class MyComponentDemoPage extends StatefulWidget {
 }
 
 class _MyComponentDemoPageState extends State<MyComponentDemoPage> {
-  // State variables here
-
   @override
   Widget build(BuildContext context) {
     return DemoPageTemplate(
       title: 'My Component',
-      description: 'Brief description of what this component does',
+      description: 'Brief description of what this component does.',
       sections: [
         DemoSection(
           title: 'Basic Usage',
-          description: 'The simplest way to use this component',
-          builder: (context) => MyComponent(),
-        ),
-        DemoSection(
-          title: 'Variants',
-          description: 'Different sizes and styles',
-          builder: (context) => Column(
-            children: [
-              MyComponent(size: ComponentSize.small),
-              MyComponent(size: ComponentSize.medium),
-              MyComponent(size: ComponentSize.large),
-            ],
-          ),
+          description: 'The simplest way to use this component.',
+          builder: (context) => const MyComponent(),
         ),
         // More sections...
       ],
@@ -236,9 +212,9 @@ class _MyComponentDemoPageState extends State<MyComponentDemoPage> {
 }
 ```
 
-### 2. Add Route Definition
+### 2. Add Route Constant
 
-In `lib/routes.dart`, add your route constant:
+In `lib/routes.dart`:
 
 ```dart
 class AppRoutes {
@@ -249,38 +225,24 @@ class AppRoutes {
 
 ### 3. Add to Category
 
-In `lib/routes.dart`, add to the appropriate category:
+In `lib/routes.dart`, add to the appropriate `ComponentCategory`:
 
 ```dart
-static final Map<String, List<ComponentItem>> categories = {
-  'Your Category': [
-    // ... existing components
-    ComponentItem(
-      title: 'My Component',
-      route: AppRoutes.myComponent,
-      description: 'Brief one-line description',
-    ),
-  ],
-};
+ComponentItem(
+  title: 'My Component',
+  route: AppRoutes.myComponent,
+  description: 'Brief one-line description',
+),
 ```
 
 ### 4. Register Route Handler
 
-In `lib/main.dart`, add the route case:
+In `lib/main.dart`:
 
 ```dart
-onGenerateRoute: (settings) {
-  Widget Function(BuildContext) builder;
-
-  switch (settings.name) {
-    // ... existing cases
-    case AppRoutes.myComponent:
-      builder = (_) => const MyComponentDemoPage();
-      break;
-  }
-
-  // ... rest of routing code
-}
+case AppRoutes.myComponent:
+  builder = (_) => const MyComponentDemoPage();
+  break;
 ```
 
 ### 5. Import the Page
@@ -291,51 +253,7 @@ At the top of `lib/main.dart`:
 import 'pages/my_component_demo_page.dart';
 ```
 
-## Demo Page Best Practices
-
-### Section Organization
-
-1. **Basic Usage** - Simplest possible example
-2. **Variants** - Different sizes, styles, types
-3. **States** - Enabled, disabled, loading, error, focus
-4. **Interactive Example** - User can interact and see state changes
-5. **Edge Cases** - Long text, many items, empty state
-6. **Integration** - Used with other components
-7. **Customization** - Advanced configuration options
-
-### Example Structure
-
-```dart
-DemoSection(
-  title: 'Interactive States',
-  description: 'Component behavior in different states',
-  builder: (context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // State controls
-      Row(
-        children: [
-          Text('Current state: $_currentState'),
-          SizedBox(width: 16),
-          CarbonDropdown(
-            items: ['Normal', 'Disabled', 'Loading'],
-            selectedItem: _currentState,
-            onChanged: (value) => setState(() => _currentState = value),
-          ),
-        ],
-      ),
-      SizedBox(height: 16),
-      // Component in current state
-      MyComponent(
-        disabled: _currentState == 'Disabled',
-        loading: _currentState == 'Loading',
-      ),
-    ],
-  ),
-)
-```
-
-## Navigation Flow
+## Navigation Structure
 
 ```
 Home Page
@@ -346,30 +264,23 @@ Home Page
 │  └─ Layering
 │
 ├─ Buttons
-│  ├─ Button Variants
+│  ├─ Button (CarbonButton)
 │  ├─ Combo Button
 │  ├─ Copy Button
 │  └─ Chat Button
 │
 ├─ Forms
-│  ├─ Dropdown
-│  ├─ Combo Box
+│  ├─ Text Input
 │  ├─ Number Input
+│  ├─ Dropdown (CarbonDropdown)
+│  ├─ Combo Box (CarbonComboBox)
+│  ├─ Date & Time Picker
 │  ├─ Toggle
 │  └─ File Uploader
 │
-├─ Navigation
-│  ├─ Breadcrumb
-│  ├─ Pagination
-│  ├─ UI Shell
-│  └─ Page Header
-│
-├─ Overlays
-│  ├─ Modal
-│  ├─ Side Panel
-│  ├─ Tearsheet
-│  ├─ Popover
-│  └─ Toggle Tip
+├─ Notifications
+│  ├─ Notification
+│  └─ Status
 │
 ├─ Content
 │  ├─ Content Switcher
@@ -378,150 +289,76 @@ Home Page
 │  ├─ Structured List
 │  └─ Tree View
 │
-├─ Notifications
-│  └─ Notification
+├─ Navigation
+│  ├─ Breadcrumb
+│  ├─ Pagination
+│  └─ UI Shell
+│
+├─ Overlays
+│  ├─ Modal
+│  ├─ Side Panel
+│  ├─ Tearsheet
+│  ├─ Popover
+│  └─ Toggle Tip
 │
 ├─ Data Display
 │  ├─ Loading
 │  └─ Link
 │
 ├─ AI & Syntax
-│  └─ AI Label
+│  ├─ AI Label
+│  └─ Syntax Highlighting
 │
-└─ Other
-   ├─ Overflow Menu
-   └─ Page Header
+├─ Other
+│  ├─ Overflow Menu
+│  └─ Page Header
+│
+├─ Carbon Components
+│  ├─ Tag (CarbonTag)
+│  ├─ Tabs (CarbonTabs)
+│  ├─ Data Table (CarbonDataTable)
+│  ├─ Tile (CarbonTile)
+│  ├─ Multi-Select (CarbonMultiSelect)
+│  ├─ Contained List (CarbonContainedList)
+│  └─ Floating Menu (CarbonFloatingMenu)
+│
+└─ Material Theming
+   ├─ Accordion
+   ├─ Tooltip
+   ├─ Search
+   ├─ Select
+   └─ Selection Controls
 ```
 
 ## Key Files
 
-### Main Application
-- **main.dart** - App entry, routing, theme management, FAB wrapper
-- **routes.dart** - All route definitions and component categories
-
-### Reusable Widgets
-- **demo_page_template.dart** - Consistent page template with title, description, sections
-- **section_header.dart** - Section headers with consistent styling
-
-### Demo Pages
-All demo pages follow naming convention: `{component}_demo_page.dart`
-
-## Theme Management
-
-The example app implements global theme switching:
-
-```dart
-class _CarbonExampleAppState extends State<CarbonExampleApp> {
-  CarbonThemeMode _currentMode = CarbonThemeMode.white;
-
-  CarbonThemeData getThemeData(CarbonThemeMode mode) {
-    switch (mode) {
-      case CarbonThemeMode.white:
-        return WhiteTheme.theme;
-      case CarbonThemeMode.g10:
-        return G10Theme.theme;
-      case CarbonThemeMode.g90:
-        return G90Theme.theme;
-      case CarbonThemeMode.g100:
-        return G100Theme.theme;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final carbon = getThemeData(_currentMode);
-
-    return MaterialApp(
-      theme: carbonTheme(carbon: carbon),
-      // ... routes
-    );
-  }
-}
-```
-
-### Theme Switcher FAB
-
-Every page is wrapped with a FAB for theme switching:
-
-```dart
-class ThemeSwitcherWrapper extends StatelessWidget {
-  final CarbonThemeMode currentMode;
-  final ValueChanged<CarbonThemeMode> onThemeChanged;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        child,
-        Positioned(
-          bottom: 16,
-          right: 16,
-          child: FloatingActionButton(
-            onPressed: () => _showThemePicker(context),
-            child: Icon(Icons.palette),
-          ),
-        ),
-      ],
-    );
-  }
-}
-```
+- **main.dart** — App entry, routing, theme management, FAB wrapper
+- **routes.dart** — All route constants and component category definitions
+- **widgets/demo_page_template.dart** — Consistent page template (`DemoPageTemplate`, `DemoSection`)
 
 ## Component Status
 
-All 48 component demos are fully implemented.
+| Category | Count | Type |
+|---|---|---|
+| Custom `Carbon*` widgets | 36 | Native Carbon implementation |
+| Material theming demos | 5 | Material widget + Carbon theme |
+| Not yet implemented | 16 | Planned for future releases |
+| **Carbon Design System total** | **74** | |
 
-**Current Status**:
-- ✅ 100% Complete
-- 48/48 components with demo pages
-- 4 foundation pages
-- 48 total demo pages
-
-## Development Tips
-
-### Hot Reload
-Use hot reload (press `r` in terminal) to see changes instantly without losing state.
-
-### Theme Testing
-Test each component in all 4 themes to ensure proper color token usage.
-
-### State Management
-Use StatefulWidget for interactive demos where user actions change component state.
-
-### Code Organization
-- Keep demo pages focused on the component
-- Extract complex examples into separate widgets
-- Use clear, descriptive section titles
-- Add comments for non-obvious code
-
-### Accessibility
-- Test with screen readers
-- Ensure proper semantic labels
-- Test keyboard navigation
-- Verify color contrast
+See [../README.md](../README.md) for the full component coverage breakdown.
 
 ## Troubleshooting
 
-### Component Not Showing
-- Verify import path
-- Check that component is exported in main package
-- Ensure theme data exists for the component
-
 ### Theme Not Applying
-- Confirm `carbonTheme(carbon: carbon)` is used in MaterialApp
-- Check that `context.carbon` is called inside build method
-- Verify component uses theme tokens, not hardcoded colors
+- Confirm `carbonTheme(carbon: carbon)` is used in `MaterialApp.theme`
+- Check that `context.carbon` is called inside `build`
+- Verify the component uses Carbon theme tokens, not hardcoded colors
 
 ### Navigation Issues
-- Ensure route is defined in AppRoutes
-- Verify route case exists in onGenerateRoute
-- Check that demo page is imported in main.dart
+- Ensure the route constant is defined in `AppRoutes`
+- Verify the `case` exists in `onGenerateRoute` in `main.dart`
+- Check that the demo page is imported at the top of `main.dart`
 
 ## Related Documentation
 
-- [Main README](../README.md) - Package overview and quick start
-
----
-
-**100% Complete** - All 48 Carbon components now have comprehensive demo pages! 🎉
+- [Main README](../README.md) — Package overview, component coverage, and quick start

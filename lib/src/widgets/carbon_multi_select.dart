@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/carbon_theme.dart';
+import 'carbon_tag.dart';
 
 /// Item for Carbon multi-select dropdown.
 class CarbonMultiSelectItem<T> {
@@ -152,24 +153,13 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
             spacing: 8,
             runSpacing: 8,
             children: widget.values.map((value) {
-              return Chip(
-                label: Text(_getItemText(value)),
-                onDeleted: widget.enabled ? () => _removeItem(value) : null,
-                deleteIcon: Icon(
-                  Icons.close,
-                  size: 16,
-                  color: carbon.text.iconPrimary,
-                ),
-                backgroundColor: carbon.layer.layer01,
-                side: BorderSide(color: carbon.layer.borderSubtle01),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-                labelStyle: TextStyle(
-                  color: carbon.text.textPrimary,
-                  fontSize: 12,
-                ),
-                deleteIconColor: carbon.text.iconPrimary,
+              return CarbonTag(
+                text: _getItemText(value),
+                type: CarbonTagType.gray,
+                size: CarbonTagSize.md,
+                onDismiss:
+                    widget.enabled ? () => _removeItem(value) : null,
+                disabled: !widget.enabled,
               );
             }).toList(),
           ),

@@ -154,6 +154,15 @@
     * Highlighted item is visually indicated using `menuItemHover` color.
   * Removed Material underline border from the internal `TextField` (all border variants set to `InputBorder.none`).
 
+* **CarbonTag** (new)
+  * Added `CarbonTag` widget — a native Carbon Design System tag component, replacing Flutter's `Chip` for Carbon-compliant tag rendering.
+  * Supports 12 color variants via `CarbonTagType` enum: `red`, `magenta`, `purple`, `blue`, `cyan`, `teal`, `green`, `gray`, `coolGray`, `warmGray`, `highContrast`, `outline`. Colors use fixed IBM Design Language palette values, independent of the active theme.
+  * Supports 3 size variants via `CarbonTagSize` enum: `sm` (18px), `md` (24px, default), `lg` (32px).
+  * Provide `onDismiss` callback to render a dismissible tag with a close icon button.
+  * `disabled` parameter dims text and disables the close button.
+  * Hover state with per-type hover color using `MouseRegion`.
+  * Fully pill-shaped (`borderRadius: 100`); `outline` type renders with a 1px border and transparent background.
+
 * **CarbonFileUploaderDropZone**
   * Added `dragText` parameter to customize the primary drop zone label (defaults to `'Drag and drop files here or'`).
   * Added `browseText` parameter to customize the secondary browse label (defaults to `'click to upload'`).
@@ -163,6 +172,9 @@
 * **CarbonDataTableRow**
   * Fixed: clicking the row body on an expandable row toggled the visual expansion state but did not fire `onExpansionChanged`. The callback is now called consistently whether the row is expanded via the chevron or by tapping the row body.
   * Both parameters are ignored when a custom `child` widget is provided.
+
+* **CarbonMultiSelect**
+  * Selected item chips now render using `CarbonTag` instead of Flutter's `Chip`, eliminating the `contentSize >= rawLabelSize.height` layout assertion caused by the global `ChipThemeData` negative vertical `labelPadding`.
 
 
 ## 1.0.1+1

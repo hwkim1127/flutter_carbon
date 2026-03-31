@@ -345,23 +345,54 @@ final List<ComponentCategory> componentCategories = [
     ],
   ),
   ComponentCategory(
-    title: 'Material Equivalents',
-    subtitle: 'Material widgets with Carbon theming',
+    title: 'Carbon Components',
+    subtitle: 'Custom Carbon Design System implementations',
+    items: [
+      ComponentItem(
+        title: 'Tag',
+        route: AppRoutes.tag,
+        description: 'CarbonTag — 12 color types, 3 sizes, dismissible',
+      ),
+      ComponentItem(
+        title: 'Tabs',
+        route: AppRoutes.tabs,
+        description: 'CarbonTabs — Line and Contained variants',
+      ),
+      ComponentItem(
+        title: 'Data Table',
+        route: AppRoutes.dataTable,
+        description: 'CarbonDataTable — sort, select, expand, toolbar',
+      ),
+      ComponentItem(
+        title: 'Tile',
+        route: AppRoutes.tile,
+        description: 'CarbonTile — clickable and selectable tiles',
+      ),
+      ComponentItem(
+        title: 'Multi-Select',
+        route: AppRoutes.multiSelect,
+        description: 'Multi-selection dropdown with CarbonTag chips',
+      ),
+      ComponentItem(
+        title: 'Contained List',
+        route: AppRoutes.containedList,
+        description: 'List container for small spaces',
+      ),
+      ComponentItem(
+        title: 'Floating Menu',
+        route: AppRoutes.floatingMenu,
+        description: 'Expandable floating action menu',
+      ),
+    ],
+  ),
+  ComponentCategory(
+    title: 'Material Theming',
+    subtitle: 'Carbon components handled via Material theming',
     items: [
       ComponentItem(
         title: 'Accordion',
         route: AppRoutes.accordion,
         description: 'ExpansionTile with Carbon theme',
-      ),
-      ComponentItem(
-        title: 'Tabs',
-        route: AppRoutes.tabs,
-        description: 'TabBar with Carbon theme',
-      ),
-      ComponentItem(
-        title: 'Tag',
-        route: AppRoutes.tag,
-        description: 'Chip variants with Carbon theme',
       ),
       ComponentItem(
         title: 'Tooltip',
@@ -379,40 +410,9 @@ final List<ComponentCategory> componentCategories = [
         description: 'DropdownMenu with Carbon theme',
       ),
       ComponentItem(
-        title: 'Data Table',
-        route: AppRoutes.dataTable,
-        description: 'DataTable with Carbon theme',
-      ),
-      ComponentItem(
-        title: 'Tile',
-        route: AppRoutes.tile,
-        description: 'Carbon clickable/selectable tiles',
-      ),
-      ComponentItem(
         title: 'Selection Controls',
         route: AppRoutes.selectionControls,
-        description: 'Themed Checkbox, Radio, Switch, Slider',
-      ),
-    ],
-  ),
-  ComponentCategory(
-    title: 'Carbon Widgets',
-    subtitle: 'Custom Carbon implementations',
-    items: [
-      ComponentItem(
-        title: 'Multi-Select',
-        route: AppRoutes.multiSelect,
-        description: 'Multi-selection dropdown with chips',
-      ),
-      ComponentItem(
-        title: 'Contained List',
-        route: AppRoutes.containedList,
-        description: 'List container for small spaces',
-      ),
-      ComponentItem(
-        title: 'Floating Menu',
-        route: AppRoutes.floatingMenu,
-        description: 'Expandable floating action menu',
+        description: 'Checkbox, Radio, Switch, Slider with Carbon theme',
       ),
     ],
   ),

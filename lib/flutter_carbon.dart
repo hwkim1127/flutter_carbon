@@ -42,6 +42,7 @@ export 'src/widgets/carbon_floating_menu.dart';
 export 'src/widgets/carbon_tabs.dart';
 export 'src/widgets/carbon_data_table.dart';
 export 'src/widgets/carbon_toolbar.dart';
+export 'src/widgets/carbon_tag.dart';
 
 // Component Themes
 export 'src/theme/component_themes/ai_theme_data.dart';

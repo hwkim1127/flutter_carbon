@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
 import '../widgets/demo_page_template.dart';
 
-/// Demo page for Tag/Label functionality using Material's Chip widgets.
+/// Demo page for CarbonTag and Material Chip (Tag) components.
 class TagDemoPage extends StatefulWidget {
   const TagDemoPage({super.key});
 
@@ -14,17 +14,110 @@ class _TagDemoPageState extends State<TagDemoPage> {
   final Set<String> _selectedFilters = {'all'};
   String _selectedChoice = 'option1';
   final List<String> _inputTags = ['Design', 'Development'];
+  final List<CarbonTagType> _dismissibleTags = CarbonTagType.values.toList();
 
   @override
   Widget build(BuildContext context) {
     return DemoPageTemplate(
-      title: 'Tag / Label',
+      title: 'Tag',
       description:
-          'Tags categorize and label content. Built using Material Chip widgets with Carbon theming.',
+          'Tags are used to label, categorize, or organize items using keywords. '
+          'CarbonTag is a native Carbon Design System implementation with 12 color variants and 3 sizes. '
+          'Material Chip is also available with Carbon theming for filter/choice/input interactions.',
       sections: [
+        // ── CarbonTag ──────────────────────────────────────────────────────
+
         DemoSection(
-          title: 'Basic Tags',
-          description: 'Simple non-interactive tags for displaying categories.',
+          title: 'CarbonTag — Color Variants',
+          description:
+              'All 12 Carbon tag color types with fixed IBM Design Language palette colors, '
+              'independent of the active theme.',
+          builder: (context) => Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: const [
+              CarbonTag(text: 'Red', type: CarbonTagType.red),
+              CarbonTag(text: 'Magenta', type: CarbonTagType.magenta),
+              CarbonTag(text: 'Purple', type: CarbonTagType.purple),
+              CarbonTag(text: 'Blue', type: CarbonTagType.blue),
+              CarbonTag(text: 'Cyan', type: CarbonTagType.cyan),
+              CarbonTag(text: 'Teal', type: CarbonTagType.teal),
+              CarbonTag(text: 'Green', type: CarbonTagType.green),
+              CarbonTag(text: 'Gray', type: CarbonTagType.gray),
+              CarbonTag(text: 'Cool Gray', type: CarbonTagType.coolGray),
+              CarbonTag(text: 'Warm Gray', type: CarbonTagType.warmGray),
+              CarbonTag(text: 'High Contrast', type: CarbonTagType.highContrast),
+              CarbonTag(text: 'Outline', type: CarbonTagType.outline),
+            ],
+          ),
+        ),
+        DemoSection(
+          title: 'CarbonTag — Size Variants',
+          description: 'Three sizes: sm (18px), md (24px, default), lg (32px).',
+          builder: (context) => Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: const [
+              CarbonTag(text: 'Small', type: CarbonTagType.blue, size: CarbonTagSize.sm),
+              CarbonTag(text: 'Medium', type: CarbonTagType.blue, size: CarbonTagSize.md),
+              CarbonTag(text: 'Large', type: CarbonTagType.blue, size: CarbonTagSize.lg),
+              CarbonTag(text: 'Small', type: CarbonTagType.green, size: CarbonTagSize.sm),
+              CarbonTag(text: 'Medium', type: CarbonTagType.green, size: CarbonTagSize.md),
+              CarbonTag(text: 'Large', type: CarbonTagType.green, size: CarbonTagSize.lg),
+            ],
+          ),
+        ),
+        DemoSection(
+          title: 'CarbonTag — Dismissible',
+          description: 'Tags with an onDismiss callback show a close button.',
+          builder: (context) => Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _dismissibleTags.map((type) {
+              return CarbonTag(
+                text: type.name,
+                type: type,
+                onDismiss: () {
+                  setState(() => _dismissibleTags.remove(type));
+                },
+              );
+            }).toList(),
+          ),
+        ),
+        DemoSection(
+          title: 'CarbonTag — Disabled',
+          description:
+              'Disabled tags dim the text and make the close button inert.',
+          builder: (context) => Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: const [
+              CarbonTag(text: 'Blue', type: CarbonTagType.blue, disabled: true),
+              CarbonTag(text: 'Green', type: CarbonTagType.green, disabled: true),
+              CarbonTag(
+                text: 'Dismissible',
+                type: CarbonTagType.gray,
+                disabled: true,
+                onDismiss: null,
+              ),
+              CarbonTag(
+                text: 'High Contrast',
+                type: CarbonTagType.highContrast,
+                disabled: true,
+              ),
+            ],
+          ),
+        ),
+
+        // ── Material Chip (with Carbon theming) ────────────────────────────
+
+        DemoSection(
+          title: 'Material Chip — Basic (with Carbon theming)',
+          description:
+              'Standard Material Chip widgets styled via the Carbon ChipThemeData. '
+              'Use these when you need filter/choice/input chip interactions '
+              'that integrate with Flutter\'s chip selection model.',
           builder: (context) => Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -38,42 +131,8 @@ class _TagDemoPageState extends State<TagDemoPage> {
           ),
         ),
         DemoSection(
-          title: 'Tags with Avatars',
-          description: 'Tags can include icons or avatars.',
-          builder: (context) => Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              Chip(
-                avatar: Icon(
-                  Icons.person,
-                  size: 20,
-                  color: context.carbon.text.iconPrimary,
-                ),
-                label: const Text('User'),
-              ),
-              Chip(
-                avatar: Icon(
-                  Icons.location_on,
-                  size: 20,
-                  color: context.carbon.text.iconPrimary,
-                ),
-                label: const Text('Location'),
-              ),
-              Chip(
-                avatar: Icon(
-                  Icons.calendar_today,
-                  size: 20,
-                  color: context.carbon.text.iconPrimary,
-                ),
-                label: const Text('Date'),
-              ),
-            ],
-          ),
-        ),
-        DemoSection(
-          title: 'Filter Chips',
-          description: 'Selectable chips for filtering content.',
+          title: 'Material FilterChip — Selectable',
+          description: 'Multi-selectable chips for filtering content.',
           builder: (context) => Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -134,7 +193,7 @@ class _TagDemoPageState extends State<TagDemoPage> {
           ),
         ),
         DemoSection(
-          title: 'Choice Chips',
+          title: 'Material ChoiceChip — Single Select',
           description: 'Single-select chips (radio button alternative).',
           builder: (context) => Wrap(
             spacing: 8,
@@ -165,7 +224,7 @@ class _TagDemoPageState extends State<TagDemoPage> {
           ),
         ),
         DemoSection(
-          title: 'Input Chips',
+          title: 'Material InputChip — Removable',
           description: 'Removable chips often used in tag inputs.',
           builder: (context) => Wrap(
             spacing: 8,
@@ -184,61 +243,12 @@ class _TagDemoPageState extends State<TagDemoPage> {
                 label: const Text('Add Tag'),
                 onPressed: () {
                   setState(() {
-                    _inputTags.add('New Tag ${_inputTags.length + 1}');
+                    _inputTags.add('Tag ${_inputTags.length + 1}');
                   });
                 },
               ),
             ],
           ),
-        ),
-        DemoSection(
-          title: 'Status Tags',
-          description: 'Tags with different colors for status indication.',
-          builder: (context) {
-            final carbon = context.carbon;
-            return Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                Chip(
-                  backgroundColor: carbon.layer.supportSuccess.withValues(
-                    alpha: 0.1,
-                  ),
-                  label: Text(
-                    'Success',
-                    style: TextStyle(color: carbon.layer.supportSuccess),
-                  ),
-                ),
-                Chip(
-                  backgroundColor: carbon.layer.supportError.withValues(
-                    alpha: 0.1,
-                  ),
-                  label: Text(
-                    'Error',
-                    style: TextStyle(color: carbon.layer.supportError),
-                  ),
-                ),
-                Chip(
-                  backgroundColor: carbon.layer.supportWarning.withValues(
-                    alpha: 0.1,
-                  ),
-                  label: Text(
-                    'Warning',
-                    style: TextStyle(color: carbon.layer.supportWarning),
-                  ),
-                ),
-                Chip(
-                  backgroundColor: carbon.layer.supportInfo.withValues(
-                    alpha: 0.1,
-                  ),
-                  label: Text(
-                    'Info',
-                    style: TextStyle(color: carbon.layer.supportInfo),
-                  ),
-                ),
-              ],
-            );
-          },
         ),
       ],
     );
