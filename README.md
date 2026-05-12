@@ -4,14 +4,14 @@
 
 # Flutter Carbon
 
-A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **36 custom Carbon components**, 4 theme variants, and automatic Carbon styling for standard Material widgets.
+A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **37 custom Carbon components**, 4 theme variants, and automatic Carbon styling for standard Material widgets.
 
 #### 🔗 [Live Demo](https://hwkim1127.github.io/flutter_carbon/)
 
 **Carbon Design System has 74 components.** Here is how Flutter Carbon covers them:
 
-- **36 custom `Carbon*` widgets** — full spec implementations
-- **12 via Material theming** — standard Material widgets auto-styled by `carbonTheme()`
+- **37 custom `Carbon*` widgets** — full spec implementations
+- **11 via Material theming** — standard Material widgets auto-styled by `carbonTheme()`
 - **10 architectural / utilities** — layout/structural concepts mapped to Flutter primitives
 - **16 not yet implemented** — planned for future releases
 
@@ -30,7 +30,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - **Motion System**: Duration and easing values for animations
 - **Layering System**: Background, layer, field, and border tokens for proper visual hierarchy
 
-### 🧩 36 Carbon Components
+### 🧩 37 Carbon Components
 
 **Buttons & Actions**
 - `CarbonButton` - Full-spec button with 7 kind variants (primary, secondary, tertiary, ghost, danger, dangerTertiary, dangerGhost) and 5 size variants (sm/md/lg/xl/2xl); supports text, text+icon, and icon-only modes
@@ -79,6 +79,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - `CarbonContainedList` - List container for small UI spaces with headers and actions
 
 **Notifications & Feedback**
+- `CarbonProgressIndicator` - Multi-step progress indicator (horizontal/vertical) with complete/current/incomplete/invalid/disabled states and optional tap-to-navigate
 - `CarbonNotification` - Toast/inline notifications with 4 severity types
 - `CarbonLoading` - Loading spinner (small, default, large)
 - `CarbonSkeleton` - Skeleton loading states (text, rectangle, circle)
@@ -102,7 +103,6 @@ These Carbon components are covered by standard Material widgets that automatica
 | `inline-loading` | `CircularProgressIndicator` |
 | `list` | `ListTile` |
 | `progress-bar` | `LinearProgressIndicator` |
-| `progress-indicator` | `CircularProgressIndicator` |
 | `radio-button` | `Radio` |
 | `search` | `SearchBar` |
 | `slider` | `Slider` |
@@ -548,7 +548,7 @@ lib/
 │   │   ├── typography.dart            # Typography system
 │   │   ├── spacing.dart               # Spacing constants
 │   │   └── motion.dart                # Animation durations
-│   ├── widgets/                       # 36 Carbon components
+│   ├── widgets/                       # 37 Carbon components
 │   │   ├── carbon_button.dart
 │   │   ├── carbon_modal.dart
 │   │   ├── carbon_dropdown.dart
@@ -579,8 +579,8 @@ This implementation follows the official Carbon Design System V11 specifications
 - ✅ Components match Carbon web component behavior
 - ✅ All 4 official themes (White, G10, G90, G100) supported
 - ✅ Spacing, motion, and layering follow Carbon guidelines
-- ✅ 36 custom `Carbon*` widgets with full spec compliance
-- ✅ 12 Carbon components covered via automatic Material theming
+- ✅ 37 custom `Carbon*` widgets with full spec compliance
+- ✅ 11 Carbon components covered via automatic Material theming
 - ✅ All 4 official themes (White, G10, G90, G100) supported
 - 🚧 16 components not yet implemented (see table above)
 
