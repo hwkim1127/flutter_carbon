@@ -43,6 +43,7 @@ export 'src/widgets/carbon_tabs.dart';
 export 'src/widgets/carbon_data_table.dart';
 export 'src/widgets/carbon_toolbar.dart';
 export 'src/widgets/carbon_tag.dart';
+export 'src/widgets/carbon_progress_indicator.dart';
 
 // Component Themes
 export 'src/theme/component_themes/ai_theme_data.dart';

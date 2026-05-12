@@ -1,3 +1,40 @@
+## 1.2.0
+
+### New Features
+
+* **CarbonProgressIndicator** (new)
+  * Added `CarbonProgressIndicator` widget — a native Carbon Design System progress indicator component.
+  * Accepts a `List<CarbonProgressStep>` to define each step with a required `label`, optional `secondaryLabel`, optional explicit `state`, and `disabled` flag.
+  * Step states are automatically derived from `currentIndex` (parent-managed):
+    * `complete` — steps before the current index; filled circle with white checkmark.
+    * `current` — step at the current index; filled circle with white hollow center (CircleDash).
+    * `incomplete` — steps after the current index; circle outline.
+    * `invalid` — error state (explicit only); `CarbonIcons.warningFilled` in `carbon.layer.supportError`.
+    * `disabled` — grayed-out circle outline; not tappable even when `onStepTap` is set.
+    * Individual steps can override automatic state via `CarbonProgressStep.state`.
+  * **Orientation**: horizontal (default) and vertical via `vertical` parameter.
+    * Horizontal: connector lines run left/right of each icon; each step in `Expanded` by default.
+    * Vertical: connector line runs downward from icon; labels sit to the right; minimum step height 58px matching Carbon spec.
+  * **`spaceEqually`** (horizontal only, default `true`): wraps each step in `Expanded` to distribute width equally.
+  * **`onStepTap`**: when provided, steps become tappable. Current and disabled steps remain non-interactive.
+  * **Connector lines** reflect completion: lines connecting to/from complete steps use `buttonPrimary` (Carbon Blue); lines to incomplete steps use `#8D8D8D`.
+  * **Custom icon painters** (`CustomPainter`):
+    * `_CheckCirclePainter` — filled circle + white checkmark strokes.
+    * `_CurrentCirclePainter` — filled circle + white hollow dot center.
+    * `_OutlineCirclePainter` — 1.5px stroke circle outline.
+  * `MouseRegion` cursor changes to `click` on tappable steps.
+  * Icon and label colors follow Carbon theme tokens (`carbon.button.buttonPrimary`, `carbon.text.textPrimary`, `carbon.text.textSecondary`, `carbon.text.textDisabled`).
+
+### Component Updates
+
+* **CarbonComboBox**
+  * The trailing chevron icon is now tappable and toggles the dropdown open/closed (previously only the text field area opened the menu).
+
+### Bug Fixes
+
+* **CarbonComboBox**
+  * Fixed: the trailing chevron icon did not flip back from up to down immediately after the dropdown closed because `_isOpen` was mutated outside `setState`. Closing the dropdown now triggers a rebuild consistently.
+
 ## 1.1.0
 
 ### Deprecations

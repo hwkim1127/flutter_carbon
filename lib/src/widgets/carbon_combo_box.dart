@@ -224,10 +224,12 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   void _closeDropdown() {
     if (!_isOpen) return;
 
-    _isOpen = false;
-    _highlightedIndex = -1;
     _overlayEntry?.remove();
     _overlayEntry = null;
+    setState(() {
+      _isOpen = false;
+      _highlightedIndex = -1;
+    });
     _updateSearchText();
   }
 
@@ -268,6 +270,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
       builder: (context) {
         final carbon = context.carbon;
         final theme = carbon.comboBox;
+        final items = _filteredItems;
 
         return GestureDetector(
           behavior: HitTestBehavior.translucent,
@@ -286,7 +289,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                     color: theme.menuBackground,
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 300),
-                      child: _filteredItems.isEmpty
+                      child: items.isEmpty
                           ? Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Text(
@@ -301,10 +304,10 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                               controller: _scrollController,
                               padding: EdgeInsets.zero,
                               shrinkWrap: true,
-                              itemCount: _filteredItems.length,
+                              itemCount: items.length,
                               itemExtent: _itemHeight,
                               itemBuilder: (context, index) {
-                                final item = _filteredItems[index];
+                                final item = items[index];
                                 final isSelected = item.value == widget.value;
                                 final isHighlighted =
                                     index == _highlightedIndex;
@@ -456,16 +459,28 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                   ),
                 ],
                 // Dropdown icon
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Icon(
-                    _isOpen
-                        ? Icons.keyboard_arrow_up
-                        : Icons.keyboard_arrow_down,
-                    color: widget.enabled
-                        ? theme.iconColor
-                        : theme.iconColorDisabled,
-                    size: 20,
+                GestureDetector(
+                  onTap: () {
+                    if (widget.enabled) {
+                      if (_isOpen) {
+                        _closeDropdown();
+                      } else {
+                        _focusNode.requestFocus();
+                        _openDropdown();
+                      }
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Icon(
+                      _isOpen
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      color: widget.enabled
+                          ? theme.iconColor
+                          : theme.iconColorDisabled,
+                      size: 20,
+                    ),
                   ),
                 ),
               ],
