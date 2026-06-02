@@ -1,3 +1,20 @@
+## 1.2.1
+
+### Deprecations
+
+* **CarbonDataTable**
+  * `CarbonDataTable.sortable` is now a no-op and marked `@Deprecated`. Sort UI is driven entirely by `header.sortable: true` (per-column opt-in) + a non-null `onSort` callback — the table-level flag became redundant ("yes I really mean it"). Existing call sites that pass `sortable: true` keep compiling (with a deprecation warning) and behave the same as before, since the gate now uses `header.sortable && onSort != null`. To disable all sort UI on a table, pass `onSort: null` (or omit it). The field will be removed in 2.0.0.
+
+### Behavior Changes
+
+* **CarbonDataTable**
+  * `CarbonDataTableHeader.sortable` now defaults to **`false`** (was `true`). Sort indicators no longer appear on every column whenever the table is sortable; columns now **opt in** by setting `sortable: true` explicitly. The previous default made non-sortable columns show a misleading grey up/down chevron. Existing call sites that explicitly set `sortable: false` keep working (the value is now redundant but harmless); call sites that relied on the implicit default to be sortable must set `sortable: true` on those headers.
+
+### Bug Fixes
+
+* **CarbonDataTable**
+  * Fixed: a sortable header that used `flex` (no fixed `width`) crashed at layout with `Expanded was placed inside a Listener`. The sortable click handler (`MouseRegion` + `GestureDetector`) was wrapping the cell container — which, for `flex`-sized columns, **is** an `Expanded` — and that `Expanded` ended up nested inside a `Listener` instead of being a direct child of the parent `Row`. The click handler now wraps the header's **content** before the cell container is built, so the `Expanded` (or `SizedBox`, for `width`-sized columns) stays a direct child of the parent `Flex`. Sortable columns can now use either `flex` or `width`.
+
 ## 1.2.0
 
 ### New Features

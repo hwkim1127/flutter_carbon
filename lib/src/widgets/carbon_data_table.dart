@@ -155,21 +155,23 @@ class CarbonDataTable extends StatefulWidget {
   /// - [CarbonDataTableSize.compact]: 32px rows
   final CarbonDataTableSize size;
 
-  /// Whether the table supports sortable columns.
+  /// Deprecated. No-op since 1.2.1.
   ///
-  /// When true, headers with [CarbonDataTableHeader.sortable] = true will
-  /// show sort indicators and respond to clicks.
+  /// Sort UI is now driven by the combination of `header.sortable: true`
+  /// (per-column opt-in) and a non-null [onSort] callback. To disable sort
+  /// UI on a table, pass `onSort: null` (or omit it). Will be removed in 2.0.0.
+  @Deprecated(
+      'No-op since 1.2.1. A column is sortable iff its header has sortable: true AND onSort is non-null. Will be removed in 2.0.0.')
   final bool sortable;
 
   /// The key of the currently sorted column.
   ///
-  /// Must match a [CarbonDataTableHeader] key. Only used when [sortable] is true.
+  /// Must match a [CarbonDataTableHeader] key. A column shows the sort
+  /// indicator iff its header has `sortable: true` AND [onSort] is non-null.
   /// Use with [sortDirection] to control programmatic sorting.
   final String? sortKey;
 
-  /// The current sort direction.
-  ///
-  /// Only used when [sortable] is true and [sortKey] is set.
+  /// The current sort direction. Used together with [sortKey].
   final CarbonDataTableSortDirection sortDirection;
 
   /// Callback when a sortable header is clicked.
@@ -234,7 +236,7 @@ class CarbonDataTable extends StatefulWidget {
     this.onSelectAll,
     this.stickyHeader = false,
     this.size = CarbonDataTableSize.medium,
-    this.sortable = false,
+    @Deprecated('No-op since 1.2.1. A column is sortable iff its header has sortable: true AND onSort is non-null. Will be removed in 2.0.0.') this.sortable = false,
     this.sortKey,
     this.sortDirection = CarbonDataTableSortDirection.none,
     this.onSort,
@@ -483,7 +485,10 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
 
   Widget _buildHeaderCell(
       CarbonDataTableHeader header, CarbonThemeData carbon) {
-    final bool isSortable = widget.sortable && header.sortable;
+    // A column is interactive iff the header opted in AND the caller wired a
+    // sort handler. No separate table-level kill-switch: pass `onSort: null`
+    // to disable sort UI altogether.
+    final bool isSortable = header.sortable && widget.onSort != null;
     final bool isSorted = widget.sortKey == header.key;
     final sortDirection =
         isSorted ? widget.sortDirection : CarbonDataTableSortDirection.none;
@@ -513,16 +518,13 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
       ],
     );
 
-    Widget cell = _buildCellContainer(
-      flex: header.flex,
-      width: header.width,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: headerContent,
-    );
-
-    // Make header clickable if sortable
-    if (isSortable && widget.onSort != null) {
-      cell = MouseRegion(
+    // Wrap the header CONTENT in the click handler before the cell container,
+    // so that when header.flex is used, the Expanded from _buildCellContainer
+    // remains the direct child of the parent Row (a Flex). Wrapping the cell
+    // itself put Expanded inside a Listener and crashed at layout time.
+    if (isSortable) {
+      // isSortable already implies widget.onSort != null.
+      headerContent = MouseRegion(
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: () {
@@ -532,12 +534,17 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
             widget.onSort!(header.key, newDirection);
           },
           behavior: HitTestBehavior.opaque,
-          child: cell,
+          child: headerContent,
         ),
       );
     }
 
-    return cell;
+    return _buildCellContainer(
+      flex: header.flex,
+      width: header.width,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: headerContent,
+    );
   }
 
   Widget _buildCellContainer({
@@ -805,11 +812,11 @@ class CarbonDataTableHeader {
   /// When set, the column will not flex and will use this exact width.
   final double? width;
 
-  /// Whether this column is sortable.
+  /// Whether this column is sortable. Defaults to `false` — columns opt in.
   ///
-  /// When true and the table has [CarbonDataTable.sortable] = true,
-  /// the header will show a sort indicator and respond to clicks.
-  /// Individual columns can disable sorting by setting this to false.
+  /// When `true` and the table has [CarbonDataTable.sortable] = true, the
+  /// header shows the sort indicator and responds to clicks. When `false`,
+  /// no indicator is shown for this column even if the table is sortable.
   final bool sortable;
 
   /// Horizontal alignment of header content.
@@ -824,7 +831,7 @@ class CarbonDataTableHeader {
     this.child,
     this.flex = 1,
     this.width,
-    this.sortable = true,
+    this.sortable = false,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
   })  : assert(label != null || child != null,
