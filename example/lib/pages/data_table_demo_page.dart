@@ -321,18 +321,20 @@ class _DataTableDemoPageState extends State<DataTableDemoPage> {
         ),
         DemoSection(
           title: 'Sortable Columns',
-          description: 'Click headers to sort data in ascending/descending order.',
+          description:
+              'Columns opt in to sorting with sortable: true on their header. '
+              'Protocol stays non-sortable. Click headers to cycle '
+              'ascending/descending/none.',
           builder: (context) => CarbonDataTable(
-            sortable: true,
             sortKey: _sortKey,
             sortDirection: _sortDirection,
             onSort: _sort,
             headers: [
-              CarbonDataTableHeader(key: 'name', label: 'Name'),
-              CarbonDataTableHeader(key: 'protocol', label: 'Protocol', sortable: false),
-              CarbonDataTableHeader(key: 'port', label: 'Port'),
-              CarbonDataTableHeader(key: 'rule', label: 'Rule'),
-              CarbonDataTableHeader(key: 'status', label: 'Status'),
+              CarbonDataTableHeader(key: 'name', label: 'Name', sortable: true),
+              CarbonDataTableHeader(key: 'protocol', label: 'Protocol'),
+              CarbonDataTableHeader(key: 'port', label: 'Port', sortable: true),
+              CarbonDataTableHeader(key: 'rule', label: 'Rule', sortable: true),
+              CarbonDataTableHeader(key: 'status', label: 'Status', sortable: true),
             ],
             rows: _sortedData.map((item) => CarbonDataTableRow(
               cells: [

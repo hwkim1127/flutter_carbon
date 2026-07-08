@@ -74,6 +74,7 @@ class AppRoutes {
   static const String multiSelect = '/carbon/multi-select';
   static const String containedList = '/carbon/contained-list';
   static const String floatingMenu = '/carbon/floating-menu';
+  static const String progressIndicator = '/carbon/progress-indicator';
 }
 
 /// Component category for organizing navigation.
@@ -382,6 +383,12 @@ final List<ComponentCategory> componentCategories = [
         title: 'Floating Menu',
         route: AppRoutes.floatingMenu,
         description: 'Expandable floating action menu',
+      ),
+      ComponentItem(
+        title: 'Progress Indicator',
+        route: AppRoutes.progressIndicator,
+        description:
+            'CarbonProgressIndicator — multi-step progress, horizontal and vertical',
       ),
     ],
   ),

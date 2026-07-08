@@ -85,9 +85,12 @@ class HomePage extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _buildStatChip('73 Components', carbon),
+              _buildStatChip(
+                '${componentCategories.fold<int>(0, (n, c) => n + c.items.length)} Components',
+                carbon,
+              ),
               _buildStatChip('4 Themes', carbon),
-              _buildStatChip('22 Custom Widgets', carbon),
+              _buildStatChip('37 Custom Widgets', carbon),
             ],
           ),
         ],

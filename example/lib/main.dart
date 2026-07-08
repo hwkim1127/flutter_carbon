@@ -54,6 +54,7 @@ import 'pages/material_selection_demo_page.dart';
 import 'pages/multi_select_demo_page.dart';
 import 'pages/contained_list_demo_page.dart';
 import 'pages/floating_menu_demo_page.dart';
+import 'pages/progress_indicator_demo_page.dart';
 import 'routes.dart';
 
 void main() {
@@ -299,6 +300,9 @@ class _CarbonExampleAppState extends State<CarbonExampleApp> {
             break;
           case AppRoutes.floatingMenu:
             builder = (_) => const FloatingMenuDemoPage();
+            break;
+          case AppRoutes.progressIndicator:
+            builder = (_) => const ProgressIndicatorDemoPage();
             break;
 
           // Add more routes here as you create demo pages

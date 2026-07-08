@@ -14,6 +14,8 @@ class _NewCarbonWidgetsSectionState extends State<NewCarbonWidgetsSection> {
   List<String> _selectedCountries = ['kr'];
   bool _tile1Selected = false;
   bool _tile2Expanded = false;
+  int _tabIndex = 0;
+  int _progressIndex = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +25,102 @@ class _NewCarbonWidgetsSectionState extends State<NewCarbonWidgetsSection> {
         const Text(
           'New Carbon Widgets',
           style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+
+        // CarbonTag
+        const Text(
+          'Tags',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            const CarbonTag(text: 'Red', type: CarbonTagType.red),
+            const CarbonTag(text: 'Blue', type: CarbonTagType.blue),
+            const CarbonTag(text: 'Green', type: CarbonTagType.green),
+            const CarbonTag(text: 'Purple', type: CarbonTagType.purple),
+            const CarbonTag(text: 'Outline', type: CarbonTagType.outline),
+            CarbonTag(
+              text: 'Dismissible',
+              type: CarbonTagType.cyan,
+              onDismiss: () {},
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        // CarbonTabs
+        const Text(
+          'Tabs',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        CarbonTabs(
+          initialIndex: _tabIndex,
+          tabs: const [
+            CarbonTab(label: 'Overview'),
+            CarbonTab(label: 'Details'),
+            CarbonTab(label: 'Settings'),
+          ],
+          onTabChanged: (i) => setState(() => _tabIndex = i),
+        ),
+        Container(
+          height: 60,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            'Tab ${_tabIndex + 1} content',
+            style: TextStyle(color: context.carbon.text.textSecondary),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // CarbonProgressIndicator
+        const Text(
+          'Progress Indicator',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        CarbonProgressIndicator(
+          currentIndex: _progressIndex,
+          onStepTap: (i) => setState(() => _progressIndex = i),
+          steps: const [
+            CarbonProgressStep(label: 'Cart'),
+            CarbonProgressStep(label: 'Shipping'),
+            CarbonProgressStep(label: 'Payment'),
+            CarbonProgressStep(label: 'Review'),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        // CarbonDataTable
+        const Text(
+          'Data Table',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        CarbonDataTable(
+          size: CarbonDataTableSize.short,
+          headers: const [
+            CarbonDataTableHeader(key: 'name', label: 'Name'),
+            CarbonDataTableHeader(key: 'protocol', label: 'Protocol'),
+            CarbonDataTableHeader(key: 'status', label: 'Status'),
+          ],
+          rows: const [
+            CarbonDataTableRow(cells: [
+              CarbonDataTableCell(child: Text('Load Balancer 1')),
+              CarbonDataTableCell(child: Text('HTTP')),
+              CarbonDataTableCell(child: Text('Active')),
+            ]),
+            CarbonDataTableRow(cells: [
+              CarbonDataTableCell(child: Text('Load Balancer 2')),
+              CarbonDataTableCell(child: Text('HTTPS')),
+              CarbonDataTableCell(child: Text('Inactive')),
+            ]),
+          ],
         ),
         const SizedBox(height: 16),
 
@@ -97,6 +195,41 @@ class _NewCarbonWidgetsSectionState extends State<NewCarbonWidgetsSection> {
               onTap: () {},
             ),
           ],
+        ),
+        const SizedBox(height: 16),
+
+        // CarbonFloatingMenu
+        const Text(
+          'Floating Menu',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 220,
+          child: Stack(
+            children: [
+              Positioned(
+                bottom: 8,
+                right: 8,
+                child: CarbonFloatingMenu(
+                  heroTag: 'all-components-fab',
+                  icon: Icons.add,
+                  items: [
+                    CarbonFloatingMenuItem(
+                      icon: Icons.create,
+                      label: 'Create new',
+                      onTap: () {},
+                    ),
+                    CarbonFloatingMenuItem(
+                      icon: Icons.upload,
+                      label: 'Upload file',
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
