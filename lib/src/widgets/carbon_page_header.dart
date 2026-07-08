@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../theme/carbon_theme.dart';
 import '../theme/component_themes/page_header_theme_data.dart';

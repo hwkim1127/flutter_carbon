@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../base/carbon_pressable.dart';
+import '../icons/carbon_icons.dart';
+import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 
 /// File uploader item state from Carbon Design System.
@@ -81,8 +84,7 @@ class CarbonFileUploader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final carbon = theme.extension<CarbonThemeData>()!;
+    final carbon = context.carbon;
     final fileUploaderTheme = carbon.fileUploader;
 
     return Column(
@@ -255,8 +257,7 @@ class CarbonFileUploaderDropZone extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final carbon = theme.extension<CarbonThemeData>()!;
+    final carbon = context.carbon;
     final fileUploaderTheme = carbon.fileUploader;
 
     final backgroundColor = disabled
@@ -271,9 +272,9 @@ class CarbonFileUploaderDropZone extends StatelessWidget {
             ? fileUploaderTheme.dropZoneDragBorder
             : fileUploaderTheme.dropZoneBorder);
 
-    return InkWell(
+    return CarbonPressable(
       onTap: disabled ? null : onBrowseFiles,
-      child: Container(
+      builder: (context, _) => Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: backgroundColor,
@@ -388,8 +389,7 @@ class CarbonFileUploaderItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final carbon = theme.extension<CarbonThemeData>()!;
+    final carbon = context.carbon;
     final fileUploaderTheme = carbon.fileUploader;
 
     return Column(
@@ -471,7 +471,7 @@ class CarbonFileUploaderItem extends StatelessWidget {
 
       case CarbonFileUploaderItemState.complete:
         return Icon(
-          Icons.check_circle,
+          CarbonIcons.checkmarkFilled,
           size: 16,
           color: theme.completeColor,
         );
@@ -482,14 +482,14 @@ class CarbonFileUploaderItem extends StatelessWidget {
           children: [
             if (invalid)
               Icon(
-                Icons.warning,
+                CarbonIcons.warningFilled,
                 size: 16,
                 color: theme.errorColor,
               ),
             const SizedBox(width: 8),
             IconButton(
               icon: Icon(
-                Icons.close,
+                CarbonIcons.close,
                 size: 16,
                 color: theme.fileItemIconColor,
               ),

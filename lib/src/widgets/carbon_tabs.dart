@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../../flutter_carbon.dart';
 
 enum CarbonTabsType {
@@ -220,7 +220,7 @@ class _CarbonTabItemState extends State<_CarbonTabItem> {
     final carbon = context.carbon;
 
     // Define colors based on type and state
-    Color backgroundColor = Colors.transparent;
+    Color backgroundColor = CarbonPalette.transparent;
     Color textColor = carbon.text.textSecondary;
     Color borderColor = carbon.layer.borderSubtle01; // Default underline
     double borderThickness = 1.0;
@@ -228,7 +228,7 @@ class _CarbonTabItemState extends State<_CarbonTabItem> {
     if (widget.type == CarbonTabsType.contained) {
       // Contained Tabs
       backgroundColor = carbon.layer.layerAccent01; // Default background
-      borderColor = Colors.transparent; // No bottom border by default
+      borderColor = CarbonPalette.transparent; // No bottom border by default
 
       if (widget.disabled) {
         backgroundColor =

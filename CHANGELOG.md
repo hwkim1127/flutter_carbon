@@ -1,3 +1,59 @@
+## 1.3.0
+
+### Visual Changes
+
+* **No more ink ripple.** Every internal `InkWell` was replaced with a plain
+  hover/press/focus detector. Carbon's spec has no ripple — interaction
+  feedback is a flat color change — so this is a fidelity fix, but interactive
+  surfaces (tree view rows, structured list rows, copy buttons, menu items,
+  file uploader drop zone, …) no longer splash on tap.
+* **Carbon icon glyphs everywhere.** All internal Material `Icons.*` were
+  replaced with the corresponding `CarbonIcons` glyphs (close, chevrons,
+  checkmarks, warning/error/information, search, menu, overflow, subtract,
+  undo, copy). Notification/status/loading icons now use Carbon's filled
+  variants (`errorFilled`, `checkmarkFilled`, `warningFilled`,
+  `informationFilled`).
+
+### Internal De-Materialization
+
+* 24 of 37 widgets no longer import `package:flutter/material.dart` at all —
+  including button, tabs, tag, tile, breadcrumb, link, skeleton, page header,
+  progress indicator, dropdown, notification, overflow menu, popover,
+  toggle tip, structured list, tree view, content switcher, copy button,
+  contained list, chat button, AI label, toggle, side panel, and tearsheet.
+* New internal building blocks (not exported): `CarbonPressable`
+  (hover/press/focus + keyboard activation, extracted from `CarbonButton`),
+  `CarbonDivider` (1px rule, horizontal/vertical), and `CarbonOverlaySurface`
+  (installs Carbon's text style in overlay entries, replacing
+  `Material(color: transparent)` wrappers).
+* Material `elevation` on the dropdown menu, combo box menu, side panel, and
+  tearsheet was replaced with explicit Carbon box shadows.
+* `CarbonTearsheet` no longer builds on `Scaffold`.
+* Internal `Theme.of(context).extension<CarbonThemeData>()` lookups were
+  replaced with `context.carbon` across all widgets.
+* All internal `Colors.*` uses were replaced with `CarbonPalette` constants;
+  added `CarbonPalette.transparent`.
+* The 13 widgets still importing Material do so for components that get
+  native Carbon replacements in V2: `TextField` (combo box, multi-select,
+  number input, modal, toolbar search), `Checkbox`/`Radio` (data table,
+  multi-select), Material `Tooltip` (pagination, combo button),
+  `CircularProgressIndicator` (loading, file uploader),
+  `FloatingActionButton` (floating menu), `Scaffold` (modal, UI shell), and
+  `SelectableText` (code snippet).
+
+### New Features
+
+* **`context.carbonOrNull`** — nullable variant of `context.carbon` that
+  returns null instead of throwing when no Carbon theme is installed.
+
+### Bug Fixes
+
+* **CarbonPagination**
+  * The default English page-range label rendered the literal placeholder
+    text `{current} of N pages`. It now renders `of N pages` (the current
+    page is displayed by the adjacent page dropdown), matching the documented
+    behavior.
+
 ## 1.2.1
 
 ### Deprecations

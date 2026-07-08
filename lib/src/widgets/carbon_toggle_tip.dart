@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
+import '../foundation/colors.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import 'carbon_popover.dart';
 
@@ -128,7 +130,9 @@ class _CarbonToggleTipState extends State<CarbonToggleTip> {
         behavior: HitTestBehavior.translucent,
         child: Stack(
           children: [
-            Positioned.fill(child: Container(color: Colors.transparent)),
+            Positioned.fill(
+              child: Container(color: CarbonPalette.transparent),
+            ),
             Positioned(
               width: widget.maxWidth,
               child: CompositedTransformFollower(
@@ -268,7 +272,7 @@ class _ToggleTipButtonState extends State<_ToggleTipButton> {
             ),
             child: widget.icon ??
                 Icon(
-                  Icons.info_outline,
+                  CarbonIcons.information,
                   size: 16,
                   color: carbon.toggleTip.buttonIcon,
                 ),
@@ -316,15 +320,13 @@ class _ToggleTipContent extends StatelessWidget {
             borderRadius: BorderRadius.circular(2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
+                color: CarbonPalette.black.withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
             ],
           ),
-          child: Material(
-            color: Colors.transparent,
-            child: Padding(
+          child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -358,7 +360,6 @@ class _ToggleTipContent extends StatelessWidget {
                 ],
               ),
             ),
-          ),
         ),
         if (_isTopAligned) _buildCaret(carbon.toggleTip.caret, isTop: false),
       ],

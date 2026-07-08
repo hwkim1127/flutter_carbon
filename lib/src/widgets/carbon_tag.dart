@@ -1,4 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+import '../foundation/colors.dart';
+import '../icons/carbon_icons.dart';
 
 /// Tag size variants from Carbon Design System.
 enum CarbonTagSize {
@@ -100,7 +103,7 @@ const _tagColorMap = <CarbonTagType, _TagColors>{
     hover: Color(0xFF474747),
   ),
   CarbonTagType.outline: _TagColors(
-    background: Colors.transparent,
+    background: CarbonPalette.transparent,
     text: Color(0xFF393939),
     hover: Color(0xFFE8E8E8),
     border: Color(0xFF8D8D8D),
@@ -210,7 +213,7 @@ class _CarbonTagState extends State<CarbonTag> {
               GestureDetector(
                 onTap: widget.disabled ? null : widget.onDismiss,
                 child: Icon(
-                  Icons.close,
+                  CarbonIcons.close,
                   size: widget.size == CarbonTagSize.lg ? 16 : 14,
                   color: widget.disabled
                       ? colors.text.withValues(alpha: 0.5)

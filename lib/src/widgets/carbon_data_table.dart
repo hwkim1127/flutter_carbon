@@ -1163,7 +1163,7 @@ class _CustomRadioButton extends StatelessWidget {
               selected ? effectiveColor : effectiveColor.withValues(alpha: 0.5),
           width: selected ? 2 : 1.5,
         ),
-        color: selected ? Colors.transparent : Colors.transparent,
+        color: CarbonPalette.transparent,
       ),
       child: selected
           ? Center(

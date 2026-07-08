@@ -75,7 +75,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(InkWell), findsNothing);
+      expect(find.byIcon(CarbonIcons.close), findsNothing);
     });
 
     testWidgets('calls onClose when close button is tapped', (tester) async {
@@ -93,7 +93,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.byType(InkWell));
+      await tester.tap(find.byIcon(CarbonIcons.close));
       await tester.pump();
 
       expect(closeCalled, isTrue);

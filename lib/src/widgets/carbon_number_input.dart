@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 
 /// Carbon Design System number input.
@@ -243,7 +244,7 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _StepperButton(
-                        icon: Icons.add,
+                        icon: CarbonIcons.add,
                         onPressed: widget.disabled || widget.readOnly
                             ? null
                             : _increment,
@@ -253,7 +254,7 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
                         color: carbon.numberInput.controlButtonDivider,
                       ),
                       _StepperButton(
-                        icon: Icons.remove,
+                        icon: CarbonIcons.subtract,
                         onPressed: widget.disabled || widget.readOnly
                             ? null
                             : _decrement,

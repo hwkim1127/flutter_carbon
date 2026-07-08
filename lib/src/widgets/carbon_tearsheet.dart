@@ -1,7 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_divider.dart';
+import '../base/carbon_overlay_surface.dart';
+import '../base/carbon_pressable.dart';
 import '../foundation/colors.dart';
 import '../foundation/motion.dart';
+import '../icons/carbon_icons.dart';
+import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 
 /// Tearsheet width variants from Carbon Design System.
@@ -162,8 +167,7 @@ class CarbonTearsheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final carbon = theme.extension<CarbonThemeData>()!;
+    final carbon = context.carbon;
     final tearsheetTheme = carbon.tearsheet;
 
     final isWide = width == CarbonTearsheetWidth.wide;
@@ -174,15 +178,21 @@ class CarbonTearsheet extends StatelessWidget {
     final effectiveWidth =
         screenWidth < targetWidth ? screenWidth : targetWidth;
 
-    return Material(
-      color: tearsheetTheme.background,
-      elevation: 16,
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(0),
-        topRight: Radius.circular(0),
-      ),
-      child: SizedBox(
-        width: effectiveWidth,
+    return CarbonOverlaySurface(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: tearsheetTheme.background,
+          boxShadow: [
+            // Replaces the Material elevation the sheet previously relied on.
+            BoxShadow(
+              color: CarbonPalette.black.withValues(alpha: 0.3),
+              blurRadius: 16,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: SizedBox(
+          width: effectiveWidth,
         child: Column(
           mainAxisSize: scrollable ? MainAxisSize.min : MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -191,11 +201,7 @@ class CarbonTearsheet extends StatelessWidget {
             _buildHeader(context, tearsheetTheme, isWide),
 
             // Divider
-            Divider(
-              height: 1,
-              thickness: 1,
-              color: tearsheetTheme.dividerColor,
-            ),
+            CarbonDivider(color: tearsheetTheme.dividerColor),
 
             // Body with optional influencer
             if (scrollable)
@@ -213,11 +219,7 @@ class CarbonTearsheet extends StatelessWidget {
 
             // Actions
             if (actions != null && actions!.isNotEmpty) ...[
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: tearsheetTheme.dividerColor,
-              ),
+              CarbonDivider(color: tearsheetTheme.dividerColor),
               IntrinsicHeight(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -226,6 +228,7 @@ class CarbonTearsheet extends StatelessWidget {
               ),
             ],
           ],
+        ),
         ),
       ),
     );
@@ -295,16 +298,20 @@ class CarbonTearsheet extends StatelessWidget {
               ],
               if (showCloseButton) ...[
                 const SizedBox(width: 16),
-                IconButton(
-                  icon: Icon(Icons.close, color: theme.iconColor),
-                  onPressed: () {
+                CarbonPressable(
+                  onTap: () {
                     onClose?.call();
                     Navigator.of(context).pop();
                   },
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 32,
-                    minHeight: 32,
+                  focusable: true,
+                  builder: (context, _) => SizedBox(
+                    width: 32,
+                    height: 32,
+                    child: Icon(
+                      CarbonIcons.close,
+                      size: 16,
+                      color: theme.iconColor,
+                    ),
                   ),
                 ),
               ],
@@ -314,7 +321,7 @@ class CarbonTearsheet extends StatelessWidget {
           // Header navigation (only for wide tearsheets)
           if (headerNavigation != null && isWide) ...[
             const SizedBox(height: 16),
-            Divider(height: 1, thickness: 1, color: theme.dividerColor),
+            CarbonDivider(color: theme.dividerColor),
             const SizedBox(height: 8),
             headerNavigation!,
           ],
@@ -345,20 +352,12 @@ class CarbonTearsheet extends StatelessWidget {
       children: influencerPlacement == CarbonTearsheetInfluencerPlacement.left
           ? [
               influencerSection,
-              VerticalDivider(
-                width: 1,
-                thickness: 1,
-                color: theme.dividerColor,
-              ),
+              CarbonDivider(vertical: true, color: theme.dividerColor),
               contentSection,
             ]
           : [
               contentSection,
-              VerticalDivider(
-                width: 1,
-                thickness: 1,
-                color: theme.dividerColor,
-              ),
+              CarbonDivider(vertical: true, color: theme.dividerColor),
               influencerSection,
             ],
     );
@@ -403,9 +402,8 @@ class _CarbonTearsheetRoute<T> extends PageRoute<T> {
   Color? get barrierColor {
     final BuildContext? context = navigator?.context;
     if (context == null) return CarbonPalette.overlay;
-    final theme = Theme.of(context);
-    final carbon = theme.extension<CarbonThemeData>();
-    return carbon?.tearsheet.overlayColor ?? CarbonPalette.overlay;
+    return context.carbonOrNull?.tearsheet.overlayColor ??
+        CarbonPalette.overlay;
   }
 
   @override
@@ -427,10 +425,9 @@ class _CarbonTearsheetRoute<T> extends PageRoute<T> {
   ) {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        minimum: const EdgeInsets.only(top: kToolbarHeight),
+    // 56 = toolbar height previously taken from Material's kToolbarHeight.
+    return SafeArea(
+        minimum: const EdgeInsets.only(top: 56),
         child: Center(
           child: Column(
             children: [
@@ -456,7 +453,6 @@ class _CarbonTearsheetRoute<T> extends PageRoute<T> {
             ],
           ),
         ),
-      ),
     );
   }
 
@@ -467,8 +463,7 @@ class _CarbonTearsheetRoute<T> extends PageRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    final theme = Theme.of(context);
-    final carbon = theme.extension<CarbonThemeData>()!;
+    final carbon = context.carbon;
 
     final slideAnimation = Tween<Offset>(
       begin: const Offset(0, 1.0),

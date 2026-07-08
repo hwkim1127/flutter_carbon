@@ -55,7 +55,7 @@ void main() {
       );
 
       // Tap dropdown arrow
-      await tester.tap(find.byIcon(Icons.keyboard_arrow_down));
+      await tester.tap(find.byIcon(CarbonIcons.chevronDown));
       await tester.pump();
 
       expect(find.text('Option 1'), findsOneWidget);
@@ -106,7 +106,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.byIcon(Icons.keyboard_arrow_down));
+      await tester.tap(find.byIcon(CarbonIcons.chevronDown));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Edit'));

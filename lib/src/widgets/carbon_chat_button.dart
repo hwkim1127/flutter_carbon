@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../foundation/colors.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 
@@ -45,7 +46,7 @@ enum CarbonChatButtonKind {
 ///     // Handle chat action
 ///   },
 ///   child: Text('Send'),
-///   icon: Icon(Icons.send),
+///   icon: Icon(CarbonIcons.sendFilled),
 /// )
 /// ```
 class CarbonChatButton extends StatefulWidget {
@@ -200,11 +201,11 @@ class _CarbonChatButtonState extends State<CarbonChatButton> {
       case CarbonChatButtonKind.tertiary:
         // Tertiary buttons have transparent background
         // buttonTertiary token is used for border/text (see line 214)
-        return Colors.transparent;
+        return CarbonPalette.transparent;
       case CarbonChatButtonKind.ghost:
         return widget.isQuickAction
             ? carbon.chat.chatButton
-            : Colors.transparent;
+            : CarbonPalette.transparent;
       case CarbonChatButtonKind.danger:
         return carbon.button.buttonDangerPrimary;
     }

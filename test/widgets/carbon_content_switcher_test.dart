@@ -20,7 +20,11 @@ void main() {
         ),
       );
 
-      expect(find.byType(CarbonContentSwitcher), findsOneWidget);
+      // byType can't match the generic instantiation (CarbonContentSwitcher<String>).
+      expect(
+        find.byWidgetPredicate((w) => w is CarbonContentSwitcher),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays all items', (tester) async {
@@ -88,7 +92,7 @@ void main() {
       );
 
       final switcher = tester.widget<CarbonContentSwitcher>(
-        find.byType(CarbonContentSwitcher),
+        find.byWidgetPredicate((w) => w is CarbonContentSwitcher),
       );
       expect(switcher.size, CarbonContentSwitcherSize.small);
     });
@@ -108,7 +112,7 @@ void main() {
       );
 
       final switcher = tester.widget<CarbonContentSwitcher>(
-        find.byType(CarbonContentSwitcher),
+        find.byWidgetPredicate((w) => w is CarbonContentSwitcher),
       );
       expect(switcher.size, CarbonContentSwitcherSize.medium);
     });
@@ -128,7 +132,7 @@ void main() {
       );
 
       final switcher = tester.widget<CarbonContentSwitcher>(
-        find.byType(CarbonContentSwitcher),
+        find.byWidgetPredicate((w) => w is CarbonContentSwitcher),
       );
       expect(switcher.size, CarbonContentSwitcherSize.large);
     });
@@ -148,7 +152,7 @@ void main() {
       );
 
       final switcher = tester.widget<CarbonContentSwitcher>(
-        find.byType(CarbonContentSwitcher),
+        find.byWidgetPredicate((w) => w is CarbonContentSwitcher),
       );
       expect(switcher.fullWidth, isTrue);
     });

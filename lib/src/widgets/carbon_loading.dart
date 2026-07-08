@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 
@@ -156,13 +157,17 @@ class CarbonInlineLoading extends StatelessWidget {
 
       case CarbonInlineLoadingStatus.finished:
         return Icon(
-          Icons.check_circle,
+          CarbonIcons.checkmarkFilled,
           size: 16,
           color: carbon.status.statusGreen,
         );
 
       case CarbonInlineLoadingStatus.error:
-        return Icon(Icons.error, size: 16, color: carbon.status.statusRed);
+        return Icon(
+          CarbonIcons.errorFilled,
+          size: 16,
+          color: carbon.status.statusRed,
+        );
     }
   }
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
 
@@ -29,7 +29,9 @@ void main() {
           ),
         ),
       );
-      expect(find.text('5 of 10 pages'), findsOne);
+      // Current page is shown in the page dropdown; the label renders the rest.
+      expect(find.text('of 10 pages'), findsOne);
+      expect(find.text('5'), findsWidgets);
     });
 
     testWidgets('calls onPageChanged when page is changed', (tester) async {
@@ -48,7 +50,7 @@ void main() {
       );
 
       // Find and tap next button
-      final nextButton = find.byIcon(Icons.chevron_right);
+      final nextButton = find.byIcon(CarbonIcons.chevronRight);
       if (nextButton.evaluate().isNotEmpty) {
         await tester.tap(nextButton);
         await tester.pump();
@@ -91,6 +93,12 @@ void main() {
     });
 
     testWidgets('supports page size selector', (tester) async {
+      // The full pagination bar with the size selector is wider than the
+      // default 800px test surface.
+      tester.view.physicalSize = const Size(1400, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
       await tester.pumpWidget(
         buildTestApp(
           child: CarbonPagination(

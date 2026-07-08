@@ -19,6 +19,11 @@ extension CarbonThemeContext on BuildContext {
     }
     return carbon;
   }
+
+  /// Returns the [CarbonThemeData] from the current [Theme], or null when no
+  /// Carbon theme is installed. Prefer [carbon] unless a fallback is needed.
+  CarbonThemeData? get carbonOrNull =>
+      Theme.of(this).extension<CarbonThemeData>();
 }
 
 /// Helper to create a Material [ThemeData] from a [CarbonThemeData].

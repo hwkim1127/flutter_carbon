@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart' show KeyDownEvent;
 
+import '../foundation/colors.dart';
 import '../foundation/motion.dart';
 import '../foundation/typography.dart';
 import '../theme/carbon_theme.dart';
@@ -206,7 +207,7 @@ class _CarbonButtonState extends State<CarbonButton> {
                   decoration: BoxDecoration(
                     color: bg,
                     border: Border.all(
-                      color: borderColor ?? Colors.transparent,
+                      color: borderColor ?? CarbonPalette.transparent,
                       width: 1,
                     ),
                   ),
@@ -316,10 +317,10 @@ class _CarbonButtonState extends State<CarbonButton> {
     }
     switch (widget.kind) {
       case CarbonButtonKind.tertiary:
-        return _isHovered || _isPressed ? Colors.transparent : t.buttonTertiary;
+        return _isHovered || _isPressed ? CarbonPalette.transparent : t.buttonTertiary;
       case CarbonButtonKind.dangerTertiary:
         return _isHovered || _isPressed
-            ? Colors.transparent
+            ? CarbonPalette.transparent
             : t.buttonDangerSecondary;
       default:
         return null;
@@ -335,7 +336,7 @@ class _CarbonButtonState extends State<CarbonButton> {
         case CarbonButtonKind.dangerGhost:
         case CarbonButtonKind.tertiary:
         case CarbonButtonKind.dangerTertiary:
-          return Colors.transparent;
+          return CarbonPalette.transparent;
         default:
           return t.buttonDisabled;
       }
@@ -358,13 +359,13 @@ class _CarbonButtonState extends State<CarbonButton> {
             ? t.buttonTertiaryActive
             : _isHovered
                 ? t.buttonTertiaryHover
-                : Colors.transparent;
+                : CarbonPalette.transparent;
       case CarbonButtonKind.ghost:
         return _isPressed
             ? l.layerActive01
             : _isHovered
                 ? l.backgroundHover
-                : Colors.transparent;
+                : CarbonPalette.transparent;
       case CarbonButtonKind.danger:
         return _isPressed
             ? t.buttonDangerActive
@@ -376,13 +377,13 @@ class _CarbonButtonState extends State<CarbonButton> {
             ? t.buttonDangerActive
             : _isHovered
                 ? t.buttonDangerPrimary
-                : Colors.transparent;
+                : CarbonPalette.transparent;
       case CarbonButtonKind.dangerGhost:
         return _isPressed
             ? t.buttonDangerActive
             : _isHovered
                 ? t.buttonDangerHover
-                : Colors.transparent;
+                : CarbonPalette.transparent;
     }
   }
 

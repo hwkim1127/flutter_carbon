@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../foundation/colors.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 
@@ -171,11 +173,11 @@ class _CarbonAILabelState extends State<CarbonAILabel> {
             decoration: BoxDecoration(
               color: _isHovered
                   ? carbon.ai.aiAuraHoverBackground
-                  : Colors.transparent,
+                  : CarbonPalette.transparent,
               borderRadius: BorderRadius.circular(sizeValue / 2),
             ),
             child: Icon(
-              Icons.undo,
+              CarbonIcons.undo,
               size: sizeValue * 0.6,
               color: carbon.text.textPrimary,
             ),
@@ -255,7 +257,7 @@ class _CarbonAILabelState extends State<CarbonAILabel> {
                     : null,
                 color: _isHovered ? null : carbon.layer.layer01,
                 borderRadius: BorderRadius.circular(sizeValue / 2),
-                border: Border.all(width: 1.5, color: Colors.transparent),
+                border: Border.all(width: 1.5, color: CarbonPalette.transparent),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

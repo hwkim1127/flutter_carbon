@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_overlay_surface.dart';
+import '../foundation/colors.dart';
 import '../theme/carbon_theme.dart';
 
 /// Popover alignment options.
@@ -142,7 +144,7 @@ class _CarbonPopoverState extends State<CarbonPopover> {
         child: Stack(
           children: [
             // Transparent overlay to capture outside taps
-            Positioned.fill(child: Container(color: Colors.transparent)),
+            Positioned.fill(child: Container(color: CarbonPalette.transparent)),
             // Popover content
             Positioned(
               width: widget.maxWidth,
@@ -309,8 +311,7 @@ class _PopoverContent extends StatelessWidget {
                   ]
                 : null,
           ),
-          child: Material(
-            color: Colors.transparent,
+          child: CarbonOverlaySurface(
             child: Padding(padding: const EdgeInsets.all(16), child: content),
           ),
         ),

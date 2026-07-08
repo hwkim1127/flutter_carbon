@@ -1,6 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
+import '../base/carbon_divider.dart';
+import '../base/carbon_overlay_surface.dart';
+import '../foundation/colors.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 
 /// Size options for the overflow menu.
@@ -118,7 +122,7 @@ class _CarbonOverflowMenuState extends State<CarbonOverflowMenu> {
         onTap: _close,
         child: Stack(
           children: [
-            Positioned.fill(child: Container(color: Colors.transparent)),
+            Positioned.fill(child: Container(color: CarbonPalette.transparent)),
             CompositedTransformFollower(
               link: _layerLink,
               targetAnchor:
@@ -126,8 +130,7 @@ class _CarbonOverflowMenuState extends State<CarbonOverflowMenu> {
               followerAnchor:
                   widget.flipped ? Alignment.bottomLeft : Alignment.topLeft,
               offset: Offset(0, widget.flipped ? -8 : 8),
-              child: Material(
-                color: Colors.transparent,
+              child: CarbonOverlaySurface(
                 child: _MenuContent(
                   items: widget.items,
                   size: widget.size,
@@ -180,7 +183,7 @@ class _CarbonOverflowMenuState extends State<CarbonOverflowMenu> {
                     : carbon.overflowMenu.triggerBackground,
               ),
               child: Icon(
-                widget.icon ?? Icons.more_vert,
+                widget.icon ?? CarbonIcons.overflowMenuVertical,
                 size: _iconSize,
                 color: carbon.overflowMenu.triggerIcon,
               ),
@@ -282,7 +285,7 @@ class _MenuContentState extends State<_MenuContent> {
 
       if (item is CarbonOverflowMenuDivider) {
         widgets.add(
-          Divider(height: 1, thickness: 1, color: widget.theme.divider),
+          CarbonDivider(color: widget.theme.divider),
         );
       } else if (item is CarbonOverflowMenuItem) {
         widgets.add(_buildMenuItem(item, i));

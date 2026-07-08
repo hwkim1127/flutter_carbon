@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_overlay_surface.dart';
+import '../foundation/colors.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 
@@ -204,7 +207,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
           children: [
             // Full-screen invisible layer to detect clicks outside
             Positioned.fill(
-              child: Container(color: Colors.transparent),
+              child: Container(color: CarbonPalette.transparent),
             ),
             // The actual dropdown menu
             Positioned(
@@ -212,9 +215,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
                 link: _layerLink,
                 showWhenUnlinked: false,
                 offset: menuOffset,
-                child: Material(
-                  elevation: 2,
-                  color: Colors.transparent,
+                child: CarbonOverlaySurface(
                   child: _buildDropdownMenu(
                     width: size.width,
                     carbon: carbon,
@@ -245,6 +246,14 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
         color: carbon.layer.layer01,
         border: Border.all(color: carbon.layer.borderSubtle01, width: 1),
         borderRadius: BorderRadius.zero,
+        boxShadow: [
+          // Replaces the Material elevation the menu previously relied on.
+          BoxShadow(
+            color: CarbonPalette.black.withValues(alpha: 0.2),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: ListView(
         padding: EdgeInsets.zero,
@@ -289,7 +298,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
                 ? carbon.layer.layerHover01
                 : isSelected
                     ? carbon.layer.layerSelected01
-                    : Colors.transparent,
+                    : CarbonPalette.transparent,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
@@ -322,7 +331,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Icon(
-                    Icons.check,
+                    CarbonIcons.checkmark,
                     size: 16,
                     color: carbon.text.iconInteractive,
                   ),
@@ -423,8 +432,8 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
                         child: widget.icon ??
                             Icon(
                               _isOpen
-                                  ? Icons.keyboard_arrow_up
-                                  : Icons.keyboard_arrow_down,
+                                  ? CarbonIcons.chevronUp
+                                  : CarbonIcons.chevronDown,
                               color: widget.enabled
                                   ? carbon.text.iconPrimary
                                   : carbon.text.iconDisabled,

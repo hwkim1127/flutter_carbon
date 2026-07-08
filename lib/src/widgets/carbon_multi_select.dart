@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../foundation/colors.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import 'carbon_tag.dart';
 
@@ -201,7 +203,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
                   ),
                 ),
                 Icon(
-                  _isOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                  _isOpen ? CarbonIcons.chevronUp : CarbonIcons.chevronDown,
                   color: widget.enabled
                       ? carbon.text.iconPrimary
                       : carbon.text.iconDisabled,
@@ -222,7 +224,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
               borderRadius: BorderRadius.zero,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: CarbonPalette.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),

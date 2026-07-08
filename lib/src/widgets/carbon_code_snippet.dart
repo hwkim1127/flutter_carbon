@@ -1,6 +1,12 @@
-import 'package:flutter/material.dart';
+// Material import retained for SelectableText (no widgets-layer equivalent
+// until the V2 text primitives land).
+import 'package:flutter/material.dart' show SelectableText;
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
+import '../base/carbon_pressable.dart';
+import '../foundation/colors.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 
@@ -172,9 +178,9 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
             ],
           ),
           if (_canExpand)
-            InkWell(
+            CarbonPressable(
               onTap: () => setState(() => _isExpanded = !_isExpanded),
-              child: Container(
+              builder: (context, _) => Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   border: Border(
@@ -193,7 +199,9 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
                     ),
                     const SizedBox(width: 8),
                     Icon(
-                      _isExpanded ? Icons.expand_less : Icons.expand_more,
+                      _isExpanded
+                          ? CarbonIcons.chevronUp
+                          : CarbonIcons.chevronDown,
                       color: carbon.text.linkPrimary,
                       size: 16,
                     ),
@@ -275,7 +283,7 @@ class _CopyButtonState extends State<_CopyButton> {
                 ),
               ),
               child: Icon(
-                Icons.content_copy,
+                CarbonIcons.copy,
                 color: widget.iconColor,
                 size: 16,
               ),
@@ -293,7 +301,7 @@ class _CopyButtonState extends State<_CopyButton> {
                 borderRadius: BorderRadius.circular(2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: CarbonPalette.black.withValues(alpha: 0.2),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

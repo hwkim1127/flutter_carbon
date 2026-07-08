@@ -8,12 +8,12 @@ A comprehensive Flutter implementation of [IBM's Carbon Design System](https://c
 
 #### 🔗 [Live Demo](https://hwkim1127.github.io/flutter_carbon/)
 
-**Carbon Design System has 74 components.** Here is how Flutter Carbon covers them:
+**Carbon Design System (v11) ships 85 components** across its `styles` and `web-components` packages. Here is how Flutter Carbon covers them:
 
 - **37 custom `Carbon*` widgets** — full spec implementations
 - **11 via Material theming** — standard Material widgets auto-styled by `carbonTheme()`
-- **10 architectural / utilities** — layout/structural concepts mapped to Flutter primitives
-- **16 not yet implemented** — planned for future releases
+- **12 architectural / utilities** — layout/structural concepts mapped to Flutter primitives
+- **25 not yet implemented** — planned for future releases (11 of these are the `fluid-*` input variants)
 
 ## Overview
 
@@ -29,6 +29,11 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - **Spacing & Layout**: Consistent spacing scale (2px to 160px) and container sizes
 - **Motion System**: Duration and easing values for animations
 - **Layering System**: Background, layer, field, and border tokens for proper visual hierarchy
+
+### 🧱 Spec-First Internals (1.3+)
+- **No Material ink ripple** — interaction feedback is a flat color change, exactly as the Carbon spec defines
+- **Carbon icon glyphs throughout** — every internal icon comes from the bundled `CarbonIcons` font, not Material Icons
+- **Widgets-layer implementation** — 24 of 37 components have no `material.dart` dependency at all; the rest keep it only for primitives (text fields, checkboxes) that get native replacements in V2 (see `V2_ROADMAP.md`)
 
 ### 🧩 37 Carbon Components
 
@@ -92,7 +97,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - `CarbonAILabel` - AI-generated content indicator with gradient
 - `CarbonFloatingMenu` - Expandable floating action menu with animations
 
-#### Handled via Material Theming (12)
+#### Handled via Material Theming (11)
 
 These Carbon components are covered by standard Material widgets that automatically receive Carbon styling through `carbonTheme()` — no extra wrappers needed:
 
@@ -113,12 +118,13 @@ These Carbon components are covered by standard Material widgets that automatica
 > For buttons, prefer `CarbonButton` over Material variants (`FilledButton`, `ElevatedButton`, etc.) — it implements the full Carbon spec with 7 kind variants and 5 size variants.
 > For tags, prefer `CarbonTag` over `Chip` — it implements the full Carbon tag spec with 12 color types and proper sizing.
 
-#### Architectural / Utilities (10)
+#### Architectural / Utilities (12)
 
 These are not renderable widgets — they are structural concepts, token systems, or deprecated entries:
 
 | Carbon Component | Flutter Equivalent |
 |---|---|
+| `aspect-ratio` | Flutter `AspectRatio` widget |
 | `feature-flags` | Runtime configuration, not a UI component |
 | `form` | Flutter `Form` widget |
 | `form-group` | Flutter layout (`Column`, `Padding`) |
@@ -126,47 +132,48 @@ These are not renderable widgets — they are structural concepts, token systems
 | `heading` | `CarbonTypography` text styles |
 | `icon` | `CarbonIcons` icon font |
 | `layer` | Theme layering tokens (`carbon.layer.*`) |
+| `list-box` | Internal primitive — implemented implicitly by `CarbonDropdown` / `CarbonComboBox` / `CarbonMultiSelect` |
 | `skip-to-content` | Accessibility helper — no visual widget needed |
 | `slug` | Deprecated — use `CarbonAILabel` |
 | `stack` | Deprecated utility |
 
-#### Not Yet Implemented (16)
+#### Not Yet Implemented (25)
 
 These components do not have a dedicated `Carbon*` widget yet:
 
 | Carbon Component | Notes |
 |---|---|
+| `ai-skeleton` | Use `CarbonSkeleton` |
 | `badge-indicator` | No current equivalent |
+| `copy` | Use `CarbonCopyButton` |
 | `date-picker` | Use Material `showDatePicker()` (auto-themed) |
-| `fluid-search` | Fluid/expressive variant — not yet implemented |
-| `fluid-select` | Fluid/expressive variant — not yet implemented |
-| `fluid-text-input` | Fluid/expressive variant — not yet implemented |
-| `fluid-textarea` | Fluid/expressive variant — not yet implemented |
+| `dialog` | Experimental Carbon primitive (feature-flagged) — use `CarbonModal` |
+| `fluid-*` (11 variants) | `combo-box`, `date-picker`, `dropdown`, `list-box`, `multiselect`, `number-input`, `search`, `select`, `text-area`, `text-input`, `time-picker` — fluid/expressive variants, not yet implemented |
 | `icon-button` | Use `CarbonButton` with icon-only mode |
 | `icon-indicator` | No current equivalent |
 | `menu` | Use Material `MenuBar` / `DropdownMenu` (auto-themed) |
 | `menu-button` | Use Material `MenuAnchor` (auto-themed) |
+| `pagination-nav` | Page-number button navigation — use `CarbonPagination` (select-based) |
 | `password-input` | Use `TextField(obscureText: true)` (auto-themed) |
+| `select` | Use `CarbonDropdown` |
 | `shape-indicator` | No current equivalent |
 | `time-picker` | Use Material `showTimePicker()` (auto-themed) |
-| `ai-skeleton` | Use `CarbonSkeleton` |
-| `select` | Use `CarbonDropdown` |
-| `copy` | Use `CarbonCopyButton` |
 
-### 📱 51 Demo Pages
+### 📱 49 Demo Pages
 
-The example app includes comprehensive demos for every component, organized into 11 categories:
-- Foundation (3 pages)
+The example app includes comprehensive demos for every component, organized into 12 categories:
+- Foundation (4 pages)
 - Buttons (4 pages)
 - Forms (7 pages)
-- Navigation (5 pages)
-- Overlays (5 pages)
-- Content (6 pages)
 - Notifications (2 pages)
-- Data Display (4 pages)
+- Content (5 pages)
+- Navigation (3 pages)
+- Overlays (5 pages)
+- Data Display (2 pages)
 - AI & Syntax (2 pages)
-- Material Equivalents (8 pages)
-- Carbon Widgets (3 pages)
+- Other (2 pages)
+- Carbon Components (8 pages)
+- Material Theming (5 pages)
 
 ## 🚀 Quick Start
 
@@ -339,11 +346,14 @@ CarbonTag(
 CarbonDataTable(
   title: 'Users',
   description: 'Manage user accounts',
-  sortable: true,
   hasSelectableRows: true,
   batchSelection: true,
   zebra: true,
   size: CarbonDataTableSize.medium,
+  // Sorting: columns opt in via header.sortable + a non-null onSort
+  sortKey: _sortKey,
+  sortDirection: _sortDirection,
+  onSort: (key, direction) => sortUsers(key, direction),
   toolbar: CarbonToolbar(
     selectedCount: selectedIds.length,
     content: CarbonToolbarContent(
@@ -372,9 +382,9 @@ CarbonDataTable(
     ),
   ),
   headers: [
-    CarbonDataTableHeader(key: 'name', label: 'Name'),
-    CarbonDataTableHeader(key: 'status', label: 'Status'),
-    CarbonDataTableHeader(key: 'role', label: 'Role', sortable: false),
+    CarbonDataTableHeader(key: 'name', label: 'Name', sortable: true),
+    CarbonDataTableHeader(key: 'status', label: 'Status', sortable: true),
+    CarbonDataTableHeader(key: 'role', label: 'Role'), // not sortable (default)
   ],
   rows: users.map((user) => CarbonDataTableRow(
     cells: [
@@ -508,9 +518,9 @@ CarbonSpacing.spacing13  // 160px
 
 ## 📱 Example App
 
-A comprehensive example app showcasing all 51 components is included in the `example/` directory. It features:
+A comprehensive example app showcasing every component is included in the `example/` directory. It features:
 
-- **51 demo pages** with interactive examples
+- **49 demo pages** with interactive examples
 - **All 4 theme variants** with live switching
 - **Multiple examples per component** (variants, states, sizes)
 - **Categorized navigation** for easy browsing
@@ -546,8 +556,12 @@ lib/
 │   ├── foundation/
 │   │   ├── colors.dart                # Color palette
 │   │   ├── typography.dart            # Typography system
-│   │   ├── spacing.dart               # Spacing constants
+│   │   ├── layout.dart                # Spacing & container sizes
 │   │   └── motion.dart                # Animation durations
+│   ├── base/                          # Internal building blocks (not exported)
+│   │   ├── carbon_pressable.dart      # Hover/press/focus detector (no ripple)
+│   │   ├── carbon_divider.dart        # 1px rule
+│   │   └── carbon_overlay_surface.dart # Text style root for overlays
 │   ├── widgets/                       # 37 Carbon components
 │   │   ├── carbon_button.dart
 │   │   ├── carbon_modal.dart
@@ -566,7 +580,7 @@ lib/
     ├── lib/
     │   ├── main.dart                  # App entry + routing
     │   ├── routes.dart                # Route definitions
-    │   └── pages/                     # 51 demo pages
+    │   └── pages/                     # 49 demo pages
     └── assets/                        # Example assets
 ```
 
@@ -580,9 +594,9 @@ This implementation follows the official Carbon Design System V11 specifications
 - ✅ All 4 official themes (White, G10, G90, G100) supported
 - ✅ Spacing, motion, and layering follow Carbon guidelines
 - ✅ 37 custom `Carbon*` widgets with full spec compliance
+- ✅ No Material ink ripple — flat interaction feedback per Carbon spec (1.3+)
 - ✅ 11 Carbon components covered via automatic Material theming
-- ✅ All 4 official themes (White, G10, G90, G100) supported
-- 🚧 16 components not yet implemented (see table above)
+- 🚧 25 components not yet implemented (see table above)
 
 **Reference**: https://carbondesignsystem.com/
 
@@ -593,7 +607,7 @@ Contributions are welcome! This project implements the Carbon Design System V11 
 ### Guidelines
 1. Follow Carbon Design System V11 specifications
 2. Support all 4 theme variants (White, G10, G90, G100)
-3. Use Material Design widgets when possible, create custom widgets when necessary
+3. Build widget internals on the widgets layer — use the `lib/src/base/` primitives (`CarbonPressable`, `CarbonDivider`, `CarbonOverlaySurface`) and `CarbonIcons` instead of Material widgets/icons (see `V2_ROADMAP.md`)
 4. Add comprehensive examples in the example app with demos
 5. Run `flutter analyze` to ensure code quality
 6. Test across all 4 themes

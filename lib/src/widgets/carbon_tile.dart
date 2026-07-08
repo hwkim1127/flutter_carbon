@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 import '../theme/component_themes/tile_theme_data.dart';
@@ -290,7 +291,9 @@ class _CarbonTileState extends State<CarbonTile> {
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: Icon(
-                widget.selected ? Icons.check_circle : Icons.circle_outlined,
+                widget.selected
+                    ? CarbonIcons.checkmarkFilled
+                    : CarbonIcons.radioButton,
                 color: widget.selected
                     ? carbon.button.buttonPrimary
                     : carbon.text.iconSecondary,
@@ -313,8 +316,8 @@ class _CarbonTileState extends State<CarbonTile> {
               padding: const EdgeInsets.only(left: 12),
               child: Icon(
                 widget.expanded
-                    ? Icons.keyboard_arrow_up
-                    : Icons.keyboard_arrow_down,
+                    ? CarbonIcons.chevronUp
+                    : CarbonIcons.chevronDown,
                 color: carbon.text.iconPrimary,
               ),
             ),

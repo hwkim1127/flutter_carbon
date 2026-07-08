@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart' show KeyDownEvent;
 
+import '../foundation/colors.dart';
 import '../foundation/motion.dart';
+import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 
 /// Carbon toggle size variants.
@@ -146,7 +148,7 @@ class _CarbonToggleState extends State<CarbonToggle>
 
   @override
   Widget build(BuildContext context) {
-    final carbon = Theme.of(context).extension<CarbonThemeData>()!;
+    final carbon = context.carbon;
     final toggleTheme = carbon.toggle;
 
     return GestureDetector(
@@ -228,7 +230,7 @@ class _CarbonToggleState extends State<CarbonToggle>
       trackColor = theme.backgroundDisabled;
       thumbColor = theme.thumbColorDisabled;
     } else if (widget.readOnly) {
-      trackColor = Colors.transparent;
+      trackColor = CarbonPalette.transparent;
       thumbColor = theme.thumbReadOnly;
       borderColor = theme.borderReadOnly;
     } else {

@@ -60,7 +60,7 @@ void main() {
       );
 
       // Find and tap menu button
-      final menuButton = find.byIcon(Icons.menu);
+      final menuButton = find.byIcon(CarbonIcons.menu);
       if (menuButton.evaluate().isNotEmpty) {
         await tester.tap(menuButton);
         await tester.pumpAndSettle();

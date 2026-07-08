@@ -55,7 +55,7 @@ void main() {
       expect(find.text('Panel'), findsOneWidget);
 
       // Close panel
-      await tester.tap(find.byIcon(Icons.close));
+      await tester.tap(find.byIcon(CarbonIcons.close));
       await tester.pumpAndSettle();
 
       expect(find.text('Panel'), findsNothing);
@@ -87,7 +87,7 @@ void main() {
         expect(find.text(size.name), findsOneWidget);
 
         // Close
-        await tester.tap(find.byIcon(Icons.close));
+        await tester.tap(find.byIcon(CarbonIcons.close));
         await tester.pumpAndSettle();
       }
     });
@@ -117,7 +117,7 @@ void main() {
       expect(find.text('Subtitle text'), findsOneWidget);
 
       // Close
-      await tester.tap(find.byIcon(Icons.close));
+      await tester.tap(find.byIcon(CarbonIcons.close));
       await tester.pumpAndSettle();
     });
   });

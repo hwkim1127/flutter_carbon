@@ -53,7 +53,7 @@ void main() {
       await tester.tap(find.text('Show'));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.close), findsOneWidget);
+      expect(find.byIcon(CarbonIcons.close), findsOneWidget);
     });
 
     testWidgets('dismisses when tapped outside if dismissible', (tester) async {
@@ -201,8 +201,9 @@ void main() {
       await tester.tap(find.text('Show'));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.warning), findsOneWidget);
-      expect(find.text('Delete'), findsOneWidget);
+      expect(find.byIcon(CarbonIcons.warningFilled), findsOneWidget);
+      // 'Delete' appears in both the title and the primary action button.
+      expect(find.text('Delete'), findsWidgets);
       expect(find.text('Cannot be undone'), findsOneWidget);
     });
   });

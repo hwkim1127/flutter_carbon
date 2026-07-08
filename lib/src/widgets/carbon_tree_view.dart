@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_pressable.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 
 /// Carbon Design System tree view (hierarchical tree with expand/collapse).
@@ -90,7 +92,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
         MouseRegion(
           onEnter: (_) => setState(() => _hoveredNode = node),
           onExit: (_) => setState(() => _hoveredNode = null),
-          child: InkWell(
+          child: CarbonPressable(
             onTap: () {
               if (hasChildren) {
                 setState(() {
@@ -105,10 +107,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
                 widget.onNodeSelected!(node);
               }
             },
-            hoverColor: Colors.transparent,
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            child: Container(
+            builder: (context, _) => Container(
               padding: EdgeInsets.only(
                 left: 16.0 + (depth * 24.0),
                 right: 16.0,
@@ -124,7 +123,9 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
                 children: [
                   if (hasChildren)
                     Icon(
-                      isExpanded ? Icons.expand_more : Icons.chevron_right,
+                      isExpanded
+                          ? CarbonIcons.chevronDown
+                          : CarbonIcons.chevronRight,
                       size: 20,
                       color: theme.iconColor,
                     )

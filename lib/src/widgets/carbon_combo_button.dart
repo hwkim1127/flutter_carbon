@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../theme/carbon_theme_data.dart';
+import '../icons/carbon_icons.dart';
+import '../theme/carbon_theme.dart';
 
 /// A Carbon Design System combo button (split button).
 ///
@@ -56,8 +57,7 @@ class CarbonComboButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final carbon = theme.extension<CarbonThemeData>()!;
+    final carbon = context.carbon;
 
     final height = size.height;
     final fontSize = size.fontSize;
@@ -147,7 +147,7 @@ class CarbonComboButton extends StatelessWidget {
               ),
             ),
             icon: Icon(
-              Icons.keyboard_arrow_down,
+              CarbonIcons.chevronDown,
               size: 16,
               color:
                   disabled ? carbon.text.textDisabled : carbon.text.textOnColor,

@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_divider.dart';
+import '../foundation/colors.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/component_themes/contained_list_theme_data.dart';
 
@@ -62,7 +64,7 @@ class CarbonContainedList extends StatelessWidget {
         boxShadow: disclosed
             ? [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: CarbonPalette.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -95,7 +97,7 @@ class CarbonContainedList extends StatelessWidget {
                         ),
                       ),
                     ),
-                  if (headerAction != null) headerAction!,
+                  ?headerAction,
                 ],
               ),
             ),
@@ -252,11 +254,7 @@ class _ContainedListItemWidgetState extends State<_ContainedListItemWidget> {
             padding: widget.insetDivider
                 ? const EdgeInsets.only(left: 16)
                 : EdgeInsets.zero,
-            child: Divider(
-              color: widget.theme.divider,
-              height: 1,
-              thickness: 1,
-            ),
+            child: CarbonDivider(color: widget.theme.divider),
           ),
       ],
     );

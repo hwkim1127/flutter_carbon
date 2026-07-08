@@ -1,7 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_divider.dart';
+import '../base/carbon_overlay_surface.dart';
+import '../base/carbon_pressable.dart';
 import '../foundation/colors.dart';
 import '../foundation/motion.dart';
+import '../icons/carbon_icons.dart';
+import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 
 /// Side panel size variants from Carbon Design System.
@@ -127,41 +132,43 @@ class CarbonSidePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final carbon = theme.extension<CarbonThemeData>()!;
+    final carbon = context.carbon;
     final sidePanelTheme = carbon.sidePanel;
 
-    return Material(
-      color: sidePanelTheme.background,
-      elevation: 16,
-      child: SizedBox(
-        width: size.width,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Header
-            _buildHeader(context, sidePanelTheme),
-
-            // Divider
-            Divider(
-              height: 1,
-              thickness: 1,
-              color: sidePanelTheme.dividerColor,
+    return CarbonOverlaySurface(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: sidePanelTheme.background,
+          boxShadow: [
+            // Replaces the Material elevation the panel previously relied on.
+            BoxShadow(
+              color: CarbonPalette.black.withValues(alpha: 0.3),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
             ),
-
-            // Content
-            Expanded(child: child),
-
-            // Actions
-            if (actions != null && actions!.isNotEmpty) ...[
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: sidePanelTheme.dividerColor,
-              ),
-              _buildActions(sidePanelTheme),
-            ],
           ],
+        ),
+        child: SizedBox(
+          width: size.width,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Header
+              _buildHeader(context, sidePanelTheme),
+
+              // Divider
+              CarbonDivider(color: sidePanelTheme.dividerColor),
+
+              // Content
+              Expanded(child: child),
+
+              // Actions
+              if (actions != null && actions!.isNotEmpty) ...[
+                CarbonDivider(color: sidePanelTheme.dividerColor),
+                _buildActions(sidePanelTheme),
+              ],
+            ],
+          ),
         ),
       ),
     );
@@ -217,14 +224,17 @@ class CarbonSidePanel extends StatelessWidget {
           ),
           if (showCloseButton) ...[
             const SizedBox(width: 16),
-            IconButton(
-              icon: Icon(Icons.close, color: theme.iconColor),
-              onPressed: () {
+            CarbonPressable(
+              onTap: () {
                 onClose?.call();
                 Navigator.of(context).pop();
               },
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              focusable: true,
+              builder: (context, _) => SizedBox(
+                width: 32,
+                height: 32,
+                child: Icon(CarbonIcons.close, size: 16, color: theme.iconColor),
+              ),
             ),
           ],
         ],
@@ -278,9 +288,8 @@ class _CarbonSidePanelRoute<T> extends PageRoute<T> {
   Color? get barrierColor {
     final BuildContext? context = navigator?.context;
     if (context == null) return CarbonPalette.overlay;
-    final theme = Theme.of(context);
-    final carbon = theme.extension<CarbonThemeData>();
-    return carbon?.sidePanel.overlayColor ?? CarbonPalette.overlay;
+    return context.carbonOrNull?.sidePanel.overlayColor ??
+        CarbonPalette.overlay;
   }
 
   @override
@@ -320,8 +329,7 @@ class _CarbonSidePanelRoute<T> extends PageRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    final theme = Theme.of(context);
-    final carbon = theme.extension<CarbonThemeData>()!;
+    final carbon = context.carbon;
 
     final slideAnimation = Tween<Offset>(
       begin: Offset(

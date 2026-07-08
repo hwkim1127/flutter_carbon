@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../foundation/colors.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/component_themes/floating_menu_theme_data.dart';
 
@@ -46,7 +48,7 @@ class CarbonFloatingMenu extends StatefulWidget {
 
   const CarbonFloatingMenu({
     super.key,
-    this.icon = Icons.add,
+    this.icon = CarbonIcons.add,
     this.openIcon,
     required this.items,
     this.label,
@@ -147,7 +149,7 @@ class _CarbonFloatingMenuState extends State<CarbonFloatingMenu>
             turns: _isOpen ? 0.125 : 0.0, // 45 degree rotation when open
             duration: const Duration(milliseconds: 200),
             child: Icon(
-              _isOpen ? (widget.openIcon ?? Icons.close) : widget.icon,
+              _isOpen ? (widget.openIcon ?? CarbonIcons.close) : widget.icon,
             ),
           ),
         ),
@@ -198,7 +200,7 @@ class _FloatingMenuItemState extends State<_FloatingMenuItem> {
                 borderRadius: BorderRadius.zero,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: CarbonPalette.black.withValues(alpha: 0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -227,7 +229,7 @@ class _FloatingMenuItemState extends State<_FloatingMenuItem> {
                 borderRadius: BorderRadius.zero,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: CarbonPalette.black.withValues(alpha: 0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

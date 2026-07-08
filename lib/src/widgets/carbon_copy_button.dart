@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
+import '../base/carbon_pressable.dart';
 import '../foundation/motion.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 
 /// Carbon Design System copy button with feedback.
@@ -70,10 +72,9 @@ class _CarbonCopyButtonState extends State<CarbonCopyButton> {
     final carbon = context.carbon;
     final theme = carbon.codeSnippet;
 
-    return InkWell(
+    return CarbonPressable(
       onTap: widget.enabled ? _handleCopy : null,
-      borderRadius: BorderRadius.zero,
-      child: Container(
+      builder: (context, _) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: widget.enabled
@@ -86,7 +87,7 @@ class _CarbonCopyButtonState extends State<CarbonCopyButton> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              _copied ? Icons.check : Icons.content_copy,
+              _copied ? CarbonIcons.checkmark : CarbonIcons.copy,
               size: 16,
               color: widget.enabled
                   ? theme.copyButtonIcon

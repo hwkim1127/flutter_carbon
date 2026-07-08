@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_pressable.dart';
 import '../theme/carbon_theme.dart';
 
 /// Content switcher size variants.
@@ -214,9 +215,9 @@ class _ContentSwitcherButtonState<T> extends State<_ContentSwitcherButton<T>> {
         setState(() => _isHovered = false);
         widget.onHover(false);
       },
-      child: InkWell(
+      child: CarbonPressable(
         onTap: widget.item.disabled ? null : widget.onTap,
-        child: Container(
+        builder: (context, _) => Container(
           padding: _getPadding(),
           decoration: BoxDecoration(
             color: backgroundColor,

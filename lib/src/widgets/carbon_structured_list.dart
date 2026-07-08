@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_pressable.dart';
 import '../theme/carbon_theme.dart';
 
 /// Size variants for [CarbonStructuredList].
@@ -150,14 +151,11 @@ class _CarbonStructuredListState extends State<CarbonStructuredList> {
             return MouseRegion(
               onEnter: (_) => setState(() => _hoveredIndex = index),
               onExit: (_) => setState(() => _hoveredIndex = null),
-              child: InkWell(
+              child: CarbonPressable(
                 onTap: widget.selectable && widget.onRowSelected != null
                     ? () => widget.onRowSelected!(index)
                     : null,
-                hoverColor: Colors.transparent,
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                child: Container(
+                builder: (context, _) => Container(
                   decoration: BoxDecoration(
                     color: isSelected
                         ? theme.rowSelected

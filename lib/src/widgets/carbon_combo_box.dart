@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../base/carbon_overlay_surface.dart';
+import '../base/carbon_pressable.dart';
+import '../foundation/colors.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 
 /// Carbon Design System combo box with autocomplete and search.
@@ -283,10 +287,19 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                   link: _layerLink,
                   showWhenUnlinked: false,
                   offset: Offset(0, size.height),
-                  child: Material(
-                    elevation: 2,
-                    borderRadius: BorderRadius.zero,
-                    color: theme.menuBackground,
+                  child: CarbonOverlaySurface(
+                    child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: theme.menuBackground,
+                      boxShadow: [
+                        // Replaces the previous Material elevation.
+                        BoxShadow(
+                          color: CarbonPalette.black.withValues(alpha: 0.2),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 300),
                       child: items.isEmpty
@@ -312,17 +325,16 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                                 final isHighlighted =
                                     index == _highlightedIndex;
 
-                                return InkWell(
+                                return CarbonPressable(
                                   onTap: item.enabled
                                       ? () => _selectItem(item.value)
                                       : null,
-                                  hoverColor: theme.menuItemHover,
-                                  child: Container(
+                                  builder: (context, state) => Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 16,
                                       vertical: 12,
                                     ),
-                                    color: isHighlighted
+                                    color: state.hovered || isHighlighted
                                         ? theme.menuItemHover
                                         : isSelected
                                             ? theme.menuItemSelected
@@ -345,6 +357,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                               },
                             ),
                     ),
+                  ),
                   ),
                 ),
               ),
@@ -446,12 +459,12 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                 if (widget.allowClear &&
                     widget.value != null &&
                     widget.enabled) ...[
-                  InkWell(
+                  CarbonPressable(
                     onTap: _clearSelection,
-                    child: Padding(
+                    builder: (context, _) => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Icon(
-                        Icons.close,
+                        CarbonIcons.close,
                         size: 16,
                         color: theme.iconColor,
                       ),
@@ -474,8 +487,8 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Icon(
                       _isOpen
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
+                          ? CarbonIcons.chevronUp
+                          : CarbonIcons.chevronDown,
                       color: widget.enabled
                           ? theme.iconColor
                           : theme.iconColorDisabled,

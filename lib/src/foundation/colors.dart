@@ -11,6 +11,8 @@ class CarbonPalette {
   // Custom Color is used NOT rgba(0,0,0,0.6)
   static const Color overlay = Color(0x52999999);
 
+  static const Color transparent = Color(0x00000000);
+
   // Black & White
   static const Color black = Color(0xFF000000);
   static const Color black100 = black;

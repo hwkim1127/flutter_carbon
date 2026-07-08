@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../flutter_carbon.dart';
+import '../base/carbon_pressable.dart';
 
 /// Carbon Design System Toolbar.
 ///
@@ -443,7 +444,7 @@ class _CarbonToolbarSearchState extends State<CarbonToolbarSearch> {
             borderRadius: BorderRadius.zero,
           ),
           filled: true,
-          fillColor: Colors.transparent,
+          fillColor: CarbonPalette.transparent,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
           isDense: true,
@@ -461,9 +462,9 @@ class _CarbonToolbarSearchState extends State<CarbonToolbarSearch> {
       // Supports both click and keyboard focus (tab navigation)
       return Focus(
         focusNode: _iconFocusNode,
-        child: InkWell(
+        child: CarbonPressable(
           onTap: _handleExpand,
-          child: Container(
+          builder: (context, _) => Container(
             width: 48,
             height: 48,
             alignment: Alignment.center,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../foundation/colors.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 
 /// Carbon Design System modal dialog.
@@ -29,7 +31,7 @@ class CarbonModal {
     await Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
-        barrierColor: Colors.black.withValues(alpha: 0.5),
+        barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
         pageBuilder: (context, animation, secondaryAnimation) =>
             _CarbonPassiveModal(
           title: title,
@@ -68,7 +70,7 @@ class CarbonModal {
     return await Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
-        barrierColor: Colors.black.withValues(alpha: 0.5),
+        barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
         pageBuilder: (context, animation, secondaryAnimation) =>
             _CarbonTransactionalModal(
           title: title,
@@ -106,7 +108,7 @@ class CarbonModal {
     return await Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
-        barrierColor: Colors.black.withValues(alpha: 0.5),
+        barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
         pageBuilder: (context, animation, secondaryAnimation) =>
             _CarbonDangerModal(
           title: title,
@@ -149,7 +151,7 @@ class CarbonModal {
     return await Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
-        barrierColor: Colors.black.withValues(alpha: 0.5),
+        barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
         pageBuilder: (context, animation, secondaryAnimation) =>
             _CarbonInputModal(
           title: title,
@@ -188,7 +190,7 @@ class CarbonModal {
     return await Navigator.of(context).push<T>(
       PageRouteBuilder(
         opaque: false,
-        barrierColor: Colors.black.withValues(alpha: 0.5),
+        barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
         pageBuilder: (context, animation, secondaryAnimation) =>
             _CarbonCustomModal<T>(
           content: content,
@@ -216,7 +218,7 @@ class _ModalScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: CarbonPalette.transparent,
       body: SafeArea(
         child: Stack(
           alignment: Alignment.center,
@@ -227,7 +229,7 @@ class _ModalScaffold extends StatelessWidget {
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
-                color: Colors.transparent,
+                color: CarbonPalette.transparent,
               ),
             ),
             // Modal content
@@ -311,7 +313,7 @@ class _CarbonPassiveModal extends StatelessWidget {
               child: IconButton(
                 onPressed: Navigator.of(context).pop,
                 icon: Icon(
-                  Icons.close,
+                  CarbonIcons.close,
                   color: carbon.text.iconPrimary,
                   size: 20,
                 ),
@@ -444,7 +446,7 @@ class _CarbonDangerModal extends StatelessWidget {
               decoration: BoxDecoration(color: carbon.layer.supportError),
               child: Row(
                 children: [
-                  Icon(Icons.warning, color: carbon.text.textOnColor, size: 24),
+                  Icon(CarbonIcons.warningFilled, color: carbon.text.textOnColor, size: 24),
                   if (title != null) ...[
                     const SizedBox(width: 12),
                     Expanded(
@@ -665,7 +667,7 @@ class _CarbonCustomModal<T> extends StatelessWidget {
               child: IconButton(
                 onPressed: () => Navigator.of(context).pop(),
                 icon: Icon(
-                  Icons.close,
+                  CarbonIcons.close,
                   color: carbon.text.iconPrimary,
                   size: 20,
                 ),

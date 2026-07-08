@@ -1,6 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_overlay_surface.dart';
+import '../base/carbon_pressable.dart';
 import '../foundation/motion.dart';
+import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 
@@ -118,13 +121,12 @@ class CarbonInlineNotification extends StatelessWidget {
           // Close button
           if (showCloseButton && onClose != null) ...[
             const SizedBox(width: 16),
-            InkWell(
+            CarbonPressable(
               onTap: onClose,
-              borderRadius: BorderRadius.zero,
-              child: Padding(
+              builder: (context, _) => Padding(
                 padding: const EdgeInsets.all(4),
                 child: Icon(
-                  Icons.close,
+                  CarbonIcons.close,
                   color: carbon.text.iconPrimary,
                   size: 16,
                 ),
@@ -165,13 +167,13 @@ class CarbonInlineNotification extends StatelessWidget {
   IconData _getIcon() {
     switch (kind) {
       case CarbonNotificationKind.error:
-        return Icons.error;
+        return CarbonIcons.errorFilled;
       case CarbonNotificationKind.success:
-        return Icons.check_circle;
+        return CarbonIcons.checkmarkFilled;
       case CarbonNotificationKind.warning:
-        return Icons.warning;
+        return CarbonIcons.warningFilled;
       case CarbonNotificationKind.info:
-        return Icons.info;
+        return CarbonIcons.informationFilled;
     }
   }
 }
@@ -279,8 +281,7 @@ class _CarbonToastState extends State<_CarbonToast>
       right: 16,
       child: SlideTransition(
         position: _slideAnimation,
-        child: Material(
-          color: Colors.transparent,
+        child: CarbonOverlaySurface(
           child: Container(
             constraints: const BoxConstraints(maxWidth: 400),
             child: CarbonInlineNotification(

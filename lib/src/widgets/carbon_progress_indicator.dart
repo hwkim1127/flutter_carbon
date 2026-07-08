@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../../flutter_carbon.dart';
 
 // ── Enums ──────────────────────────────────────────────────────────────────────
@@ -291,7 +291,7 @@ class _VerticalStepState extends State<_VerticalStep> {
                 left: BorderSide(
                   width: 1,
                   color:
-                      widget.isLast ? Colors.transparent : _lineColor,
+                      widget.isLast ? CarbonPalette.transparent : _lineColor,
                 ),
               ),
             ),

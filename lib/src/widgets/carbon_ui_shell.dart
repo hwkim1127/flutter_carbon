@@ -326,7 +326,7 @@ class _MenuButton extends StatelessWidget {
       height: 48,
       child: IconButton(
         onPressed: onPressed,
-        icon: Icon(Icons.menu, color: icon, size: 20),
+        icon: Icon(CarbonIcons.menu, color: icon, size: 20),
         padding: EdgeInsets.zero,
       ),
     );

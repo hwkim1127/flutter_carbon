@@ -29,7 +29,7 @@ void main() {
         ),
       );
 
-      expect(find.byIcon(Icons.more_vert), findsOneWidget);
+      expect(find.byIcon(CarbonIcons.overflowMenuVertical), findsOneWidget);
     });
 
     testWidgets('can use custom icon', (tester) async {

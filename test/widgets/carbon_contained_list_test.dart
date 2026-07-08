@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:flutter_carbon/src/base/carbon_divider.dart';
 
 import '../shared/build.dart';
 
@@ -172,7 +173,7 @@ void main() {
       );
 
       expect(
-        find.byType(Divider),
+        find.byType(CarbonDivider),
         findsOneWidget,
       ); // One divider between two items
     });
@@ -190,7 +191,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(Divider), findsNothing);
+      expect(find.byType(CarbonDivider), findsNothing);
     });
 
     testWidgets('supports inset dividers', (tester) async {

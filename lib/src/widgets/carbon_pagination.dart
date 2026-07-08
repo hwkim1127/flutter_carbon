@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../icons/carbon_icons.dart';
 import 'carbon_dropdown.dart';
 import '../theme/carbon_theme.dart';
 
@@ -44,8 +45,7 @@ class CarbonPaginationLabels {
   /// Default English labels
   factory CarbonPaginationLabels.en() => CarbonPaginationLabels(
         itemsRange: (start, end, total) => '$start-$end of $total items',
-        pageRange: (total) =>
-            '{current} of $total page${total <= 1 ? '' : 's'}',
+        pageRange: (total) => 'of $total page${total <= 1 ? '' : 's'}',
       );
 }
 
@@ -195,7 +195,7 @@ class CarbonPagination extends StatelessWidget {
                     ? () => onPageChanged?.call(currentPage - 1)
                     : null,
                 icon: Icon(
-                  Icons.chevron_left,
+                  CarbonIcons.chevronLeft,
                   color: currentPage > 1
                       ? carbon.text.iconPrimary
                       : carbon.text.iconDisabled,
@@ -209,7 +209,7 @@ class CarbonPagination extends StatelessWidget {
                     ? () => onPageChanged?.call(currentPage + 1)
                     : null,
                 icon: Icon(
-                  Icons.chevron_right,
+                  CarbonIcons.chevronRight,
                   color: currentPage < totalPages
                       ? carbon.text.iconPrimary
                       : carbon.text.iconDisabled,
