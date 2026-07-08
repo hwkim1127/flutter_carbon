@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Semantic layer colors for Carbon Design System.
 /// Includes Background, Layer, Field, and Border tokens.
 @immutable
-class CarbonLayerThemeData extends ThemeExtension<CarbonLayerThemeData> {
+class CarbonLayerThemeData {
   // Background
   final Color background;
   final Color backgroundInverse;
@@ -189,7 +189,6 @@ class CarbonLayerThemeData extends ThemeExtension<CarbonLayerThemeData> {
     required this.supportCautionUndefined,
   });
 
-  @override
   CarbonLayerThemeData copyWith({
     Color? background,
     Color? backgroundInverse,
@@ -361,12 +360,11 @@ class CarbonLayerThemeData extends ThemeExtension<CarbonLayerThemeData> {
     );
   }
 
-  @override
   CarbonLayerThemeData lerp(
-    ThemeExtension<CarbonLayerThemeData>? other,
+    CarbonLayerThemeData? other,
     double t,
   ) {
-    if (other is! CarbonLayerThemeData) return this;
+    if (other == null) return this;
     return CarbonLayerThemeData(
       background: Color.lerp(background, other.background, t)!,
       backgroundInverse: Color.lerp(

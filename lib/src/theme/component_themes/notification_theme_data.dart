@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonNotificationThemeData
-    extends ThemeExtension<CarbonNotificationThemeData> {
+class CarbonNotificationThemeData {
   final Color notificationBackgroundError;
   final Color notificationBackgroundSuccess;
   final Color notificationBackgroundInfo;
@@ -27,7 +26,6 @@ class CarbonNotificationThemeData
     required this.notificationActionTertiaryInverseTextOnColorDisabled,
   });
 
-  @override
   CarbonNotificationThemeData copyWith({
     Color? notificationBackgroundError,
     Color? notificationBackgroundSuccess,
@@ -68,12 +66,11 @@ class CarbonNotificationThemeData
     );
   }
 
-  @override
   CarbonNotificationThemeData lerp(
-    ThemeExtension<CarbonNotificationThemeData>? other,
+    CarbonNotificationThemeData? other,
     double t,
   ) {
-    if (other is! CarbonNotificationThemeData) return this;
+    if (other == null) return this;
     return CarbonNotificationThemeData(
       notificationBackgroundError: Color.lerp(
         notificationBackgroundError,

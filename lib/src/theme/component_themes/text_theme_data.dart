@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Semantic text colors for Carbon Design System.
 ///
 /// See: https://carbondesignsystem.com/guidelines/color/usage/#text
 @immutable
-class CarbonTextThemeData extends ThemeExtension<CarbonTextThemeData> {
+class CarbonTextThemeData {
   // Text
   final Color textPrimary;
   final Color textSecondary;
@@ -62,7 +62,6 @@ class CarbonTextThemeData extends ThemeExtension<CarbonTextThemeData> {
     required this.iconInteractive,
   });
 
-  @override
   CarbonTextThemeData copyWith({
     Color? textPrimary,
     Color? textSecondary,
@@ -117,12 +116,11 @@ class CarbonTextThemeData extends ThemeExtension<CarbonTextThemeData> {
     );
   }
 
-  @override
   CarbonTextThemeData lerp(
-    ThemeExtension<CarbonTextThemeData>? other,
+    CarbonTextThemeData? other,
     double t,
   ) {
-    if (other is! CarbonTextThemeData) return this;
+    if (other == null) return this;
     return CarbonTextThemeData(
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import '../../../../foundation/colors.dart';
 import '../../../component_themes/ui_shell_theme_data.dart';
 
@@ -12,7 +11,7 @@ class WhiteUIShellThemeData extends CarbonUIShellThemeData {
           headerIconPrimary: CarbonPalette.gray10,
           headerIconSecondary: CarbonPalette.gray30,
           // Header nav items
-          headerNavItemBackground: Colors.transparent,
+          headerNavItemBackground: CarbonPalette.transparent,
           headerNavItemBackgroundHover: CarbonPalette.gray90Hover,
           headerNavItemBackgroundActive: CarbonPalette.gray80,
           headerNavItemBackgroundSelected: CarbonPalette.gray90,
@@ -23,7 +22,7 @@ class WhiteUIShellThemeData extends CarbonUIShellThemeData {
           // Side nav
           sideNavBackground: CarbonPalette.gray100,
           sideNavOverlay: CarbonPalette.gray100,
-          sideNavItemBackground: Colors.transparent,
+          sideNavItemBackground: CarbonPalette.transparent,
           sideNavItemBackgroundHover: CarbonPalette.gray90Hover,
           sideNavItemBackgroundActive: CarbonPalette.gray80,
           sideNavItemText: CarbonPalette.gray10,

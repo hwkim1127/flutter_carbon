@@ -5,10 +5,12 @@ import '../../../component_themes/notification_theme_data.dart';
 class G90NotificationThemeData extends CarbonNotificationThemeData {
   const G90NotificationThemeData()
       : super(
-          notificationBackgroundError: CarbonPalette.red90,
-          notificationBackgroundSuccess: CarbonPalette.green90,
-          notificationBackgroundInfo: CarbonPalette.blue90,
-          notificationBackgroundWarning: CarbonPalette.yellow90,
+          // Dark themes use a neutral layer background; the kind is conveyed
+          // by the colored border/icon (Carbon v11 component tokens: gray-80).
+          notificationBackgroundError: CarbonPalette.gray80,
+          notificationBackgroundSuccess: CarbonPalette.gray80,
+          notificationBackgroundInfo: CarbonPalette.gray80,
+          notificationBackgroundWarning: CarbonPalette.gray80,
           notificationActionHover:
               CarbonPalette.gray90Hover, // approximate/fallback
           notificationActionTertiaryInverse: CarbonPalette.white,

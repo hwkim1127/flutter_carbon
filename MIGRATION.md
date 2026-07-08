@@ -1,3 +1,83 @@
+# Migration Guides
+
+## 1.x → 2.0.0 — Theming rearchitecture
+
+v2.0 makes the theming core Material-free. `context.carbon` now resolves
+through a `CarbonTheme` inherited widget instead of Material's
+`ThemeExtension` mechanism, and everything Material-specific moved to an
+explicit bridge library.
+
+### Material apps (most existing users)
+
+Two changes: the import, and one `builder:` line.
+
+**Before (1.x):**
+```dart
+import 'package:flutter_carbon/flutter_carbon.dart';
+
+MaterialApp(
+  theme: carbonTheme(carbon: WhiteTheme.theme),
+  home: const MyHomePage(),
+)
+```
+
+**After (2.0):**
+```dart
+import 'package:flutter_carbon/material.dart'; // re-exports flutter_carbon.dart
+
+MaterialApp(
+  theme: carbonTheme(carbon: WhiteTheme.theme),
+  builder: (context, child) => CarbonMaterialBridge(child: child!),
+  home: const MyHomePage(),
+)
+```
+
+Everything else — `context.carbon`, all widgets, theme switching via
+`MaterialApp.theme` — behaves exactly as before.
+
+### Pure Carbon apps (new option)
+
+If you don't use Material widgets, drop `MaterialApp` entirely:
+
+```dart
+import 'package:flutter_carbon/flutter_carbon.dart';
+
+CarbonApp(
+  theme: WhiteTheme.theme,
+  home: const MyHomePage(),
+)
+```
+
+`CarbonApp` provides navigation (`CarbonPageRoute`: fade + rise, Carbon
+productive motion), localizations, and animated theme switching. **Not yet
+supported inside a pure `CarbonApp`** — these widgets still require a
+Material host (use the bridge setup above) until their native primitives land:
+
+| Widget | Material dependency |
+|---|---|
+| `CarbonComboBox`, `CarbonNumberInput`, `CarbonMultiSelect`, `CarbonToolbar` (search), `CarbonModal` | `TextField` / `Scaffold` |
+| `CarbonDataTable` (selectable rows) | `Checkbox` / `Radio` |
+| `CarbonLoading`, `CarbonFileUploader` | `CircularProgressIndicator` |
+| `CarbonPagination`, `CarbonComboButton` | Material `Tooltip` / menus |
+| `CarbonFloatingMenu` | `FloatingActionButton` |
+| `CarbonUIShell` | `Scaffold` |
+| `CarbonCodeSnippet` | `SelectableText` |
+
+### API changes
+
+| 1.x | 2.0 |
+|---|---|
+| `Theme.of(context).extension<CarbonThemeData>()` | `context.carbon` (or `CarbonTheme.of(context)`) |
+| `CarbonThemeData extends ThemeExtension` | plain class — no `ThemeExtension` supertype |
+| `CarbonThemeData.lerp(ThemeExtension<CarbonThemeData>? other, t)` | `lerp(CarbonThemeData? other, t)` (same for all component theme data classes) |
+| `carbonTheme()` / `CarbonInputDecorationHelper` in `flutter_carbon.dart` | moved to `package:flutter_carbon/material.dart` |
+| missing theme → `StateError` | missing theme → `FlutterError` with setup instructions |
+
+Reading the Carbon data back off a Material `ThemeData` (rare):
+`themeData.extension<CarbonMaterialThemeExtension>()!.data`.
+
+---
+
 # Migration Guide: CarbonDataTable v1.1.0
 
 This guide helps migrate existing CarbonDataTable implementations to v1.1.0, which includes significant architectural improvements and new features.

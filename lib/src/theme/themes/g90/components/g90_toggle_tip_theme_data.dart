@@ -1,11 +1,10 @@
-import 'package:flutter/material.dart';
 import '../../../../foundation/colors.dart';
 import '../../../component_themes/toggle_tip_theme_data.dart';
 
 class G90ToggleTipThemeData extends CarbonToggleTipThemeData {
   const G90ToggleTipThemeData()
       : super(
-          buttonBackground: Colors.transparent,
+          buttonBackground: CarbonPalette.transparent,
           buttonBackgroundHover: CarbonPalette.gray70Hover,
           buttonIcon: CarbonPalette.gray10,
           contentBackground: CarbonPalette.gray90,

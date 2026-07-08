@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonContentSwitcherThemeData
-    extends ThemeExtension<CarbonContentSwitcherThemeData> {
+class CarbonContentSwitcherThemeData {
   final Color contentSwitcherSelected;
   final Color contentSwitcherDivider;
   final Color contentSwitcherTextOnColor; // For the active state text usually
@@ -28,7 +27,6 @@ class CarbonContentSwitcherThemeData
     required this.contentSwitcherBackgroundHover,
   });
 
-  @override
   CarbonContentSwitcherThemeData copyWith({
     Color? contentSwitcherSelected,
     Color? contentSwitcherDivider,
@@ -50,12 +48,11 @@ class CarbonContentSwitcherThemeData
     );
   }
 
-  @override
   CarbonContentSwitcherThemeData lerp(
-    ThemeExtension<CarbonContentSwitcherThemeData>? other,
+    CarbonContentSwitcherThemeData? other,
     double t,
   ) {
-    if (other is! CarbonContentSwitcherThemeData) return this;
+    if (other == null) return this;
     return CarbonContentSwitcherThemeData(
       contentSwitcherSelected: Color.lerp(
         contentSwitcherSelected,

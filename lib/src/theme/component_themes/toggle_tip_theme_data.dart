@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonToggleTipThemeData
-    extends ThemeExtension<CarbonToggleTipThemeData> {
+class CarbonToggleTipThemeData {
   final Color buttonBackground;
   final Color buttonBackgroundHover;
   final Color buttonIcon;
@@ -25,7 +24,6 @@ class CarbonToggleTipThemeData
     required this.actionButtonTextHover,
   });
 
-  @override
   CarbonToggleTipThemeData copyWith({
     Color? buttonBackground,
     Color? buttonBackgroundHover,
@@ -52,12 +50,11 @@ class CarbonToggleTipThemeData
     );
   }
 
-  @override
   CarbonToggleTipThemeData lerp(
-    ThemeExtension<CarbonToggleTipThemeData>? other,
+    CarbonToggleTipThemeData? other,
     double t,
   ) {
-    if (other is! CarbonToggleTipThemeData) return this;
+    if (other == null) return this;
     return CarbonToggleTipThemeData(
       buttonBackground:
           Color.lerp(buttonBackground, other.buttonBackground, t)!,

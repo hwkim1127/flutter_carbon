@@ -1,3 +1,56 @@
+## 2.0.0-dev.1
+
+The theming rearchitecture (Phase 1 of `doc/V2_ROADMAP.md`): the theming core
+is now Material-free, and Material interop became an explicit bridge library.
+See `MIGRATION.md` ("1.x → 2.0.0") — for Material apps the migration is one
+import change plus one `builder:` line.
+
+### Breaking Changes
+
+* `CarbonThemeData` (and every component theme data class) no longer extends
+  Material's `ThemeExtension`; they are plain immutable classes. `lerp`
+  signatures changed from `lerp(ThemeExtension<T>? other, double t)` to
+  `lerp(T? other, double t)`.
+* `context.carbon` resolves via the new `CarbonTheme` inherited widget instead
+  of `Theme.of(context).extension<...>()`. Material apps must install
+  `CarbonMaterialBridge` in `MaterialApp.builder`; a missing theme now throws
+  a `FlutterError` with setup instructions (was `StateError`).
+* `carbonTheme()` and `CarbonInputDecorationHelper` moved from
+  `package:flutter_carbon/flutter_carbon.dart` to
+  `package:flutter_carbon/material.dart` (which re-exports the core library —
+  switching the import is enough).
+
+### New Features
+
+* **`CarbonApp`** — a pure-Carbon application shell on `WidgetsApp`: no
+  `MaterialApp` needed. Provides Navigator/Overlay, localizations, Carbon
+  default text style, text-selection colors, and animated theme switching.
+* **`CarbonPageRoute`** — page route with Carbon productive motion (fade +
+  slight rise, `duration-moderate-02` / entrance-productive easing). Used by
+  `CarbonApp` and pushable directly.
+* **`CarbonTheme`** / **`AnimatedCarbonTheme`** / **`CarbonThemeDataTween`** —
+  the new theming core (CupertinoTheme-style `of`/`maybeOf`, implicit
+  animation for runtime theme switches).
+* **`CarbonMaterialBridge`** / **`CarbonMaterialThemeExtension`** — the
+  Material interop layer in `package:flutter_carbon/material.dart`.
+* The theming core (`lib/src/theme`, `foundation`, `base`, `app`) contains no
+  `material.dart`/`cupertino.dart` imports — enforced by a guard test.
+
+### Bug Fixes (token audit vs Carbon v11.96)
+
+Theme token values were audited against the `@carbon/themes` v11.96 sources;
+corrected drift:
+
+* **Content switcher (white theme)**: adopted the 2025 redesign — container
+  `gray-20`, selected `white`, hover `gray-20-hover` (was inverted).
+* **`$toggle-off`** (all themes): white/g10 gray-30 → gray-50; g90 gray-70 →
+  gray-50; g100 gray-70 → gray-60. Toggle disabled text now uses spec
+  `$text-disabled` (25% text-primary) instead of solid approximations.
+* **Status (g90)**: red/purple/blue/gray corrected to the 50-level palette
+  values (previously copied g100's 40-level values).
+* **Notification backgrounds (g90)**: colored dark backgrounds → neutral
+  `gray-80` for all four kinds, matching Carbon's dark-theme component tokens.
+
 ## 1.3.0
 
 ### Visual Changes

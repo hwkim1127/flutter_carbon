@@ -1,0 +1,9 @@
+# Reference checkout of the Carbon Design System monorepo — used for token
+# audits/codegen (see doc/implementation/01-token-audit.md), never shipped.
+carbon/
+
+# Icon font build tooling — not part of the package.
+icon_converter/
+
+# Build artifacts.
+build/

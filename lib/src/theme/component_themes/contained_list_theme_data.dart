@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Contained list theme data for Carbon Design System.
 class CarbonContainedListThemeData {

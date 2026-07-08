@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon structured list (table-like list with rows/columns).
 @immutable
-class CarbonStructuredListThemeData
-    extends ThemeExtension<CarbonStructuredListThemeData> {
+class CarbonStructuredListThemeData {
   /// Background color for the list.
   final Color background;
 
@@ -43,7 +42,6 @@ class CarbonStructuredListThemeData
     required this.headerBackground,
   });
 
-  @override
   CarbonStructuredListThemeData copyWith({
     Color? background,
     Color? rowHover,
@@ -68,10 +66,9 @@ class CarbonStructuredListThemeData
     );
   }
 
-  @override
   CarbonStructuredListThemeData lerp(
-      ThemeExtension<CarbonStructuredListThemeData>? other, double t) {
-    if (other is! CarbonStructuredListThemeData) return this;
+      CarbonStructuredListThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonStructuredListThemeData(
       background: Color.lerp(background, other.background, t)!,
       rowHover: Color.lerp(rowHover, other.rowHover, t)!,

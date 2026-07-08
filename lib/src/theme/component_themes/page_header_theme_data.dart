@@ -1,12 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon Page Header component.
 ///
 /// The Page Header provides a consistent header area for pages with
 /// title, breadcrumbs, actions, and optional tabs.
 @immutable
-class CarbonPageHeaderThemeData
-    extends ThemeExtension<CarbonPageHeaderThemeData> {
+class CarbonPageHeaderThemeData {
   /// Background color of the page header.
   final Color background;
 
@@ -46,7 +45,6 @@ class CarbonPageHeaderThemeData
     required this.actionTextHover,
   });
 
-  @override
   CarbonPageHeaderThemeData copyWith({
     Color? background,
     Color? titleText,
@@ -71,12 +69,11 @@ class CarbonPageHeaderThemeData
     );
   }
 
-  @override
   CarbonPageHeaderThemeData lerp(
-    ThemeExtension<CarbonPageHeaderThemeData>? other,
+    CarbonPageHeaderThemeData? other,
     double t,
   ) {
-    if (other is! CarbonPageHeaderThemeData) return this;
+    if (other == null) return this;
     return CarbonPageHeaderThemeData(
       background: Color.lerp(background, other.background, t)!,
       titleText: Color.lerp(titleText, other.titleText, t)!,

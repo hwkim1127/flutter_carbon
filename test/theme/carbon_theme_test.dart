@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:flutter_carbon/material.dart';
 
 void main() {
   group('CarbonTheme', () {
@@ -8,6 +8,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: carbonTheme(carbon: WhiteTheme.theme),
+          builder: (context, child) => CarbonMaterialBridge(child: child!),
           home: Builder(
             builder: (context) {
               final carbon = context.carbon;
@@ -33,6 +34,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: carbonTheme(carbon: WhiteTheme.theme),
+          builder: (context, child) => CarbonMaterialBridge(child: child!),
           home: Builder(
             builder: (context) {
               themeData = context.carbon;
@@ -46,14 +48,14 @@ void main() {
       expect(themeData, isA<CarbonThemeData>());
     });
 
-    testWidgets('throws StateError when CarbonThemeData is not in theme', (
+    testWidgets('throws FlutterError when no CarbonTheme is in scope', (
       tester,
     ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
             builder: (context) {
-              expect(() => context.carbon, throwsStateError);
+              expect(() => context.carbon, throwsFlutterError);
               return const SizedBox();
             },
           ),
@@ -92,7 +94,10 @@ void main() {
 
       expect(themeData, isA<ThemeData>());
       expect(themeData.useMaterial3, isTrue);
-      expect(themeData.extensions[CarbonThemeData], carbon);
+      expect(
+        themeData.extension<CarbonMaterialThemeExtension>()!.data,
+        carbon,
+      );
     });
 
     test('sets correct scaffold background color', () {
@@ -139,6 +144,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: carbonTheme(carbon: WhiteTheme.theme),
+          builder: (context, child) => CarbonMaterialBridge(child: child!),
           home: Builder(
             builder: (context) {
               carbonData = context.carbon;

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonChatThemeData extends ThemeExtension<CarbonChatThemeData> {
+class CarbonChatThemeData {
   final Color chatPromptBackground;
   final Color chatPromptBorderStart;
   final Color chatPromptBorderEnd;
@@ -48,7 +48,6 @@ class CarbonChatThemeData extends ThemeExtension<CarbonChatThemeData> {
     required this.chatButtonTextSelected,
   });
 
-  @override
   CarbonChatThemeData copyWith({
     Color? chatPromptBackground,
     Color? chatPromptBorderStart,
@@ -99,12 +98,11 @@ class CarbonChatThemeData extends ThemeExtension<CarbonChatThemeData> {
     );
   }
 
-  @override
   CarbonChatThemeData lerp(
-    ThemeExtension<CarbonChatThemeData>? other,
+    CarbonChatThemeData? other,
     double t,
   ) {
-    if (other is! CarbonChatThemeData) return this;
+    if (other == null) return this;
     return CarbonChatThemeData(
       chatPromptBackground: Color.lerp(
         chatPromptBackground,

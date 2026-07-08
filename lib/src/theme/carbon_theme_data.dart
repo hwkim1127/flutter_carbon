@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'component_themes/ai_theme_data.dart';
 import 'component_themes/breadcrumb_theme_data.dart';
@@ -54,10 +54,10 @@ export 'package:flutter_carbon/src/theme/component_themes/page_header_theme_data
 
 /// The Carbon Design System Theme.
 ///
-/// This extension aggregates all semantic and component themes.
-/// Use [CarbonThemeData.of] to access the current theme data.
+/// Aggregates all semantic and component themes. Install with a `CarbonTheme`
+/// widget and read via `context.carbon`.
 @immutable
-class CarbonThemeData extends ThemeExtension<CarbonThemeData> {
+class CarbonThemeData {
   final CarbonLayerThemeData layer;
   final CarbonTextThemeData text;
   final CarbonButtonThemeData button;
@@ -112,7 +112,7 @@ class CarbonThemeData extends ThemeExtension<CarbonThemeData> {
     required this.pageHeader,
   });
 
-  @override
+  /// Creates a copy with the given fields replaced.
   CarbonThemeData copyWith({
     CarbonLayerThemeData? layer,
     CarbonTextThemeData? text,
@@ -169,9 +169,9 @@ class CarbonThemeData extends ThemeExtension<CarbonThemeData> {
     );
   }
 
-  @override
-  CarbonThemeData lerp(ThemeExtension<CarbonThemeData>? other, double t) {
-    if (other is! CarbonThemeData) return this;
+  /// Linearly interpolates towards [other].
+  CarbonThemeData lerp(CarbonThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonThemeData(
       layer: layer.lerp(other.layer, t),
       text: text.lerp(other.text, t),

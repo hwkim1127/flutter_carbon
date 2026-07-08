@@ -99,7 +99,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 
 #### Handled via Material Theming (11)
 
-These Carbon components are covered by standard Material widgets that automatically receive Carbon styling through `carbonTheme()` — no extra wrappers needed:
+These Carbon components are covered by standard Material widgets that automatically receive Carbon styling through `carbonTheme()` (from `package:flutter_carbon/material.dart`, using the MaterialApp + `CarbonMaterialBridge` setup):
 
 | Carbon Component | Flutter Equivalent |
 |---|---|
@@ -179,10 +179,9 @@ The example app includes comprehensive demos for every component, organized into
 
 ### 1. Setup Theme
 
-Wrap your `MaterialApp` with Carbon theme:
+**Option A — pure Carbon app** (no MaterialApp needed):
 
 ```dart
-import 'package:flutter/material.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
 
 void main() {
@@ -194,12 +193,34 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Choose your theme: WhiteTheme, G10Theme, G90Theme, or G100Theme
+    return CarbonApp(
+      title: 'My Carbon App',
+      // Choose your theme: WhiteTheme, G10Theme, G90Theme, or G100Theme
+      theme: WhiteTheme.theme,
+      home: const MyHomePage(),
+    );
+  }
+}
+```
+
+**Option B — Material app with the Carbon bridge** (needed for the
+Material-themed components and the widgets that still use Material internals):
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_carbon/material.dart';
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     final carbon = WhiteTheme.theme;
 
     return MaterialApp(
       title: 'My Carbon App',
       theme: carbonTheme(carbon: carbon),
+      builder: (context, child) => CarbonMaterialBridge(child: child!),
       home: const MyHomePage(),
     );
   }
@@ -437,11 +458,15 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: carbonTheme(carbon: _carbon),
+      builder: (context, child) => CarbonMaterialBridge(child: child!),
       home: MyHomePage(onThemeChanged: _switchTheme),
     );
   }
 }
 ```
+
+In a pure Carbon app, just rebuild `CarbonApp` with a different `theme:` —
+switches animate automatically via `AnimatedCarbonTheme`.
 
 ## 📚 Design Tokens
 

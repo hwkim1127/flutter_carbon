@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:flutter_carbon/material.dart';
 
 class MaterialWidgetsSection extends StatefulWidget {
   const MaterialWidgetsSection({super.key});

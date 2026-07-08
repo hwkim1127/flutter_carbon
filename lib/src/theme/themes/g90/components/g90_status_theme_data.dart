@@ -7,15 +7,15 @@ import '../../../component_themes/status_theme_data.dart';
 class G90StatusThemeData extends CarbonStatusThemeData {
   const G90StatusThemeData()
       : super(
-          statusRed: CarbonPalette.red40,
+          statusRed: CarbonPalette.red50,
           statusOrange: CarbonPalette.orange40,
           statusOrangeOutline: CarbonPalette.orange40,
           statusYellow: CarbonPalette.yellow30,
           statusYellowOutline: CarbonPalette.yellow30,
-          statusPurple: CarbonPalette.purple40,
+          statusPurple: CarbonPalette.purple50,
           statusGreen: CarbonPalette.green40,
-          statusBlue: CarbonPalette.blue40,
-          statusGray: CarbonPalette.gray30,
+          statusBlue: CarbonPalette.blue50,
+          statusGray: CarbonPalette.gray50,
           statusAccessibilityBackground: const Color(
             0x40FFFFFF,
           ), // white @ 0.25?? No g90 statusBG.

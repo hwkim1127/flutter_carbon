@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonSyntaxThemeData extends ThemeExtension<CarbonSyntaxThemeData> {
+class CarbonSyntaxThemeData {
   final Color syntaxComment;
   final Color syntaxLineComment;
   final Color syntaxBlockComment;
@@ -88,7 +88,6 @@ class CarbonSyntaxThemeData extends ThemeExtension<CarbonSyntaxThemeData> {
     required this.syntaxColor,
   });
 
-  @override
   CarbonSyntaxThemeData copyWith({
     Color? syntaxComment,
     Color? syntaxLineComment,
@@ -179,12 +178,11 @@ class CarbonSyntaxThemeData extends ThemeExtension<CarbonSyntaxThemeData> {
     );
   }
 
-  @override
   CarbonSyntaxThemeData lerp(
-    ThemeExtension<CarbonSyntaxThemeData>? other,
+    CarbonSyntaxThemeData? other,
     double t,
   ) {
-    if (other is! CarbonSyntaxThemeData) return this;
+    if (other == null) return this;
     return CarbonSyntaxThemeData(
       syntaxComment: Color.lerp(syntaxComment, other.syntaxComment, t)!,
       syntaxLineComment: Color.lerp(

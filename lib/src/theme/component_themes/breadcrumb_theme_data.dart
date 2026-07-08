@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonBreadcrumbThemeData
-    extends ThemeExtension<CarbonBreadcrumbThemeData> {
+class CarbonBreadcrumbThemeData {
   /// Text color for breadcrumb links
   final Color linkColor;
 
@@ -22,7 +21,6 @@ class CarbonBreadcrumbThemeData
     required this.linkHoverColor,
   });
 
-  @override
   CarbonBreadcrumbThemeData copyWith({
     Color? linkColor,
     Color? currentColor,
@@ -37,12 +35,11 @@ class CarbonBreadcrumbThemeData
     );
   }
 
-  @override
   CarbonBreadcrumbThemeData lerp(
-    ThemeExtension<CarbonBreadcrumbThemeData>? other,
+    CarbonBreadcrumbThemeData? other,
     double t,
   ) {
-    if (other is! CarbonBreadcrumbThemeData) return this;
+    if (other == null) return this;
     return CarbonBreadcrumbThemeData(
       linkColor: Color.lerp(linkColor, other.linkColor, t)!,
       currentColor: Color.lerp(currentColor, other.currentColor, t)!,

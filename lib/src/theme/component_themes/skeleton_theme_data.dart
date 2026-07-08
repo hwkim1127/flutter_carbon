@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonSkeletonThemeData extends ThemeExtension<CarbonSkeletonThemeData> {
+class CarbonSkeletonThemeData {
   final Color skeletonBackground;
   final Color skeletonElement;
 
@@ -10,7 +10,6 @@ class CarbonSkeletonThemeData extends ThemeExtension<CarbonSkeletonThemeData> {
     required this.skeletonElement,
   });
 
-  @override
   CarbonSkeletonThemeData copyWith({
     Color? skeletonBackground,
     Color? skeletonElement,
@@ -21,12 +20,11 @@ class CarbonSkeletonThemeData extends ThemeExtension<CarbonSkeletonThemeData> {
     );
   }
 
-  @override
   CarbonSkeletonThemeData lerp(
-    ThemeExtension<CarbonSkeletonThemeData>? other,
+    CarbonSkeletonThemeData? other,
     double t,
   ) {
-    if (other is! CarbonSkeletonThemeData) return this;
+    if (other == null) return this;
     return CarbonSkeletonThemeData(
       skeletonBackground: Color.lerp(
         skeletonBackground,

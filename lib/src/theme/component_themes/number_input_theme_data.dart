@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon number input control buttons.
 @immutable
-class CarbonNumberInputThemeData
-    extends ThemeExtension<CarbonNumberInputThemeData> {
+class CarbonNumberInputThemeData {
   /// Background color for control buttons.
   final Color controlButtonBackground;
 
@@ -31,7 +30,6 @@ class CarbonNumberInputThemeData
     required this.controlButtonDivider,
   });
 
-  @override
   CarbonNumberInputThemeData copyWith({
     Color? controlButtonBackground,
     Color? controlButtonBackgroundHover,
@@ -53,10 +51,9 @@ class CarbonNumberInputThemeData
     );
   }
 
-  @override
   CarbonNumberInputThemeData lerp(
-      ThemeExtension<CarbonNumberInputThemeData>? other, double t) {
-    if (other is! CarbonNumberInputThemeData) return this;
+      CarbonNumberInputThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonNumberInputThemeData(
       controlButtonBackground: Color.lerp(
           controlButtonBackground, other.controlButtonBackground, t)!,

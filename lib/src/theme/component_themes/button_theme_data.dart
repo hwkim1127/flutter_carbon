@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonButtonThemeData extends ThemeExtension<CarbonButtonThemeData> {
+class CarbonButtonThemeData {
   // Primary
   final Color buttonPrimary;
   final Color buttonPrimaryActive;
@@ -54,7 +54,6 @@ class CarbonButtonThemeData extends ThemeExtension<CarbonButtonThemeData> {
     required this.buttonDisabled,
   });
 
-  @override
   CarbonButtonThemeData copyWith({
     Color? buttonPrimary,
     Color? buttonPrimaryActive,
@@ -93,12 +92,11 @@ class CarbonButtonThemeData extends ThemeExtension<CarbonButtonThemeData> {
     );
   }
 
-  @override
   CarbonButtonThemeData lerp(
-    ThemeExtension<CarbonButtonThemeData>? other,
+    CarbonButtonThemeData? other,
     double t,
   ) {
-    if (other is! CarbonButtonThemeData) return this;
+    if (other == null) return this;
     return CarbonButtonThemeData(
       buttonPrimary: Color.lerp(buttonPrimary, other.buttonPrimary, t)!,
       buttonPrimaryActive: Color.lerp(

@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon file uploader components.
 @immutable
-class CarbonFileUploaderThemeData
-    extends ThemeExtension<CarbonFileUploaderThemeData> {
+class CarbonFileUploaderThemeData {
   /// Background color for drop zone.
   final Color dropZoneBackground;
 
@@ -59,7 +58,6 @@ class CarbonFileUploaderThemeData
     required this.errorTextColor,
   });
 
-  @override
   CarbonFileUploaderThemeData copyWith({
     Color? dropZoneBackground,
     Color? dropZoneBorder,
@@ -94,10 +92,9 @@ class CarbonFileUploaderThemeData
     );
   }
 
-  @override
   CarbonFileUploaderThemeData lerp(
-      ThemeExtension<CarbonFileUploaderThemeData>? other, double t) {
-    if (other is! CarbonFileUploaderThemeData) return this;
+      CarbonFileUploaderThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonFileUploaderThemeData(
       dropZoneBackground:
           Color.lerp(dropZoneBackground, other.dropZoneBackground, t)!,

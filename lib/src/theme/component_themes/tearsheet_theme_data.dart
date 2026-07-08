@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon tearsheet (full-height slide-in panel from bottom).
 @immutable
-class CarbonTearsheetThemeData
-    extends ThemeExtension<CarbonTearsheetThemeData> {
+class CarbonTearsheetThemeData {
   /// Background color for the tearsheet.
   final Color background;
 
@@ -43,7 +42,6 @@ class CarbonTearsheetThemeData
     required this.influencerBackground,
   });
 
-  @override
   CarbonTearsheetThemeData copyWith({
     Color? background,
     Color? overlayColor,
@@ -68,10 +66,9 @@ class CarbonTearsheetThemeData
     );
   }
 
-  @override
   CarbonTearsheetThemeData lerp(
-      ThemeExtension<CarbonTearsheetThemeData>? other, double t) {
-    if (other is! CarbonTearsheetThemeData) return this;
+      CarbonTearsheetThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonTearsheetThemeData(
       background: Color.lerp(background, other.background, t)!,
       overlayColor: Color.lerp(overlayColor, other.overlayColor, t)!,

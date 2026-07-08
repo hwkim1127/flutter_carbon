@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:flutter_carbon/material.dart';
 import '../widgets/demo_page_template.dart';
 
 /// Demo page for CarbonCodeSnippet component.
@@ -30,7 +30,7 @@ class _CodeSnippetDemoPageState extends State<CodeSnippetDemoPage> {
           title: 'Multi-line Code Snippet',
           description: 'Multiple lines of code with expandable view',
           builder: (context) => const CarbonCodeSnippet(
-            code: '''import 'package:flutter_carbon/flutter_carbon.dart';
+            code: '''import 'package:flutter_carbon/material.dart';
 
 void main() {
   runApp(MyApp());
@@ -75,7 +75,7 @@ void main() {
           builder: (context) => const CarbonCodeSnippet(
             code: '''// Complete Flutter app example
 import 'package:flutter/material.dart';
-import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:flutter_carbon/material.dart';
 
 void main() {
   runApp(const MyApp());
@@ -89,6 +89,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Carbon Theme Demo',
       theme: carbonTheme(carbon: WhiteTheme.theme),
+      builder: (context, child) => CarbonMaterialBridge(child: child!),
       home: const HomePage(),
     );
   }

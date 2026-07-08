@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon toggle (switch).
 @immutable
-class CarbonToggleThemeData extends ThemeExtension<CarbonToggleThemeData> {
+class CarbonToggleThemeData {
   /// Background color when toggle is off.
   final Color toggleOff;
 
@@ -54,7 +54,6 @@ class CarbonToggleThemeData extends ThemeExtension<CarbonToggleThemeData> {
     required this.checkmarkColor,
   });
 
-  @override
   CarbonToggleThemeData copyWith({
     Color? toggleOff,
     Color? toggleOn,
@@ -85,10 +84,9 @@ class CarbonToggleThemeData extends ThemeExtension<CarbonToggleThemeData> {
     );
   }
 
-  @override
   CarbonToggleThemeData lerp(
-      ThemeExtension<CarbonToggleThemeData>? other, double t) {
-    if (other is! CarbonToggleThemeData) return this;
+      CarbonToggleThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonToggleThemeData(
       toggleOff: Color.lerp(toggleOff, other.toggleOff, t)!,
       toggleOn: Color.lerp(toggleOn, other.toggleOn, t)!,

@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import '../../../../foundation/colors.dart';
 import '../../../component_themes/toggle_theme_data.dart';
 
@@ -5,7 +7,7 @@ import '../../../component_themes/toggle_theme_data.dart';
 class G10ToggleThemeData extends CarbonToggleThemeData {
   const G10ToggleThemeData()
       : super(
-          toggleOff: CarbonPalette.gray30, // Light gray background when off
+          toggleOff: CarbonPalette.gray50, // $toggle-off (gray-50)
           toggleOn: CarbonPalette.green50, // Success green when on
           thumbColor: CarbonPalette.white, // White circle
           thumbColorDisabled: CarbonPalette.gray30, // Disabled thumb
@@ -15,7 +17,8 @@ class G10ToggleThemeData extends CarbonToggleThemeData {
           focusColor: CarbonPalette.blue60, // Focus indicator
           labelColor: CarbonPalette.gray100, // Label text (dark)
           stateTextColor: CarbonPalette.gray100, // On/Off text (dark)
-          textDisabled: CarbonPalette.gray30, // Disabled text
+          textDisabled:
+              const Color(0x40161616), // $text-disabled (text-primary 25%)
           checkmarkColor: CarbonPalette.green60, // Checkmark icon (small)
         );
 }

@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon side panel (slide-in drawer from side).
 @immutable
-class CarbonSidePanelThemeData
-    extends ThemeExtension<CarbonSidePanelThemeData> {
+class CarbonSidePanelThemeData {
   /// Background color for the panel.
   final Color background;
 
@@ -39,7 +38,6 @@ class CarbonSidePanelThemeData
     required this.dividerColor,
   });
 
-  @override
   CarbonSidePanelThemeData copyWith({
     Color? background,
     Color? overlayColor,
@@ -62,10 +60,9 @@ class CarbonSidePanelThemeData
     );
   }
 
-  @override
   CarbonSidePanelThemeData lerp(
-      ThemeExtension<CarbonSidePanelThemeData>? other, double t) {
-    if (other is! CarbonSidePanelThemeData) return this;
+      CarbonSidePanelThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonSidePanelThemeData(
       background: Color.lerp(background, other.background, t)!,
       overlayColor: Color.lerp(overlayColor, other.overlayColor, t)!,

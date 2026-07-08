@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon code snippet.
 @immutable
-class CarbonCodeSnippetThemeData
-    extends ThemeExtension<CarbonCodeSnippetThemeData> {
+class CarbonCodeSnippetThemeData {
   /// Background color for code snippet.
   final Color background;
 
@@ -31,7 +30,6 @@ class CarbonCodeSnippetThemeData
     required this.copyButtonIcon,
   });
 
-  @override
   CarbonCodeSnippetThemeData copyWith({
     Color? background,
     Color? codeText,
@@ -51,10 +49,9 @@ class CarbonCodeSnippetThemeData
     );
   }
 
-  @override
   CarbonCodeSnippetThemeData lerp(
-      ThemeExtension<CarbonCodeSnippetThemeData>? other, double t) {
-    if (other is! CarbonCodeSnippetThemeData) return this;
+      CarbonCodeSnippetThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonCodeSnippetThemeData(
       background: Color.lerp(background, other.background, t)!,
       codeText: Color.lerp(codeText, other.codeText, t)!,

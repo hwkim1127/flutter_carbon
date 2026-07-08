@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon combo box (autocomplete dropdown with search).
 @immutable
-class CarbonComboBoxThemeData extends ThemeExtension<CarbonComboBoxThemeData> {
+class CarbonComboBoxThemeData {
   /// Background color for the input field.
   final Color fieldBackground;
 
@@ -70,7 +70,6 @@ class CarbonComboBoxThemeData extends ThemeExtension<CarbonComboBoxThemeData> {
     required this.dividerColor,
   });
 
-  @override
   CarbonComboBoxThemeData copyWith({
     Color? fieldBackground,
     Color? fieldBackgroundHover,
@@ -109,10 +108,9 @@ class CarbonComboBoxThemeData extends ThemeExtension<CarbonComboBoxThemeData> {
     );
   }
 
-  @override
   CarbonComboBoxThemeData lerp(
-      ThemeExtension<CarbonComboBoxThemeData>? other, double t) {
-    if (other is! CarbonComboBoxThemeData) return this;
+      CarbonComboBoxThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonComboBoxThemeData(
       fieldBackground: Color.lerp(fieldBackground, other.fieldBackground, t)!,
       fieldBackgroundHover:

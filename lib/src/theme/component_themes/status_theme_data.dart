@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonStatusThemeData extends ThemeExtension<CarbonStatusThemeData> {
+class CarbonStatusThemeData {
   final Color statusRed;
   final Color statusOrange;
   final Color statusOrangeOutline;
@@ -26,7 +26,6 @@ class CarbonStatusThemeData extends ThemeExtension<CarbonStatusThemeData> {
     required this.statusAccessibilityBackground,
   });
 
-  @override
   CarbonStatusThemeData copyWith({
     Color? statusRed,
     Color? statusOrange,
@@ -54,12 +53,11 @@ class CarbonStatusThemeData extends ThemeExtension<CarbonStatusThemeData> {
     );
   }
 
-  @override
   CarbonStatusThemeData lerp(
-    ThemeExtension<CarbonStatusThemeData>? other,
+    CarbonStatusThemeData? other,
     double t,
   ) {
-    if (other is! CarbonStatusThemeData) return this;
+    if (other == null) return this;
     return CarbonStatusThemeData(
       statusRed: Color.lerp(statusRed, other.statusRed, t)!,
       statusOrange: Color.lerp(statusOrange, other.statusOrange, t)!,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:flutter_carbon/material.dart';
 import 'package:flutter_carbon/src/base/carbon_divider.dart';
 
 import '../shared/build.dart';
@@ -255,6 +255,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             theme: carbonTheme(carbon: theme),
+            builder: (context, child) => CarbonMaterialBridge(child: child!),
             home: Scaffold(
               body: CarbonContainedList(
                 title: 'Test',

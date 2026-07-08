@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonAIThemeData extends ThemeExtension<CarbonAIThemeData> {
+class CarbonAIThemeData {
   final Color aiInnerShadow;
   final Color aiAuraStartSm;
   final Color aiAuraStart;
@@ -52,7 +52,6 @@ class CarbonAIThemeData extends ThemeExtension<CarbonAIThemeData> {
     required this.aiPopoverCaretBottomBackground,
   });
 
-  @override
   CarbonAIThemeData copyWith({
     Color? aiInnerShadow,
     Color? aiAuraStartSm,
@@ -108,9 +107,8 @@ class CarbonAIThemeData extends ThemeExtension<CarbonAIThemeData> {
     );
   }
 
-  @override
-  CarbonAIThemeData lerp(ThemeExtension<CarbonAIThemeData>? other, double t) {
-    if (other is! CarbonAIThemeData) return this;
+  CarbonAIThemeData lerp(CarbonAIThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonAIThemeData(
       aiInnerShadow: Color.lerp(aiInnerShadow, other.aiInnerShadow, t)!,
       aiAuraStartSm: Color.lerp(aiAuraStartSm, other.aiAuraStartSm, t)!,

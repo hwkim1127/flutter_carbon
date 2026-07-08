@@ -1,6 +1,5 @@
 import 'dart:ui' show Color;
 
-import 'package:flutter/material.dart' show Colors;
 
 import '../../../../foundation/colors.dart';
 import '../../../component_themes/content_switcher_theme_data.dart';
@@ -22,7 +21,7 @@ class G100ContentSwitcherThemeData extends CarbonContentSwitcherThemeData {
           // Wait, contentSwitcherSelected is translucent gray50.
           // Let's use gray70 for divider as per borderSubtle01 in g100.js which is the default for UI borders.
           contentSwitcherTextOnColor: CarbonPalette.white,
-          contentSwitcherBackground: Colors.transparent, // transparent
+          contentSwitcherBackground: CarbonPalette.transparent, // transparent
           contentSwitcherBackgroundHover: const Color(
             0x1F8D8D8D,
           ), // gray50 (0.12)

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonPopoverThemeData extends ThemeExtension<CarbonPopoverThemeData> {
+class CarbonPopoverThemeData {
   final Color background;
   final Color backgroundHighContrast;
   final Color border;
@@ -22,7 +22,6 @@ class CarbonPopoverThemeData extends ThemeExtension<CarbonPopoverThemeData> {
     required this.dropShadowHighContrast,
   });
 
-  @override
   CarbonPopoverThemeData copyWith({
     Color? background,
     Color? backgroundHighContrast,
@@ -48,12 +47,11 @@ class CarbonPopoverThemeData extends ThemeExtension<CarbonPopoverThemeData> {
     );
   }
 
-  @override
   CarbonPopoverThemeData lerp(
-    ThemeExtension<CarbonPopoverThemeData>? other,
+    CarbonPopoverThemeData? other,
     double t,
   ) {
-    if (other is! CarbonPopoverThemeData) return this;
+    if (other == null) return this;
     return CarbonPopoverThemeData(
       background: Color.lerp(background, other.background, t)!,
       backgroundHighContrast: Color.lerp(

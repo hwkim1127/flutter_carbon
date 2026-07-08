@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon UI Shell component.
 ///
 /// The UI Shell provides the global navigation framework including header,
 /// side navigation, and panels.
 @immutable
-class CarbonUIShellThemeData extends ThemeExtension<CarbonUIShellThemeData> {
+class CarbonUIShellThemeData {
   // Header colors
   final Color headerBackground;
   final Color headerBorder;
@@ -67,7 +67,6 @@ class CarbonUIShellThemeData extends ThemeExtension<CarbonUIShellThemeData> {
     required this.panelBorder,
   });
 
-  @override
   CarbonUIShellThemeData copyWith({
     Color? headerBackground,
     Color? headerBorder,
@@ -136,12 +135,11 @@ class CarbonUIShellThemeData extends ThemeExtension<CarbonUIShellThemeData> {
     );
   }
 
-  @override
   CarbonUIShellThemeData lerp(
-    ThemeExtension<CarbonUIShellThemeData>? other,
+    CarbonUIShellThemeData? other,
     double t,
   ) {
-    if (other is! CarbonUIShellThemeData) return this;
+    if (other == null) return this;
     return CarbonUIShellThemeData(
       headerBackground:
           Color.lerp(headerBackground, other.headerBackground, t)!,

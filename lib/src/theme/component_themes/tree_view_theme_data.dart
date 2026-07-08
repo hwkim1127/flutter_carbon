@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for Carbon tree view (hierarchical tree with expand/collapse).
 @immutable
-class CarbonTreeViewThemeData extends ThemeExtension<CarbonTreeViewThemeData> {
+class CarbonTreeViewThemeData {
   /// Background color for the tree.
   final Color background;
 
@@ -34,7 +34,6 @@ class CarbonTreeViewThemeData extends ThemeExtension<CarbonTreeViewThemeData> {
     required this.lineColor,
   });
 
-  @override
   CarbonTreeViewThemeData copyWith({
     Color? background,
     Color? nodeHover,
@@ -55,10 +54,9 @@ class CarbonTreeViewThemeData extends ThemeExtension<CarbonTreeViewThemeData> {
     );
   }
 
-  @override
   CarbonTreeViewThemeData lerp(
-      ThemeExtension<CarbonTreeViewThemeData>? other, double t) {
-    if (other is! CarbonTreeViewThemeData) return this;
+      CarbonTreeViewThemeData? other, double t) {
+    if (other == null) return this;
     return CarbonTreeViewThemeData(
       background: Color.lerp(background, other.background, t)!,
       nodeHover: Color.lerp(nodeHover, other.nodeHover, t)!,

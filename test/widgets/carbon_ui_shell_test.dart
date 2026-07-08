@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:flutter_carbon/material.dart';
 
 void main() {
   group('CarbonUIShell', () {
@@ -8,6 +8,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: carbonTheme(carbon: WhiteTheme.theme),
+          builder: (context, child) => CarbonMaterialBridge(child: child!),
           home: CarbonUIShell(
             appName: 'App Title',
             child: const Text('Main content'),
@@ -24,6 +25,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: carbonTheme(carbon: WhiteTheme.theme),
+          builder: (context, child) => CarbonMaterialBridge(child: child!),
           home: CarbonUIShell(
             appName: 'App',
             initialSideNavExpanded: true,
@@ -48,6 +50,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: carbonTheme(carbon: WhiteTheme.theme),
+          builder: (context, child) => CarbonMaterialBridge(child: child!),
           home: CarbonUIShell(
             appName: 'App',
             initialSideNavExpanded: true,
@@ -79,6 +82,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             theme: carbonTheme(carbon: theme),
+            builder: (context, child) => CarbonMaterialBridge(child: child!),
             home: CarbonUIShell(appName: 'Test', child: const Text('Content')),
           ),
         );
@@ -94,6 +98,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: carbonTheme(carbon: WhiteTheme.theme),
+          builder: (context, child) => CarbonMaterialBridge(child: child!),
           home: Scaffold(body: CarbonPageHeader(title: 'Page Title')),
         ),
       );
@@ -106,6 +111,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: carbonTheme(carbon: WhiteTheme.theme),
+          builder: (context, child) => CarbonMaterialBridge(child: child!),
           home: Scaffold(
             body: CarbonPageHeader(
               title: 'Current Page',
@@ -128,6 +134,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: carbonTheme(carbon: WhiteTheme.theme),
+          builder: (context, child) => CarbonMaterialBridge(child: child!),
           home: Scaffold(
             body: CarbonPageHeader(title: 'Title', subtitle: 'Subtitle text'),
           ),

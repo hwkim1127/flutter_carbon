@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 @immutable
-class CarbonOverflowMenuThemeData
-    extends ThemeExtension<CarbonOverflowMenuThemeData> {
+class CarbonOverflowMenuThemeData {
   final Color triggerBackground;
   final Color triggerBackgroundHover;
   final Color triggerIcon;
@@ -33,7 +32,6 @@ class CarbonOverflowMenuThemeData
     required this.divider,
   });
 
-  @override
   CarbonOverflowMenuThemeData copyWith({
     Color? triggerBackground,
     Color? triggerBackgroundHover,
@@ -67,12 +65,11 @@ class CarbonOverflowMenuThemeData
     );
   }
 
-  @override
   CarbonOverflowMenuThemeData lerp(
-    ThemeExtension<CarbonOverflowMenuThemeData>? other,
+    CarbonOverflowMenuThemeData? other,
     double t,
   ) {
-    if (other is! CarbonOverflowMenuThemeData) return this;
+    if (other == null) return this;
     return CarbonOverflowMenuThemeData(
       triggerBackground:
           Color.lerp(triggerBackground, other.triggerBackground, t)!,

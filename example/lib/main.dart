@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:flutter_carbon/material.dart';
 import 'pages/home_page.dart';
 import 'pages/all_components_page.dart';
 import 'pages/foundation/colors_page.dart';
@@ -123,6 +123,7 @@ class _CarbonExampleAppState extends State<CarbonExampleApp> {
         },
       ),
       theme: carbonTheme(carbon: carbon),
+      builder: (context, child) => CarbonMaterialBridge(child: child!),
       initialRoute: AppRoutes.home,
       onGenerateRoute: (settings) {
         // Theme switcher wrapper for all pages
