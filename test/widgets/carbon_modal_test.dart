@@ -231,7 +231,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Enter name'), findsOneWidget);
-      expect(find.byType(TextField), findsOneWidget);
+      expect(find.byType(CarbonTextInput), findsOneWidget);
     });
 
     testWidgets('returns entered text', (tester) async {
@@ -258,7 +258,7 @@ void main() {
       await tester.tap(find.text('Show'));
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField), 'John Doe');
+      await tester.enterText(find.byType(CarbonTextInput), 'John Doe');
       await tester.tap(find.text('Submit'));
       await tester.pumpAndSettle();
 

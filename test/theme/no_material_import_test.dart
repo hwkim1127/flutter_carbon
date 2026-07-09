@@ -14,6 +14,7 @@ void main() {
       'lib/src/foundation',
       'lib/src/base',
       'lib/src/app',
+      'lib/src/text',
     ];
     final offenders = <String>[];
 

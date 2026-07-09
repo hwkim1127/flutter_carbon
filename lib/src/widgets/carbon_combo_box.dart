@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 import '../base/carbon_anchored_overlay.dart';
@@ -6,6 +6,7 @@ import '../base/carbon_overlay_surface.dart';
 import '../base/carbon_pressable.dart';
 import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
+import '../text/carbon_editable_core.dart';
 import '../theme/carbon_theme.dart';
 
 /// Carbon Design System combo box with autocomplete and search.
@@ -423,44 +424,35 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
           child: Row(
             children: [
               Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  focusNode: _focusNode,
-                  enabled: widget.enabled,
-                  style: TextStyle(
-                    color: widget.enabled
-                        ? theme.textColor
-                        : theme.textColorDisabled,
-                    fontSize: 14,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: widget.placeholder,
-                    hintStyle: TextStyle(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CarbonEditableCore(
+                    controller: _searchController,
+                    focusNode: _focusNode,
+                    enabled: widget.enabled,
+                    style: TextStyle(
+                      color: widget.enabled
+                          ? theme.textColor
+                          : theme.textColorDisabled,
+                      fontSize: 14,
+                    ),
+                    placeholder: widget.placeholder,
+                    placeholderStyle: TextStyle(
                       color: theme.placeholderColor,
                       fontSize: 14,
                     ),
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
+                    onChanged: (value) {
+                      if (!_isOpen) {
+                        _openDropdown();
+                      }
+                      _filterItems(value);
+                    },
+                    onTap: () {
+                      if (!_isOpen) {
+                        _openDropdown();
+                      }
+                    },
                   ),
-                  onChanged: (value) {
-                    if (!_isOpen) {
-                      _openDropdown();
-                    }
-                    _filterItems(value);
-                  },
-                  onTap: () {
-                    if (!_isOpen) {
-                      _openDropdown();
-                    }
-                  },
                 ),
               ),
               // Clear button

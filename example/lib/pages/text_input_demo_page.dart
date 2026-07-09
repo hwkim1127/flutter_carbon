@@ -1,8 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_carbon/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_carbon/flutter_carbon.dart';
 import '../widgets/demo_page_template.dart';
 
-/// Demo page for Carbon text input components.
+/// Demo page for the native Carbon text input components.
+///
+/// Material `TextField` styling through the bridge
+/// (`CarbonInputDecorationHelper`) is demonstrated on the Material widgets
+/// page instead.
 class TextInputDemoPage extends StatefulWidget {
   const TextInputDemoPage({super.key});
 
@@ -11,17 +15,18 @@ class TextInputDemoPage extends StatefulWidget {
 }
 
 class _TextInputDemoPageState extends State<TextInputDemoPage> {
-  final _textController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _multilineController = TextEditingController();
-  bool _obscurePassword = true;
-  String? _errorText;
+  final _usernameController = TextEditingController();
+  final _readOnlyController = TextEditingController(
+    text: 'You can select me, not edit me',
+  );
+  final _areaController = TextEditingController();
+  bool _usernameInvalid = false;
 
   @override
   void dispose() {
-    _textController.dispose();
-    _passwordController.dispose();
-    _multilineController.dispose();
+    _usernameController.dispose();
+    _readOnlyController.dispose();
+    _areaController.dispose();
     super.dispose();
   }
 
@@ -30,219 +35,157 @@ class _TextInputDemoPageState extends State<TextInputDemoPage> {
     return DemoPageTemplate(
       title: 'Text Input',
       description:
-          'Text input fields for user data entry with Carbon Design System styling.',
+          'Native Carbon text inputs — no Material dependency. Selection, '
+          'context menu (long-press or right-click), and keyboard shortcuts '
+          'are Carbon-styled.',
       sections: [
         DemoSection(
-          title: 'Basic Text Input',
-          description: 'Standard text input field',
+          title: 'Default',
+          description: 'Label, placeholder, and helper text',
+          builder: (context) => const CarbonTextInput(
+            labelText: 'Label',
+            placeholder: 'Placeholder text',
+            helperText: 'Helper text for additional guidance',
+          ),
+        ),
+        DemoSection(
+          title: 'Sizes',
+          description: 'xs (24px), sm (32px), md (40px, default), lg (48px)',
           builder: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
-                decoration: CarbonInputDecorationHelper.filled(
-                  context: context,
-                  labelText: 'Label',
-                  hintText: 'Placeholder text',
-                  helperText: 'Helper text for additional guidance',
+              for (final size in CarbonTextInputSize.values) ...[
+                CarbonTextInput(
+                  labelText: 'Size ${size.name}',
+                  placeholder: '${size.height.toInt()}px',
+                  size: size,
                 ),
-              ),
+                const SizedBox(height: 16),
+              ],
             ],
           ),
         ),
         DemoSection(
-          title: 'Input Variants',
-          description: 'Filled and outlined input styles',
+          title: 'States',
+          description: 'Invalid, warning, disabled, and read-only',
           builder: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
-                decoration: CarbonInputDecorationHelper.filled(
-                  context: context,
-                  labelText: 'Filled input',
-                  hintText: 'Enter text',
-                ),
+              const CarbonTextInput(
+                labelText: 'Invalid',
+                placeholder: 'Placeholder',
+                invalid: true,
+                invalidText: 'A valid value is required',
               ),
               const SizedBox(height: 16),
-              TextField(
-                decoration: CarbonInputDecorationHelper.outlined(
-                  context: context,
-                  labelText: 'Outlined input',
-                  hintText: 'Enter text',
-                ),
+              const CarbonTextInput(
+                labelText: 'Warning',
+                placeholder: 'Placeholder',
+                warn: true,
+                warnText: 'This will overwrite existing data',
+              ),
+              const SizedBox(height: 16),
+              const CarbonTextInput(
+                labelText: 'Disabled',
+                placeholder: 'Cannot type here',
+                disabled: true,
+                helperText: 'Disabled helper text',
+              ),
+              const SizedBox(height: 16),
+              CarbonTextInput(
+                labelText: 'Read-only',
+                readOnly: true,
+                controller: _readOnlyController,
+                helperText: 'Focusable and selectable, but not editable',
               ),
             ],
           ),
         ),
         DemoSection(
-          title: 'Input States',
+          title: 'Live validation',
+          description: 'invalid driven by onChanged',
+          builder: (context) => CarbonTextInput(
+            labelText: 'User name',
+            placeholder: 'lowercase letters only',
+            controller: _usernameController,
+            invalid: _usernameInvalid,
+            invalidText: 'Only lowercase letters are allowed',
+            helperText: 'Try typing an uppercase letter',
+            onChanged: (value) => setState(() {
+              _usernameInvalid =
+                  value.isNotEmpty && !RegExp(r'^[a-z]+$').hasMatch(value);
+            }),
+          ),
+        ),
+        DemoSection(
+          title: 'Hidden label',
+          description: 'Visually hidden, still announced by screen readers',
+          builder: (context) => const CarbonTextInput(
+            labelText: 'Search terms',
+            hideLabel: true,
+            placeholder: 'Label is in semantics only',
+          ),
+        ),
+        DemoSection(
+          title: 'Password',
           description:
-              'Different states including error, warning, and disabled',
+              'obscureText (the visibility toggle is a planned feature)',
+          builder: (context) => const CarbonTextInput(
+            labelText: 'Password',
+            placeholder: 'Enter password',
+            obscureText: true,
+            helperText: 'Input is obscured; copy is disabled',
+          ),
+        ),
+        DemoSection(
+          title: 'Max length',
+          description: 'maxLength enforces a character limit',
+          builder: (context) => const CarbonTextInput(
+            labelText: 'Code',
+            placeholder: 'Max 6 characters',
+            maxLength: 6,
+          ),
+        ),
+        DemoSection(
+          title: 'Text Area',
+          description: 'Multi-line input, grows with content',
           builder: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
-                decoration: CarbonInputDecorationHelper.filled(
-                  context: context,
-                  labelText: 'Normal state',
-                  hintText: 'Enter text',
-                  helperText: 'This is a normal input field',
-                ),
+              CarbonTextArea(
+                labelText: 'Notes',
+                placeholder: 'Type multiple lines…',
+                helperText: 'Grows from 4 lines with content',
+                controller: _areaController,
               ),
               const SizedBox(height: 16),
-              TextField(
-                decoration: CarbonInputDecorationHelper.filled(
-                  context: context,
-                  labelText: 'Error state',
-                  hintText: 'Enter text',
-                  errorText: 'This field has an error',
-                ),
+              const CarbonTextArea(
+                labelText: 'Invalid text area',
+                minLines: 3,
+                invalid: true,
+                invalidText: 'This field is required',
               ),
               const SizedBox(height: 16),
-              TextField(
-                decoration: CarbonInputDecorationHelper.filled(
-                  context: context,
-                  labelText: 'Warning state',
-                  hintText: 'Enter text',
-                  helperText: 'Warning: This action cannot be undone',
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                enabled: false,
-                decoration: CarbonInputDecorationHelper.filled(
-                  context: context,
-                  labelText: 'Disabled state',
-                  hintText: 'Cannot edit this field',
-                ),
+              const CarbonTextArea(
+                labelText: 'Disabled text area',
+                minLines: 3,
+                disabled: true,
               ),
             ],
           ),
         ),
         DemoSection(
-          title: 'Password Input',
-          description: 'Password field with show/hide toggle',
-          builder: (context) => TextField(
-            controller: _passwordController,
-            obscureText: _obscurePassword,
-            decoration: CarbonInputDecorationHelper.filled(
-              context: context,
-              labelText: 'Password',
-              hintText: 'Enter your password',
-              helperText: 'Password must be at least 8 characters',
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              ),
+          title: 'Localized selection menu',
+          description: 'CarbonTextSelectionLabels overrides the context menu',
+          builder: (context) => const CarbonTextInput(
+            labelText: '한국어 메뉴',
+            placeholder: '텍스트를 선택해 보세요',
+            selectionLabels: CarbonTextSelectionLabels(
+              cut: '잘라내기',
+              copy: '복사',
+              paste: '붙여넣기',
+              selectAll: '전체 선택',
             ),
-          ),
-        ),
-        DemoSection(
-          title: 'Multiline Text Area',
-          description: 'Text area for longer content',
-          builder: (context) => TextField(
-            controller: _multilineController,
-            maxLines: 4,
-            decoration: CarbonInputDecorationHelper.filled(
-              context: context,
-              labelText: 'Description',
-              hintText: 'Enter a detailed description...',
-              helperText: 'Maximum 500 characters',
-            ),
-          ),
-        ),
-        DemoSection(
-          title: 'Validation Example',
-          description: 'Input with validation logic',
-          builder: (context) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: _textController,
-                onChanged: (value) {
-                  setState(() {
-                    if (value.isEmpty) {
-                      _errorText = 'This field is required';
-                    } else if (value.length < 3) {
-                      _errorText = 'Must be at least 3 characters';
-                    } else {
-                      _errorText = null;
-                    }
-                  });
-                },
-                decoration: CarbonInputDecorationHelper.filled(
-                  context: context,
-                  labelText: 'Username',
-                  hintText: 'Enter username',
-                  helperText:
-                      _errorText == null ? 'Choose a unique username' : null,
-                  errorText: _errorText,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _errorText == null && _textController.text.isNotEmpty
-                    ? () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Username "${_textController.text}" is valid!',
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
-                child: const Text('Submit'),
-              ),
-            ],
-          ),
-        ),
-        DemoSection(
-          title: 'Input with Icons',
-          description: 'Text inputs with prefix and suffix icons',
-          builder: (context) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                decoration: CarbonInputDecorationHelper.filled(
-                  context: context,
-                  labelText: 'Email',
-                  hintText: 'Enter your email',
-                  prefixIcon: const Icon(Icons.email),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                decoration: CarbonInputDecorationHelper.filled(
-                  context: context,
-                  labelText: 'Search',
-                  hintText: 'Search...',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {},
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        DemoSection(
-          title: 'Read-only Input',
-          description: 'Non-editable input field',
-          builder: (context) => TextField(
-            readOnly: true,
-            decoration: CarbonInputDecorationHelper.filled(
-              context: context,
-              labelText: 'Read-only field',
-              hintText: 'This value cannot be changed',
-            ),
-            controller: TextEditingController(text: 'Fixed value'),
           ),
         ),
       ],

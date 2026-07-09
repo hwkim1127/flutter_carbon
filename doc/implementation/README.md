@@ -34,6 +34,7 @@ package-wide Material freedom waits for the native primitives in later phases �
 | 05 | [CarbonApp](05-carbon-app.md) | ✅ |
 | 06 | [Docs & release](06-docs-and-release.md) | ✅ |
 | 07 | [Native primitives, wave 1 (Phase 2)](07-native-primitives.md) | ✅ |
+| 08 | [CarbonTextInput + migrations (Phase 2, wave 2)](08-carbon-text-input.md) | ✅ |
 
 Update this table (⬜ → ✅) as steps complete.
 

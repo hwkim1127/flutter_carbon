@@ -1,3 +1,44 @@
+## Unreleased (2.0.0-dev.2)
+
+Phase 2 of `doc/V2_ROADMAP.md` — native primitives.
+
+### New Features
+
+* **`CarbonTextInput`** / **`CarbonTextArea`** — Material-free text fields
+  built on `EditableText` with full Carbon spec styling (sizes xs/sm/md/lg,
+  invalid/warn states with icons, read-only, hidden label) and a complete
+  Carbon-styled selection experience: custom selection handles and a
+  Cut/Copy/Paste/Select-all context menu with overridable labels
+  (**`CarbonTextSelectionLabels`**). Works under pure `CarbonApp` and the
+  Material bridge. Deferred: password visibility toggle, character counter
+  UI (`maxLength` still enforces the limit), inline/fluid variants, skeleton.
+* **`CarbonCheckbox`**, **`CarbonRadio`**, **`CarbonTooltip`**,
+  **`CarbonSpinner`** — spec-accurate native replacements for the Material
+  controls previously used internally (wave 1).
+
+### Changes
+
+* Combo box, number input, toolbar search, and multi-select no longer import
+  Material — their text fields now use the native Carbon editable core.
+  Modal's input uses `CarbonTextInput`/`CarbonTextArea`; with `maxLength` the
+  Material character counter UI is no longer shown (the limit still applies).
+* Toolbar batch-action buttons and the search clear button are now native
+  pressables (keyboard-focusable, no ripple).
+* Loading spinner uses the `$interactive` token and Carbon's exact arc
+  geometry/rotation; pagination prev/next buttons show Carbon tooltips.
+* Dropdown-style menus (dropdown, combo box, multi-select) share one overlay
+  positioner with real-height flip decisions and keyboard avoidance;
+  multi-select's menu now floats and dismisses on outside tap.
+
+### Bug Fixes
+
+* Number input: the focus border now repaints when focus changes.
+* Toolbar search: the clear button appears while typing (was only updating on
+  incidental rebuilds).
+* Toggle: focusing no longer crashes in debug builds (negative-margin focus
+  ring), with a regression test.
+* Dropdown: menu hover highlight renders again.
+
 ## 2.0.0-dev.1
 
 The theming rearchitecture (Phase 1 of `doc/V2_ROADMAP.md`): the theming core

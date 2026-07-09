@@ -300,8 +300,8 @@ void main() {
       await tester.tap(find.byType(CarbonMultiSelect<String>));
       await tester.pumpAndSettle();
 
-      // Should have a filter TextField
-      expect(find.byType(TextField), findsOneWidget);
+      // Should have a filter field (native editable, not Material TextField)
+      expect(find.byType(EditableText), findsOneWidget);
     });
 
     testWidgets('can be disabled', (tester) async {

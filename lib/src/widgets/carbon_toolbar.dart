@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../flutter_carbon.dart';
 import '../base/carbon_pressable.dart';
+import '../text/carbon_editable_core.dart';
 
 /// Carbon Design System Toolbar.
 ///
@@ -48,10 +49,7 @@ class CarbonToolbar extends StatelessWidget {
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 110),
         child: showBatchActions
-            ? KeyedSubtree(
-                key: const ValueKey('batch'),
-                child: batchActions!,
-              )
+            ? KeyedSubtree(key: const ValueKey('batch'), child: batchActions!)
             : KeyedSubtree(
                 key: const ValueKey('content'),
                 child: content ?? const SizedBox.shrink(),
@@ -69,19 +67,13 @@ class CarbonToolbarContent extends StatelessWidget {
   /// Child widgets (search, filters, actions).
   final List<Widget> children;
 
-  const CarbonToolbarContent({
-    super.key,
-    required this.children,
-  });
+  const CarbonToolbarContent({super.key, required this.children});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(minHeight: 48),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: children,
-      ),
+      child: Row(mainAxisAlignment: MainAxisAlignment.end, children: children),
     );
   }
 }
@@ -148,7 +140,7 @@ class CarbonToolbarBatchActions extends StatelessWidget {
     final carbon = context.carbon;
     final String formattedCount =
         formatSelectedItemsCount?.call(selectedCount) ??
-            '$selectedCount item${selectedCount <= 1 ? '' : 's'} selected';
+        '$selectedCount item${selectedCount <= 1 ? '' : 's'} selected';
 
     return Container(
       constraints: const BoxConstraints(minHeight: 48),
@@ -185,22 +177,21 @@ class CarbonToolbarBatchActions extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: onSelectAll,
-                    style: TextButton.styleFrom(
-                      foregroundColor: carbon.text.textOnColor,
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      selectAllLabel?.call(totalRowsCount!) ??
-                          'Select all ($totalRowsCount)',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        height: 1.29,
-                        letterSpacing: 0.16,
+                  CarbonPressable(
+                    onTap: onSelectAll,
+                    focusable: true,
+                    builder: (context, state) => Opacity(
+                      opacity: state.hovered || state.pressed ? 0.8 : 1.0,
+                      child: Text(
+                        selectAllLabel?.call(totalRowsCount!) ??
+                            'Select all ($totalRowsCount)',
+                        style: TextStyle(
+                          color: carbon.text.textOnColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          height: 1.29,
+                          letterSpacing: 0.16,
+                        ),
                       ),
                     ),
                   ),
@@ -212,9 +203,7 @@ class CarbonToolbarBatchActions extends StatelessWidget {
           // Action buttons
           Row(
             children: [
-              for (int i = 0; i < actions.length; i++) ...[
-                actions[i],
-              ],
+              for (int i = 0; i < actions.length; i++) ...[actions[i]],
               // Cancel button with divider
               if (onCancel != null) ...[
                 const SizedBox(width: 1),
@@ -259,28 +248,26 @@ class _CancelButtonState extends State<_CancelButton> {
           left: 0,
           top: 15,
           bottom: 15,
-          child: Container(
-            width: 1,
-            color: widget.textColor,
-          ),
+          child: Container(width: 1, color: widget.textColor),
         ),
         // Button
-        TextButton(
-          onPressed: widget.onPressed,
-          style: TextButton.styleFrom(
-            foregroundColor: widget.textColor,
-            // padding: EdgeInsets.zero,
-            minimumSize: Size.zero,
-            // tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-          child: Text(
-            widget.label ?? 'Cancel',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: widget.textColor,
-              height: 1.29,
-              letterSpacing: 0.16,
+        CarbonPressable(
+          onTap: widget.onPressed,
+          focusable: true,
+          builder: (context, state) => Opacity(
+            opacity: state.hovered || state.pressed ? 0.8 : 1.0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+              child: Text(
+                widget.label ?? 'Cancel',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: widget.textColor,
+                  height: 1.29,
+                  letterSpacing: 0.16,
+                ),
+              ),
             ),
           ),
         ),
@@ -341,9 +328,17 @@ class _CarbonToolbarSearchState extends State<CarbonToolbarSearch> {
     _isExpanded = widget.persistent;
     _inputFocusNode.addListener(_onInputFocusChange);
     _iconFocusNode.addListener(_onIconFocusChange);
+    // The clear button appears/disappears with the text.
+    _controller.addListener(_onTextChange);
+  }
+
+  void _onTextChange() {
+    if (mounted) setState(() {});
   }
 
   void _onInputFocusChange() {
+    // Repaint the focus outline on every change.
+    if (mounted) setState(() {});
     // Handle focus out - collapse if no value and not persistent
     if (!_inputFocusNode.hasFocus) {
       _handleFocusOut();
@@ -401,58 +396,61 @@ class _CarbonToolbarSearchState extends State<CarbonToolbarSearch> {
   Widget build(BuildContext context) {
     final carbon = context.carbon;
 
+    // 1px focus outline (pre-existing visual; the Carbon spec says 2px —
+    // left as-is deliberately, flagged as a follow-up).
     Widget searchField = Container(
       constraints: const BoxConstraints(minHeight: 48),
-      child: TextField(
-        controller: _controller,
-        focusNode: _inputFocusNode,
-        onChanged: widget.onChanged,
-        onSubmitted: widget.onSubmitted,
-        decoration: InputDecoration(
-          isCollapsed: true,
-          hintText: widget.placeholder,
-          hintStyle: TextStyle(
-            color: carbon.text.textPlaceholder,
-            fontSize: 14,
-          ),
-          prefixIcon: Icon(
-            CarbonIcons.search,
-            size: 16,
-            color: carbon.text.iconPrimary,
-          ),
-          suffixIcon: _controller.text.isNotEmpty
-              ? IconButton(
-                  icon: Icon(
-                    CarbonIcons.close,
-                    size: 16,
-                    color: carbon.text.iconPrimary,
-                  ),
-                  onPressed: () {
-                    _controller.clear();
-                    widget.onChanged?.call('');
-                    _handleFocusOut();
-                  },
-                )
-              : null,
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: carbon.layer.focus,
-              width: 1,
+      foregroundDecoration: BoxDecoration(
+        border: Border.all(
+          color: _inputFocusNode.hasFocus
+              ? carbon.layer.focus
+              : CarbonPalette.transparent,
+        ),
+      ),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Icon(
+              CarbonIcons.search,
+              size: 16,
+              color: carbon.text.iconPrimary,
             ),
-            borderRadius: BorderRadius.zero,
           ),
-          filled: true,
-          fillColor: CarbonPalette.transparent,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
-          isDense: true,
-        ),
-        style: TextStyle(
-          fontSize: 14,
-          color: carbon.text.textPrimary,
-        ),
+          Expanded(
+            child: CarbonEditableCore(
+              controller: _controller,
+              focusNode: _inputFocusNode,
+              onChanged: widget.onChanged,
+              onSubmitted: widget.onSubmitted,
+              placeholder: widget.placeholder,
+              placeholderStyle: TextStyle(
+                color: carbon.text.textPlaceholder,
+                fontSize: 14,
+              ),
+              style: TextStyle(fontSize: 14, color: carbon.text.textPrimary),
+            ),
+          ),
+          if (_controller.text.isNotEmpty)
+            CarbonPressable(
+              onTap: () {
+                _controller.clear();
+                widget.onChanged?.call('');
+                _handleFocusOut();
+              },
+              focusable: true,
+              builder: (context, state) => Container(
+                width: 48,
+                height: 48,
+                color: state.hovered ? carbon.layer.layerHover01 : null,
+                child: Icon(
+                  CarbonIcons.close,
+                  size: 16,
+                  color: carbon.text.iconPrimary,
+                ),
+              ),
+            ),
+        ],
       ),
     );
 
@@ -483,9 +481,6 @@ class _CarbonToolbarSearchState extends State<CarbonToolbarSearch> {
       return Expanded(child: searchField);
     }
 
-    return SizedBox(
-      width: 300,
-      child: searchField,
-    );
+    return SizedBox(width: 300, child: searchField);
   }
 }

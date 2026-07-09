@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../base/carbon_anchored_overlay.dart';
 import '../base/carbon_overlay_surface.dart';
 import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
+import '../text/carbon_editable_core.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
 import 'carbon_checkbox.dart';
@@ -195,15 +196,8 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         matchAnchorWidth: true,
         spacing: 4,
         onDismiss: _closeMenu,
-        contentBuilder: (context, _) => CarbonOverlaySurface(
-          // The filter TextField still needs the Material ancestor the
-          // overlay doesn't provide.
-          // TODO(v2 Phase 2): replace with CarbonTextInput when it exists.
-          child: Material(
-            type: MaterialType.transparency,
-            child: _buildMenu(context.carbon),
-          ),
-        ),
+        contentBuilder: (context, _) =>
+            CarbonOverlaySurface(child: _buildMenu(context.carbon)),
       ),
     );
   }
@@ -237,27 +231,25 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
                   bottom: BorderSide(color: carbon.layer.borderSubtle01),
                 ),
               ),
-              child: TextField(
-                controller: _filterController,
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintText: 'Filter options',
-                  hintStyle: TextStyle(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: CarbonEditableCore(
+                  controller: _filterController,
+                  autofocus: true,
+                  placeholder: 'Filter options',
+                  placeholderStyle: TextStyle(
                     color: carbon.text.textPlaceholder,
                     fontSize: 14,
                   ),
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                  style: TextStyle(
+                    color: carbon.text.textPrimary,
+                    fontSize: 14,
                   ),
+                  onChanged: (value) {
+                    setState(() => _filterText = value);
+                    _overlayEntry?.markNeedsBuild();
+                  },
                 ),
-                style: TextStyle(color: carbon.text.textPrimary, fontSize: 14),
-                onChanged: (value) {
-                  setState(() => _filterText = value);
-                  _overlayEntry?.markNeedsBuild();
-                },
               ),
             ),
           ],

@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 import '../icons/carbon_icons.dart';
+import '../text/carbon_editable_core.dart';
 import '../theme/carbon_theme.dart';
 
 /// Carbon Design System number input.
@@ -91,14 +92,21 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
       text: widget.value != null ? _formatValue(widget.value!) : '',
     );
     _focusNode = FocusNode();
+    // The bottom border thickens to 2px while focused — repaint on change.
+    _focusNode.addListener(_handleFocusChanged);
+  }
+
+  void _handleFocusChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   void didUpdateWidget(CarbonNumberInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.value != oldWidget.value) {
-      _controller.text =
-          widget.value != null ? _formatValue(widget.value!) : '';
+      _controller.text = widget.value != null
+          ? _formatValue(widget.value!)
+          : '';
     }
   }
 
@@ -186,8 +194,8 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
                 color: widget.invalid
                     ? carbon.layer.supportError
                     : (widget.disabled
-                        ? carbon.text.textDisabled
-                        : carbon.layer.borderStrong01),
+                          ? carbon.text.textDisabled
+                          : carbon.layer.borderStrong01),
                 width: _focusNode.hasFocus && !widget.disabled ? 2 : 1,
               ),
             ),
@@ -196,38 +204,33 @@ class _CarbonNumberInputState extends State<CarbonNumberInput> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: TextField(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  enabled: !widget.disabled,
-                  readOnly: widget.readOnly,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                    signed: true,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 11,
                   ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*')),
-                  ],
-                  style: TextStyle(
-                    color: widget.disabled
-                        ? carbon.text.textDisabled
-                        : carbon.text.textPrimary,
-                    fontSize: 14,
-                  ),
-                  decoration: const InputDecoration(
-                    focusedErrorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 11,
+                  child: CarbonEditableCore(
+                    controller: _controller,
+                    focusNode: _focusNode,
+                    enabled: !widget.disabled,
+                    readOnly: widget.readOnly,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                      signed: true,
                     ),
-                    isDense: true,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^-?\d*\.?\d*'),
+                      ),
+                    ],
+                    style: TextStyle(
+                      color: widget.disabled
+                          ? carbon.text.textDisabled
+                          : carbon.text.textPrimary,
+                      fontSize: 14,
+                    ),
+                    onChanged: _handleTextChanged,
                   ),
-                  onChanged: _handleTextChanged,
                 ),
               ),
               if (!widget.hideSteppers)

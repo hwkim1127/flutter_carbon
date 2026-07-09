@@ -74,8 +74,43 @@ void main() {
         ),
       );
 
-      await tester.enterText(find.byType(TextField), '20');
+      await tester.enterText(find.byType(CarbonNumberInput), '20');
       expect(changedValue, isNotNull);
+    });
+
+    testWidgets('focus border thickens and repaints on focus', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonNumberInput(value: 5, onChanged: (_) {}),
+        ),
+      );
+
+      double bottomBorderWidth() {
+        final container = tester
+            .widgetList<Container>(
+              find.descendant(
+                of: find.byType(CarbonNumberInput),
+                matching: find.byType(Container),
+              ),
+            )
+            .firstWhere(
+              (c) =>
+                  c.decoration is BoxDecoration &&
+                  (c.decoration! as BoxDecoration).border is Border &&
+                  ((c.decoration! as BoxDecoration).border! as Border)
+                          .bottom !=
+                      BorderSide.none,
+            );
+        return ((container.decoration! as BoxDecoration).border! as Border)
+            .bottom
+            .width;
+      }
+
+      expect(bottomBorderWidth(), 1);
+
+      await tester.tap(find.byType(EditableText));
+      await tester.pumpAndSettle();
+      expect(bottomBorderWidth(), 2);
     });
 
     testWidgets('can be disabled', (tester) async {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
+import 'carbon_text_input.dart';
 
 /// Carbon Design System modal dialog.
 ///
@@ -34,12 +35,12 @@ class CarbonModal {
         barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
         pageBuilder: (context, animation, secondaryAnimation) =>
             _CarbonPassiveModal(
-          title: title,
-          content: content,
-          image: image,
-          dismissible: dismissible,
-          showCloseButton: showCloseButton,
-        ),
+              title: title,
+              content: content,
+              image: image,
+              dismissible: dismissible,
+              showCloseButton: showCloseButton,
+            ),
       ),
     );
   }
@@ -73,13 +74,13 @@ class CarbonModal {
         barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
         pageBuilder: (context, animation, secondaryAnimation) =>
             _CarbonTransactionalModal(
-          title: title,
-          content: content,
-          image: image,
-          primaryButtonText: primaryButtonText,
-          secondaryButtonText: secondaryButtonText,
-          dismissible: dismissible,
-        ),
+              title: title,
+              content: content,
+              image: image,
+              primaryButtonText: primaryButtonText,
+              secondaryButtonText: secondaryButtonText,
+              dismissible: dismissible,
+            ),
       ),
     );
   }
@@ -111,12 +112,12 @@ class CarbonModal {
         barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
         pageBuilder: (context, animation, secondaryAnimation) =>
             _CarbonDangerModal(
-          title: title,
-          content: content,
-          primaryButtonText: primaryButtonText,
-          secondaryButtonText: secondaryButtonText,
-          dismissible: dismissible,
-        ),
+              title: title,
+              content: content,
+              primaryButtonText: primaryButtonText,
+              secondaryButtonText: secondaryButtonText,
+              dismissible: dismissible,
+            ),
       ),
     );
   }
@@ -154,18 +155,18 @@ class CarbonModal {
         barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
         pageBuilder: (context, animation, secondaryAnimation) =>
             _CarbonInputModal(
-          title: title,
-          label: label,
-          hintText: hintText,
-          helperText: helperText,
-          initialValue: initialValue,
-          primaryButtonText: primaryButtonText,
-          secondaryButtonText: secondaryButtonText,
-          dismissible: dismissible,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          maxLength: maxLength,
-        ),
+              title: title,
+              label: label,
+              hintText: hintText,
+              helperText: helperText,
+              initialValue: initialValue,
+              primaryButtonText: primaryButtonText,
+              secondaryButtonText: secondaryButtonText,
+              dismissible: dismissible,
+              keyboardType: keyboardType,
+              maxLines: maxLines,
+              maxLength: maxLength,
+            ),
       ),
     );
   }
@@ -193,11 +194,11 @@ class CarbonModal {
         barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
         pageBuilder: (context, animation, secondaryAnimation) =>
             _CarbonCustomModal<T>(
-          content: content,
-          dismissible: dismissible,
-          showCloseButton: showCloseButton,
-          maxWidth: maxWidth,
-        ),
+              content: content,
+              dismissible: dismissible,
+              showCloseButton: showCloseButton,
+              maxWidth: maxWidth,
+            ),
       ),
     );
   }
@@ -446,7 +447,11 @@ class _CarbonDangerModal extends StatelessWidget {
               decoration: BoxDecoration(color: carbon.layer.supportError),
               child: Row(
                 children: [
-                  Icon(CarbonIcons.warningFilled, color: carbon.text.textOnColor, size: 24),
+                  Icon(
+                    CarbonIcons.warningFilled,
+                    color: carbon.text.textOnColor,
+                    size: 24,
+                  ),
                   if (title != null) ...[
                     const SizedBox(width: 12),
                     Expanded(
@@ -586,18 +591,32 @@ class _CarbonInputModalState extends State<_CarbonInputModal> {
               ),
               const SizedBox(height: 16),
             ],
-            TextField(
-              controller: _controller,
-              autofocus: true,
-              keyboardType: widget.keyboardType,
-              maxLines: widget.maxLines ?? 1,
-              maxLength: widget.maxLength,
-              decoration: InputDecoration(
-                labelText: widget.label,
-                hintText: widget.hintText,
+            // Native Carbon input. Note: [maxLength] still enforces the
+            // limit, but Material's character counter UI is gone (the Carbon
+            // counter is a deferred CarbonTextInput feature).
+            if ((widget.maxLines ?? 1) > 1)
+              CarbonTextArea(
+                labelText: widget.label ?? widget.hintText ?? '',
+                hideLabel: widget.label == null,
+                controller: _controller,
+                autofocus: true,
+                placeholder: widget.hintText,
                 helperText: widget.helperText,
+                minLines: widget.maxLines!,
+                maxLines: widget.maxLines,
+                maxLength: widget.maxLength,
+              )
+            else
+              CarbonTextInput(
+                labelText: widget.label ?? widget.hintText ?? '',
+                hideLabel: widget.label == null,
+                controller: _controller,
+                autofocus: true,
+                placeholder: widget.hintText,
+                helperText: widget.helperText,
+                keyboardType: widget.keyboardType,
+                maxLength: widget.maxLength,
               ),
-            ),
             const SizedBox(height: 24),
             Row(
               children: [

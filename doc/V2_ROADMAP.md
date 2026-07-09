@@ -147,11 +147,14 @@ In dependency order (1–3 ✅ shipped as wave 1, see
 3. ✅ `CarbonTooltip` (unblocked `carbon_pagination`) — built on the shared
    `CarbonAnchoredOverlay`; `carbon_combo_button` still needs its menu API
    redesign.
-4. `CarbonTextInput` on `EditableText` — **the risk item**, see below. Unblocks
+4. ✅ `CarbonTextInput` + `CarbonTextArea` on `EditableText` — **the risk
+   item**, shipped as wave 2 (`doc/implementation/08-carbon-text-input.md`)
+   with full selection UX (custom handles + Carbon context menu with
+   localizable labels). All five dependents migrated in the same wave:
    `carbon_combo_box`, `carbon_number_input`, `carbon_toolbar`,
-   `carbon_multi_select`, `carbon_modal`. Ship it standalone first (it's also
-   a missing Carbon component in its own right — today text input is
-   Material-themed only), let it bake, then migrate dependents.
+   `carbon_multi_select` are now Material-free; `carbon_modal` swapped its
+   TextField (Scaffold/buttons remain). Material import count in
+   `lib/src/widgets/`: 9 → 5.
 5. Replace `FloatingActionButton` and the remaining `Scaffold` usages.
 
 ### Phase 3 — Retire the "Material Theming" category

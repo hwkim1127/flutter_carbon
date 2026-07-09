@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
 
@@ -19,6 +20,52 @@ void main() {
         ),
       );
       expect(find.byType(CarbonComboBox<String>), findsOneWidget);
+    });
+
+    testWidgets('tap opens the menu; typing filters; selection closes', (
+      tester,
+    ) async {
+      String? selected;
+      await tester.pumpWidget(
+        buildTestApp(
+          child: StatefulBuilder(
+            builder: (context, setState) => CarbonComboBox<String>(
+              value: selected,
+              items: const [
+                CarbonComboBoxItem(value: 'apple', label: 'Apple'),
+                CarbonComboBoxItem(value: 'banana', label: 'Banana'),
+                CarbonComboBoxItem(value: 'cherry', label: 'Cherry'),
+              ],
+              onChanged: (value) => setState(() => selected = value),
+            ),
+          ),
+        ),
+      );
+
+      // Tap on the field text area opens the menu (core onTap path).
+      await tester.tap(find.byType(EditableText));
+      await tester.pumpAndSettle();
+      expect(find.text('Apple'), findsOneWidget);
+      expect(find.text('Banana'), findsOneWidget);
+
+      // Typing filters the menu.
+      await tester.enterText(find.byType(EditableText), 'ban');
+      await tester.pumpAndSettle();
+      expect(find.text('Banana'), findsOneWidget);
+      expect(find.text('Apple'), findsNothing);
+
+      // Selecting an item reports the value, closes, and fills the field.
+      await tester.tap(find.text('Banana'));
+      await tester.pumpAndSettle();
+      expect(selected, 'banana');
+      expect(find.text('Cherry'), findsNothing);
+      expect(
+        tester
+            .widget<EditableText>(find.byType(EditableText))
+            .controller
+            .text,
+        'Banana',
+      );
     });
 
     testWidgets('displays label when provided', (tester) async {
