@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../base/carbon_anchored_overlay.dart';
+import '../base/carbon_overlay_surface.dart';
 import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
+import '../theme/carbon_theme_data.dart';
 import 'carbon_tag.dart';
 
 /// Item for Carbon multi-select dropdown.
@@ -26,7 +29,9 @@ class CarbonMultiSelectItem<T> {
 /// Carbon multi-select dropdown component.
 ///
 /// Allows users to select multiple options from a list. Selected items are
-/// displayed as chips above the dropdown field.
+/// displayed as chips above the dropdown field. The menu floats over the
+/// content (like [CarbonDropdown]) and dismisses on tap-outside; selecting
+/// an item keeps it open.
 class CarbonMultiSelect<T> extends StatefulWidget {
   /// The currently selected values.
   final List<T> values;
@@ -81,14 +86,62 @@ class CarbonMultiSelect<T> extends StatefulWidget {
 }
 
 class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
+  final GlobalKey _fieldKey = GlobalKey();
+  OverlayEntry? _overlayEntry;
   bool _isOpen = false;
   String _filterText = '';
   final TextEditingController _filterController = TextEditingController();
 
   @override
+  void didUpdateWidget(CarbonMultiSelect<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // The menu lives in an OverlayEntry, which does not rebuild with this
+    // widget — repaint it when the selection or items change from outside.
+    // Deferred: didUpdateWidget runs during build, and the entry is not a
+    // descendant, so marking it dirty here directly is not allowed.
+    if (_overlayEntry != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _overlayEntry?.markNeedsBuild();
+      });
+    }
+  }
+
+  @override
   void dispose() {
+    // Remove directly — _closeMenu() calls setState, which is not allowed
+    // during dispose.
+    _overlayEntry?.remove();
+    _overlayEntry = null;
     _filterController.dispose();
     super.dispose();
+  }
+
+  void _toggleMenu() {
+    if (_isOpen) {
+      _closeMenu();
+    } else {
+      _openMenu();
+    }
+  }
+
+  void _openMenu() {
+    if (!widget.enabled || _isOpen) return;
+
+    _overlayEntry = _createOverlayEntry();
+    Overlay.of(context).insert(_overlayEntry!);
+    setState(() => _isOpen = true);
+  }
+
+  void _closeMenu() {
+    if (!_isOpen) return;
+
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    _filterController.clear();
+    _filterText = '';
+    if (mounted) {
+      setState(() => _isOpen = false);
+    }
   }
 
   void _toggleSelection(T value) {
@@ -99,12 +152,15 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
       newValues.add(value);
     }
     widget.onChanged(newValues);
+    // Repaint the menu's checkboxes even if the parent doesn't rebuild us.
+    _overlayEntry?.markNeedsBuild();
   }
 
   void _removeItem(T value) {
     final newValues = List<T>.from(widget.values);
     newValues.remove(value);
     widget.onChanged(newValues);
+    _overlayEntry?.markNeedsBuild();
   }
 
   String _getItemText(T value) {
@@ -124,11 +180,147 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     }).toList();
   }
 
+  OverlayEntry _createOverlayEntry() {
+    // Anchor to the field itself, not the whole widget with its label,
+    // chips, and helper text — the menu must sit flush to the field.
+    final anchorRect = CarbonAnchoredOverlay.anchorRectGetterFor(
+      _fieldKey.currentContext ?? context,
+    );
+
+    return OverlayEntry(
+      builder: (context) => CarbonAnchoredOverlay(
+        anchorRect: anchorRect,
+        alignment: CarbonPopoverAlignment.bottomStart,
+        matchAnchorWidth: true,
+        spacing: 4,
+        onDismiss: _closeMenu,
+        contentBuilder: (context, _) => CarbonOverlaySurface(
+          // The menu still uses Material widgets (TextField, Checkbox) —
+          // give them the Material ancestor the overlay doesn't provide.
+          // TODO(v2 Phase 2): replace with Carbon-native internals.
+          child: Material(
+            type: MaterialType.transparency,
+            child: _buildMenu(context.carbon),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenu(CarbonThemeData carbon) {
+    final filteredItems = _getFilteredItems();
+
+    return Container(
+      constraints: BoxConstraints(maxHeight: widget.menuMaxHeight ?? 300),
+      decoration: BoxDecoration(
+        color: carbon.layer.layer01,
+        border: Border.all(color: carbon.layer.borderSubtle01),
+        borderRadius: BorderRadius.zero,
+        boxShadow: [
+          BoxShadow(
+            color: CarbonPalette.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Filter field
+          if (widget.filterable) ...[
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: carbon.layer.borderSubtle01),
+                ),
+              ),
+              child: TextField(
+                controller: _filterController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Filter options',
+                  hintStyle: TextStyle(
+                    color: carbon.text.textPlaceholder,
+                    fontSize: 14,
+                  ),
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                ),
+                style: TextStyle(color: carbon.text.textPrimary, fontSize: 14),
+                onChanged: (value) {
+                  setState(() => _filterText = value);
+                  _overlayEntry?.markNeedsBuild();
+                },
+              ),
+            ),
+          ],
+
+          // Options list
+          Flexible(
+            child: ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: filteredItems.length,
+              itemBuilder: (context, index) {
+                final item = filteredItems[index];
+                final isSelected = widget.values.contains(item.value);
+
+                return InkWell(
+                  onTap: item.enabled
+                      ? () => _toggleSelection(item.value)
+                      : null,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected ? carbon.layer.layerSelected01 : null,
+                    ),
+                    child: Row(
+                      children: [
+                        Checkbox(
+                          value: isSelected,
+                          onChanged: item.enabled
+                              ? (value) => _toggleSelection(item.value)
+                              : null,
+                          activeColor: carbon.button.buttonPrimary,
+                          checkColor: carbon.text.textOnColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: DefaultTextStyle(
+                            style: TextStyle(
+                              color: item.enabled
+                                  ? carbon.text.textPrimary
+                                  : carbon.text.textDisabled,
+                              fontSize: 14,
+                            ),
+                            child: item.child,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final carbon = context.carbon;
     final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
-    final filteredItems = _getFilteredItems();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,8 +351,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
                 text: _getItemText(value),
                 type: CarbonTagType.gray,
                 size: CarbonTagSize.md,
-                onDismiss:
-                    widget.enabled ? () => _removeItem(value) : null,
+                onDismiss: widget.enabled ? () => _removeItem(value) : null,
                 disabled: !widget.enabled,
               );
             }).toList(),
@@ -170,8 +361,8 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
 
         // Dropdown field
         GestureDetector(
-          onTap:
-              widget.enabled ? () => setState(() => _isOpen = !_isOpen) : null,
+          key: _fieldKey,
+          onTap: widget.enabled ? _toggleMenu : null,
           child: Container(
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -182,8 +373,10 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
               border: Border.all(
                 color: hasError
                     ? carbon.layer.supportError
+                    : _isOpen
+                    ? carbon.button.buttonPrimary
                     : carbon.layer.borderStrong01,
-                width: hasError ? 2 : 1,
+                width: hasError || _isOpen ? 2 : 1,
               ),
               borderRadius: BorderRadius.zero,
             ),
@@ -213,126 +406,15 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
           ),
         ),
 
-        // Dropdown menu
-        if (_isOpen) ...[
-          const SizedBox(height: 4),
-          Container(
-            constraints: BoxConstraints(maxHeight: widget.menuMaxHeight ?? 300),
-            decoration: BoxDecoration(
-              color: carbon.layer.layer01,
-              border: Border.all(color: carbon.layer.borderSubtle01),
-              borderRadius: BorderRadius.zero,
-              boxShadow: [
-                BoxShadow(
-                  color: CarbonPalette.black.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Filter field
-                if (widget.filterable) ...[
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: carbon.layer.borderSubtle01),
-                      ),
-                    ),
-                    child: TextField(
-                      controller: _filterController,
-                      decoration: InputDecoration(
-                        hintText: 'Filter options',
-                        hintStyle: TextStyle(
-                          color: carbon.text.textPlaceholder,
-                          fontSize: 14,
-                        ),
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                      ),
-                      style: TextStyle(
-                        color: carbon.text.textPrimary,
-                        fontSize: 14,
-                      ),
-                      onChanged: (value) {
-                        setState(() => _filterText = value);
-                      },
-                    ),
-                  ),
-                ],
-
-                // Options list
-                Flexible(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: filteredItems.length,
-                    itemBuilder: (context, index) {
-                      final item = filteredItems[index];
-                      final isSelected = widget.values.contains(item.value);
-
-                      return InkWell(
-                        onTap: item.enabled
-                            ? () => _toggleSelection(item.value)
-                            : null,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? carbon.layer.layerSelected01
-                                : null,
-                          ),
-                          child: Row(
-                            children: [
-                              Checkbox(
-                                value: isSelected,
-                                onChanged: item.enabled
-                                    ? (value) => _toggleSelection(item.value)
-                                    : null,
-                                activeColor: carbon.button.buttonPrimary,
-                                checkColor: carbon.text.textOnColor,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: DefaultTextStyle(
-                                  style: TextStyle(
-                                    color: item.enabled
-                                        ? carbon.text.textPrimary
-                                        : carbon.text.textDisabled,
-                                    fontSize: 14,
-                                  ),
-                                  child: item.child,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-
         // Helper or error text
         if (widget.helperText != null || widget.errorText != null) ...[
           const SizedBox(height: 4),
           Text(
             widget.errorText ?? widget.helperText!,
             style: TextStyle(
-              color:
-                  hasError ? carbon.layer.supportError : carbon.text.textHelper,
+              color: hasError
+                  ? carbon.layer.supportError
+                  : carbon.text.textHelper,
               fontSize: 12,
             ),
           ),

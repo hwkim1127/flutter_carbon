@@ -160,6 +160,125 @@ void main() {
       expect(selectedValues, contains('a'));
     });
 
+    testWidgets('menu floats over content without shifting layout',
+        (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: Column(
+            children: [
+              CarbonMultiSelect<String>(
+                label: 'Select',
+                values: const [],
+                items: const [
+                  CarbonMultiSelectItem(value: '1', child: Text('Option 1')),
+                ],
+                onChanged: (_) {},
+                itemToString: (v) => v,
+              ),
+              const Text('Content below'),
+            ],
+          ),
+        ),
+      );
+
+      final positionBefore = tester.getTopLeft(find.text('Content below'));
+
+      await tester.tap(find.byType(CarbonMultiSelect<String>));
+      await tester.pumpAndSettle();
+
+      // The menu is an overlay now — content below must not move.
+      expect(find.text('Option 1'), findsOneWidget);
+      expect(tester.getTopLeft(find.text('Content below')), positionBefore);
+    });
+
+    testWidgets('dismisses on tap outside, stays open on selection',
+        (tester) async {
+      List<String> selected = [];
+      await tester.pumpWidget(
+        buildTestApp(
+          child: StatefulBuilder(
+            builder: (context, setState) => CarbonMultiSelect<String>(
+              label: 'Select',
+              values: selected,
+              items: const [
+                CarbonMultiSelectItem(value: 'a', child: Text('Item A')),
+                CarbonMultiSelectItem(value: 'b', child: Text('Item B')),
+              ],
+              onChanged: (values) => setState(() => selected = values),
+              itemToString: (v) => v,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(CarbonMultiSelect<String>));
+      await tester.pumpAndSettle();
+      expect(find.text('Item A'), findsOneWidget);
+
+      // Selecting an item must keep the menu open (multi-select).
+      await tester.tap(find.text('Item A'));
+      await tester.pumpAndSettle();
+      expect(selected, contains('a'));
+      expect(find.text('Item B'), findsOneWidget);
+
+      // Tapping outside must dismiss it.
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pumpAndSettle();
+      expect(find.text('Item B'), findsNothing);
+    });
+
+    testWidgets('removes an open menu overlay when unmounted', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonMultiSelect<String>(
+            values: const [],
+            items: const [
+              CarbonMultiSelectItem(value: '1', child: Text('Leaky?')),
+            ],
+            onChanged: (_) {},
+            itemToString: (v) => v,
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(CarbonMultiSelect<String>));
+      await tester.pumpAndSettle();
+      expect(find.text('Leaky?'), findsOneWidget);
+
+      await tester.pumpWidget(buildTestApp(child: const SizedBox()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Leaky?'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('menu width matches the field width', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: SizedBox(
+            width: 280,
+            child: CarbonMultiSelect<String>(
+              values: const [],
+              items: const [
+                CarbonMultiSelectItem(value: '1', child: Text('Option 1')),
+              ],
+              onChanged: (_) {},
+              itemToString: (v) => v,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(CarbonMultiSelect<String>));
+      await tester.pumpAndSettle();
+
+      // The options list sits inside the menu's 1px border on each side.
+      expect(
+        tester.getSize(find.byType(ListView)).width,
+        closeTo(280, 2.5),
+      );
+    });
+
     testWidgets('supports filterable mode', (tester) async {
       await tester.pumpWidget(
         buildTestApp(

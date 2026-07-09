@@ -35,10 +35,12 @@ typedef CarbonAnchoredOverlayContentBuilder =
 /// size arrives during layout (no invisible measuring frame), the requested
 /// alignment **flips** to the opposite side when the content doesn't fit
 /// there but does on the other side, and the result is **clamped** to the
-/// screen bounds. Content size changes re-resolve automatically (the
-/// delegate re-runs on relayout). Known limitation: the anchor rect is read
-/// at build time, so a window resize while open repositions against the
-/// trigger's pre-resize location until the entry rebuilds.
+/// screen bounds. The software keyboard's inset is subtracted from the
+/// usable height, so content flips above rather than opening under the
+/// keyboard. Content size changes re-resolve automatically (the delegate
+/// re-runs on relayout). Known limitation: the anchor rect is read at build
+/// time, so a window resize while open repositions against the trigger's
+/// pre-resize location until the entry rebuilds.
 ///
 /// Not exported — this is a building block for Carbon widgets, not public API.
 class CarbonAnchoredOverlay extends StatefulWidget {
@@ -50,6 +52,7 @@ class CarbonAnchoredOverlay extends StatefulWidget {
     required this.contentBuilder,
     this.spacing = 4.0,
     this.maxWidth,
+    this.matchAnchorWidth = false,
   });
 
   /// Returns the trigger's rect in overlay coordinates. Evaluated during the
@@ -70,8 +73,12 @@ class CarbonAnchoredOverlay extends StatefulWidget {
   /// Gap between the anchor edge and the content.
   final double spacing;
 
-  /// Optional max content width.
+  /// Optional max content width. Ignored when [matchAnchorWidth] is true.
   final double? maxWidth;
+
+  /// Forces the content to exactly the anchor's width (dropdown-style menus
+  /// that must sit flush with their trigger field).
+  final bool matchAnchorWidth;
 
   /// Builds an anchor-rect getter for [triggerContext]'s render box, in the
   /// coordinate space of its enclosing [Overlay] (correct even when that
@@ -121,7 +128,7 @@ class _CarbonAnchoredOverlayState extends State<CarbonAnchoredOverlay> {
       builder: (context, effective, _) =>
           widget.contentBuilder(context, effective),
     );
-    if (widget.maxWidth != null) {
+    if (widget.maxWidth != null && !widget.matchAnchorWidth) {
       content = ConstrainedBox(
         constraints: BoxConstraints(maxWidth: widget.maxWidth!),
         child: content,
@@ -131,6 +138,10 @@ class _CarbonAnchoredOverlayState extends State<CarbonAnchoredOverlay> {
     // Resolve the anchor now — render-object sizes may be read during
     // build, but not from inside the delegate's layout pass.
     final anchor = widget.anchorRect();
+
+    // The keyboard's inset does not shrink the overlay's size, so without
+    // this the fit checks would place content under the keyboard on mobile.
+    final bottomInset = MediaQuery.maybeViewInsetsOf(context)?.bottom ?? 0.0;
 
     return GestureDetector(
       onTap: widget.onDismiss,
@@ -145,6 +156,8 @@ class _CarbonAnchoredOverlayState extends State<CarbonAnchoredOverlay> {
                 anchorRect: anchor,
                 alignment: widget.alignment,
                 spacing: widget.spacing,
+                matchAnchorWidth: widget.matchAnchorWidth,
+                bottomInset: bottomInset,
                 onEffectiveAlignment: _reportEffectiveAlignment,
               ),
               child: GestureDetector(
@@ -164,6 +177,8 @@ class _AnchoredOverlayDelegate extends SingleChildLayoutDelegate {
     required this.anchorRect,
     required this.alignment,
     required this.spacing,
+    required this.matchAnchorWidth,
+    required this.bottomInset,
     required this.onEffectiveAlignment,
   });
 
@@ -172,24 +187,33 @@ class _AnchoredOverlayDelegate extends SingleChildLayoutDelegate {
   final Rect anchorRect;
   final CarbonPopoverAlignment alignment;
   final double spacing;
+  final bool matchAnchorWidth;
+  final double bottomInset;
   final ValueChanged<CarbonPopoverAlignment> onEffectiveAlignment;
 
   @override
-  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
-      constraints.loosen();
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
+    final loosened = constraints.loosen();
+    if (!matchAnchorWidth) return loosened;
+    return loosened.tighten(width: anchorRect.width);
+  }
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    final effective = _resolveAlignment(anchorRect, childSize, size);
+    // Treat the keyboard-covered strip as off-screen.
+    final usable = Size(size.width, size.height - bottomInset);
+    final effective = _resolveAlignment(anchorRect, childSize, usable);
     onEffectiveAlignment(effective);
-    return _positionFor(effective, anchorRect, childSize, size);
+    return _positionFor(effective, anchorRect, childSize, usable);
   }
 
   @override
   bool shouldRelayout(_AnchoredOverlayDelegate oldDelegate) =>
       anchorRect != oldDelegate.anchorRect ||
       alignment != oldDelegate.alignment ||
-      spacing != oldDelegate.spacing;
+      spacing != oldDelegate.spacing ||
+      matchAnchorWidth != oldDelegate.matchAnchorWidth ||
+      bottomInset != oldDelegate.bottomInset;
 
   /// Flips the requested alignment to the opposite side when the content
   /// doesn't fit there but does fit on the other side.

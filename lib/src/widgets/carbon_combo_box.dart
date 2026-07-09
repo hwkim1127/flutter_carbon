@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../base/carbon_anchored_overlay.dart';
 import '../base/carbon_overlay_surface.dart';
 import '../base/carbon_pressable.dart';
 import '../foundation/colors.dart';
@@ -88,7 +89,6 @@ class CarbonComboBox<T> extends StatefulWidget {
 class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  final LayerLink _layerLink = LayerLink();
   final GlobalKey _fieldKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   OverlayEntry? _overlayEntry;
@@ -278,13 +278,11 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   }
 
   OverlayEntry _createOverlayEntry() {
-    // Measure the field itself (the transform target), not the whole widget
-    // with its label/helper text — the menu must sit flush to the field.
-    final RenderBox renderBox =
-        (_fieldKey.currentContext?.findRenderObject() ??
-                context.findRenderObject())!
-            as RenderBox;
-    final size = renderBox.size;
+    // Anchor to the field itself, not the whole widget with its label/helper
+    // text — the menu must sit flush to the field.
+    final anchorRect = CarbonAnchoredOverlay.anchorRectGetterFor(
+      _fieldKey.currentContext ?? context,
+    );
 
     return OverlayEntry(
       builder: (context) {
@@ -292,109 +290,86 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
         final theme = carbon.comboBox;
         final items = _filteredItems;
 
-        // Flip the menu above the field when there's no room below. Computed
-        // per rebuild — filtering changes the item count and thus the height.
-        // The software keyboard (viewInsets.bottom) does not shrink
-        // MediaQuery.size, so subtract it or the menu opens under the
-        // keyboard on mobile.
-        final triggerTop = renderBox.localToGlobal(Offset.zero).dy;
-        final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-        final usableHeight = MediaQuery.sizeOf(context).height - bottomInset;
-        final menuHeight = items.isEmpty
-            ? 56.0
-            : (items.length * _itemHeight + 2).clamp(0.0, 300.0);
-        final spaceBelow = usableHeight - triggerTop - size.height;
-        final showAbove = spaceBelow < menuHeight && triggerTop > spaceBelow;
-
-        return GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: _closeDropdown,
-          child: Stack(
-            children: [
-              Positioned(
-                width: size.width,
-                child: CompositedTransformFollower(
-                  link: _layerLink,
-                  showWhenUnlinked: false,
-                  offset: showAbove
-                      ? Offset(0, -menuHeight - 1)
-                      : Offset(0, size.height),
-                  child: CarbonOverlaySurface(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: theme.menuBackground,
-                        boxShadow: [
-                          // Replaces the previous Material elevation.
-                          BoxShadow(
-                            color: CarbonPalette.black.withValues(alpha: 0.2),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 300),
-                        child: items.isEmpty
-                            ? Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(
-                                  'No results found',
-                                  style: TextStyle(
-                                    color: theme.menuItemText,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              )
-                            : ListView.builder(
-                                controller: _scrollController,
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                itemCount: items.length,
-                                itemExtent: _itemHeight,
-                                itemBuilder: (context, index) {
-                                  final item = items[index];
-                                  final isSelected = item.value == widget.value;
-                                  final isHighlighted =
-                                      index == _highlightedIndex;
-
-                                  return CarbonPressable(
-                                    onTap: item.enabled
-                                        ? () => _selectItem(item.value)
-                                        : null,
-                                    builder: (context, state) => Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 12,
-                                      ),
-                                      color: state.hovered || isHighlighted
-                                          ? theme.menuItemHover
-                                          : isSelected
-                                          ? theme.menuItemSelected
-                                          : null,
-                                      child:
-                                          item.child ??
-                                          Text(
-                                            item.label!,
-                                            style: TextStyle(
-                                              color: item.enabled
-                                                  ? theme.menuItemText
-                                                  : theme.menuItemTextDisabled,
-                                              fontSize: 14,
-                                              fontWeight: isSelected
-                                                  ? FontWeight.w600
-                                                  : FontWeight.w400,
-                                            ),
-                                          ),
-                                    ),
-                                  );
-                                },
-                              ),
-                      ),
-                    ),
+        // Flip above / clamp to screen / keyboard avoidance / match field
+        // width are all handled by the shared positioner using the menu's
+        // real laid-out height (re-measured as filtering changes it).
+        return CarbonAnchoredOverlay(
+          anchorRect: anchorRect,
+          alignment: CarbonPopoverAlignment.bottomStart,
+          matchAnchorWidth: true,
+          spacing: 0,
+          onDismiss: _closeDropdown,
+          contentBuilder: (context, _) => CarbonOverlaySurface(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: theme.menuBackground,
+                boxShadow: [
+                  // Replaces the previous Material elevation.
+                  BoxShadow(
+                    color: CarbonPalette.black.withValues(alpha: 0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
-                ),
+                ],
               ),
-            ],
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 300),
+                child: items.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'No results found',
+                          style: TextStyle(
+                            color: theme.menuItemText,
+                            fontSize: 14,
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: _scrollController,
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: items.length,
+                        itemExtent: _itemHeight,
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+                          final isSelected = item.value == widget.value;
+                          final isHighlighted = index == _highlightedIndex;
+
+                          return CarbonPressable(
+                            onTap: item.enabled
+                                ? () => _selectItem(item.value)
+                                : null,
+                            builder: (context, state) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              color: state.hovered || isHighlighted
+                                  ? theme.menuItemHover
+                                  : isSelected
+                                  ? theme.menuItemSelected
+                                  : null,
+                              child:
+                                  item.child ??
+                                  Text(
+                                    item.label!,
+                                    style: TextStyle(
+                                      color: item.enabled
+                                          ? theme.menuItemText
+                                          : theme.menuItemTextDisabled,
+                                      fontSize: 14,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
+                                    ),
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ),
           ),
         );
       },
@@ -426,111 +401,108 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
           const SizedBox(height: 8),
         ],
 
-        // Input field with search. The transform target wraps only the
-        // field (not label/helper) so the menu anchors flush to it.
-        CompositedTransformTarget(
-          link: _layerLink,
-          child: Container(
-            key: _fieldKey,
-            height: 40,
-            decoration: BoxDecoration(
-              color: widget.enabled
-                  ? theme.fieldBackground
-                  : carbon.layer.layerSelectedDisabled,
-              border: Border.all(
-                color: hasError
-                    ? theme.fieldBorderError
-                    : (_focusNode.hasFocus
-                          ? theme.fieldBorderFocus
-                          : theme.fieldBorder),
-                width: hasError || _focusNode.hasFocus ? 2 : 1,
-              ),
-              borderRadius: BorderRadius.zero,
+        // Input field with search. The key marks only the field (not
+        // label/helper) so the menu anchors flush to it.
+        Container(
+          key: _fieldKey,
+          height: 40,
+          decoration: BoxDecoration(
+            color: widget.enabled
+                ? theme.fieldBackground
+                : carbon.layer.layerSelectedDisabled,
+            border: Border.all(
+              color: hasError
+                  ? theme.fieldBorderError
+                  : (_focusNode.hasFocus
+                        ? theme.fieldBorderFocus
+                        : theme.fieldBorder),
+              width: hasError || _focusNode.hasFocus ? 2 : 1,
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    focusNode: _focusNode,
-                    enabled: widget.enabled,
-                    style: TextStyle(
-                      color: widget.enabled
-                          ? theme.textColor
-                          : theme.textColorDisabled,
+            borderRadius: BorderRadius.zero,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  focusNode: _focusNode,
+                  enabled: widget.enabled,
+                  style: TextStyle(
+                    color: widget.enabled
+                        ? theme.textColor
+                        : theme.textColorDisabled,
+                    fontSize: 14,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: widget.placeholder,
+                    hintStyle: TextStyle(
+                      color: theme.placeholderColor,
                       fontSize: 14,
                     ),
-                    decoration: InputDecoration(
-                      hintText: widget.placeholder,
-                      hintStyle: TextStyle(
-                        color: theme.placeholderColor,
-                        fontSize: 14,
-                      ),
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      focusedErrorBorder: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      if (!_isOpen) {
-                        _openDropdown();
-                      }
-                      _filterItems(value);
-                    },
-                    onTap: () {
-                      if (!_isOpen) {
-                        _openDropdown();
-                      }
-                    },
-                  ),
-                ),
-                // Clear button
-                if (widget.allowClear &&
-                    widget.value != null &&
-                    widget.enabled) ...[
-                  CarbonPressable(
-                    onTap: _clearSelection,
-                    builder: (context, _) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Icon(
-                        CarbonIcons.close,
-                        size: 16,
-                        color: theme.iconColor,
-                      ),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
                   ),
-                ],
-                // Dropdown icon
-                GestureDetector(
+                  onChanged: (value) {
+                    if (!_isOpen) {
+                      _openDropdown();
+                    }
+                    _filterItems(value);
+                  },
                   onTap: () {
-                    if (widget.enabled) {
-                      if (_isOpen) {
-                        _closeDropdown();
-                      } else {
-                        _focusNode.requestFocus();
-                        _openDropdown();
-                      }
+                    if (!_isOpen) {
+                      _openDropdown();
                     }
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                ),
+              ),
+              // Clear button
+              if (widget.allowClear &&
+                  widget.value != null &&
+                  widget.enabled) ...[
+                CarbonPressable(
+                  onTap: _clearSelection,
+                  builder: (context, _) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Icon(
-                      _isOpen ? CarbonIcons.chevronUp : CarbonIcons.chevronDown,
-                      color: widget.enabled
-                          ? theme.iconColor
-                          : theme.iconColorDisabled,
-                      size: 20,
+                      CarbonIcons.close,
+                      size: 16,
+                      color: theme.iconColor,
                     ),
                   ),
                 ),
               ],
-            ),
+              // Dropdown icon
+              GestureDetector(
+                onTap: () {
+                  if (widget.enabled) {
+                    if (_isOpen) {
+                      _closeDropdown();
+                    } else {
+                      _focusNode.requestFocus();
+                      _openDropdown();
+                    }
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Icon(
+                    _isOpen ? CarbonIcons.chevronUp : CarbonIcons.chevronDown,
+                    color: widget.enabled
+                        ? theme.iconColor
+                        : theme.iconColorDisabled,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
 

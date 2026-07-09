@@ -175,6 +175,28 @@ void main() {
       await tester.pumpAndSettle();
       expect(selected, 1);
     });
+
+    testWidgets('menu width matches the trigger width', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonDropdown<String>(
+            width: 250,
+            value: null,
+            items: const [
+              CarbonDropdownItem(value: '1', child: Text('One')),
+              CarbonDropdownItem(value: '2', child: Text('Two')),
+            ],
+            onChanged: (_) {},
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(CarbonDropdown<String>));
+      await tester.pumpAndSettle();
+
+      // The options list sits inside the menu's 1px border on each side.
+      expect(tester.getSize(find.byType(ListView)).width, closeTo(250, 2.5));
+    });
   });
 
   group('CarbonDropdown flip decision', () {

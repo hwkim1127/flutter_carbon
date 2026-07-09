@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../base/carbon_anchored_overlay.dart';
 import '../base/carbon_overlay_surface.dart';
 import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
@@ -116,7 +117,6 @@ class CarbonDropdown<T> extends StatefulWidget {
 
 class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   OverlayEntry? _overlayEntry;
-  final LayerLink _layerLink = LayerLink();
   final GlobalKey _triggerKey = GlobalKey();
   bool _isOpen = false;
   T? _highlightedValue;
@@ -167,86 +167,42 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   }
 
   OverlayEntry _createOverlayEntry() {
-    // Get the render box of the trigger specifically, not the whole widget
-    final renderBox =
-        _triggerKey.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox == null) {
-      // Fallback to context if key not ready
-      final fallbackBox = context.findRenderObject() as RenderBox;
-      return _createOverlayEntryWithBox(fallbackBox);
-    }
-    return _createOverlayEntryWithBox(renderBox);
-  }
-
-  OverlayEntry _createOverlayEntryWithBox(RenderBox renderBox) {
-    final size = renderBox.size;
-    final offset = renderBox.localToGlobal(Offset.zero);
-
-    // Capture theme and items snapshot to avoid context access after disposal
-    final carbon = context.carbon;
-    final items = widget.items;
-
-    // Calculate available space below and above
-    final screenHeight = MediaQuery.of(context).size.height;
-    final spaceBelow = screenHeight - offset.dy - size.height;
-    const maxMenuHeight = 300.0;
-
-    // The rendered menu height is capped at maxMenuHeight (the list scrolls),
-    // so both the flip decision and the upward offset must use the actual
-    // height — not items × height, which would flip short menus needlessly
-    // and place long menus far off-screen.
-    final menuHeight =
-        (widget.items.length * size.height + 2).clamp(0.0, maxMenuHeight);
-    // Show menu above only when the real menu doesn't fit below.
-    final showAbove = spaceBelow < menuHeight && offset.dy > spaceBelow;
-    final menuOffset = showAbove
-        ? Offset(0, -menuHeight - 1)
-        : Offset(0, size.height + 1);
+    // Anchor to the trigger specifically, not the whole widget with its
+    // label/helper text — the menu must sit flush to the field.
+    final anchorRect = CarbonAnchoredOverlay.anchorRectGetterFor(
+      _triggerKey.currentContext ?? context,
+    );
 
     return OverlayEntry(
-      builder: (context) => GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _closeDropdown,
-        child: Stack(
-          children: [
-            // Full-screen invisible layer to detect clicks outside
-            Positioned.fill(
-              child: Container(color: CarbonPalette.transparent),
-            ),
-            // The actual dropdown menu
-            Positioned(
-              child: CompositedTransformFollower(
-                link: _layerLink,
-                showWhenUnlinked: false,
-                offset: menuOffset,
-                child: CarbonOverlaySurface(
-                  // Read value/highlight live (not captured) so hover and
-                  // selection changes render via markNeedsBuild.
-                  child: _buildDropdownMenu(
-                    width: size.width,
-                    carbon: carbon,
-                    items: items,
-                    currentValue: widget.value,
-                    highlightedValue: _highlightedValue,
-                  ),
-                ),
-              ),
-            ),
-          ],
+      // Flip above / clamp to screen / match trigger width are all handled
+      // by the shared positioner using the menu's real laid-out height.
+      builder: (context) => CarbonAnchoredOverlay(
+        anchorRect: anchorRect,
+        alignment: CarbonPopoverAlignment.bottomStart,
+        matchAnchorWidth: true,
+        spacing: 1,
+        onDismiss: _closeDropdown,
+        contentBuilder: (context, _) => CarbonOverlaySurface(
+          // Read value/highlight live (not captured) so hover and
+          // selection changes render via markNeedsBuild.
+          child: _buildDropdownMenu(
+            carbon: context.carbon,
+            items: widget.items,
+            currentValue: widget.value,
+            highlightedValue: _highlightedValue,
+          ),
         ),
       ),
     );
   }
 
   Widget _buildDropdownMenu({
-    required double width,
     required CarbonThemeData carbon,
     required List<CarbonDropdownItem<T>> items,
     required T? currentValue,
     required T? highlightedValue,
   }) {
     return Container(
-      width: width,
       constraints: const BoxConstraints(maxHeight: 300),
       decoration: BoxDecoration(
         color: carbon.layer.layer01,
@@ -300,14 +256,14 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
           height: widget.size == CarbonDropdownSize.small
               ? 32
               : widget.size == CarbonDropdownSize.large
-                  ? 48
-                  : 40,
+              ? 48
+              : 40,
           decoration: BoxDecoration(
             color: isHighlighted
                 ? carbon.layer.layerHover01
                 : isSelected
-                    ? carbon.layer.layerSelected01
-                    : CarbonPalette.transparent,
+                ? carbon.layer.layerSelected01
+                : CarbonPalette.transparent,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
@@ -358,8 +314,9 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
 
     // Find the selected item to display
-    final selectedItem =
-        widget.items.where((item) => item.value == widget.value).firstOrNull;
+    final selectedItem = widget.items
+        .where((item) => item.value == widget.value)
+        .firstOrNull;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,78 +338,76 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
         ],
 
         // Dropdown trigger
-        CompositedTransformTarget(
-          link: _layerLink,
-          child: GestureDetector(
-            key: _triggerKey,
-            onTap: _toggleDropdown,
-            child: Container(
-              width: widget.width,
-              height: widget.size.height,
-              decoration: BoxDecoration(
-                color: widget.enabled
-                    ? carbon.layer.field01
-                    : carbon.layer.layerSelectedDisabled,
-                border: widget.showBorder
-                    ? Border.all(
-                        color: hasError
-                            ? carbon.layer.supportError
-                            : _isOpen
-                                ? carbon.button.buttonPrimary
-                                : carbon.layer.borderStrong01,
-                        width: hasError || _isOpen ? 2 : 1,
+        GestureDetector(
+          key: _triggerKey,
+          onTap: _toggleDropdown,
+          child: Container(
+            width: widget.width,
+            height: widget.size.height,
+            decoration: BoxDecoration(
+              color: widget.enabled
+                  ? carbon.layer.field01
+                  : carbon.layer.layerSelectedDisabled,
+              border: widget.showBorder
+                  ? Border.all(
+                      color: hasError
+                          ? carbon.layer.supportError
+                          : _isOpen
+                          ? carbon.button.buttonPrimary
+                          : carbon.layer.borderStrong01,
+                      width: hasError || _isOpen ? 2 : 1,
+                    )
+                  : null,
+              borderRadius: BorderRadius.zero,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final textWidget = selectedItem != null
+                    ? DefaultTextStyle(
+                        style: TextStyle(
+                          color: widget.enabled
+                              ? carbon.text.textPrimary
+                              : carbon.text.textDisabled,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        child: selectedItem.child,
                       )
-                    : null,
-                borderRadius: BorderRadius.zero,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final textWidget = selectedItem != null
-                      ? DefaultTextStyle(
-                          style: TextStyle(
+                    : widget.hint != null
+                    ? Text(
+                        widget.hint!,
+                        style: TextStyle(
+                          color: widget.enabled
+                              ? carbon.text.textPlaceholder
+                              : carbon.text.textInverse,
+                          fontSize: 14,
+                        ),
+                      )
+                    : const SizedBox.shrink();
+                return Row(
+                  children: [
+                    if (constraints.hasBoundedWidth)
+                      Expanded(child: textWidget)
+                    else
+                      textWidget,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child:
+                          widget.icon ??
+                          Icon(
+                            _isOpen
+                                ? CarbonIcons.chevronUp
+                                : CarbonIcons.chevronDown,
                             color: widget.enabled
-                                ? carbon.text.textPrimary
-                                : carbon.text.textDisabled,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
+                                ? carbon.text.iconPrimary
+                                : carbon.text.iconDisabled,
+                            size: 16,
                           ),
-                          child: selectedItem.child,
-                        )
-                      : widget.hint != null
-                          ? Text(
-                              widget.hint!,
-                              style: TextStyle(
-                                color: widget.enabled
-                                    ? carbon.text.textPlaceholder
-                                    : carbon.text.textInverse,
-                                fontSize: 14,
-                              ),
-                            )
-                          : const SizedBox.shrink();
-                  return Row(
-                    children: [
-                      if (constraints.hasBoundedWidth)
-                        Expanded(child: textWidget)
-                      else
-                        textWidget,
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: widget.icon ??
-                            Icon(
-                              _isOpen
-                                  ? CarbonIcons.chevronUp
-                                  : CarbonIcons.chevronDown,
-                              color: widget.enabled
-                                  ? carbon.text.iconPrimary
-                                  : carbon.text.iconDisabled,
-                              size: 16,
-                            ),
-                      ),
-                    ],
-                  );
-                },
-              ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -463,8 +418,9 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
           Text(
             widget.errorText ?? widget.helperText!,
             style: TextStyle(
-              color:
-                  hasError ? carbon.layer.supportError : carbon.text.textHelper,
+              color: hasError
+                  ? carbon.layer.supportError
+                  : carbon.text.textHelper,
               fontSize: 12,
             ),
           ),
