@@ -14,6 +14,10 @@ class _DropdownDemoPageState extends State<DropdownDemoPage> {
   String? _basicValue;
   String? _withIconValue;
   String? _countryValue;
+  String? _requiredValue;
+  String? _hintValue;
+  String? _partiallyDisabledValue;
+  int? _manyOptionsValue;
 
   @override
   Widget build(BuildContext context) {
@@ -143,16 +147,22 @@ class _DropdownDemoPageState extends State<DropdownDemoPage> {
         ),
         DemoSection(
           title: 'Invalid Dropdown',
-          description: 'Dropdown with validation error',
-          builder: (context) => const CarbonDropdown<String>(
+          description:
+              'Dropdown with a validation error (clears once a value is selected)',
+          builder: (context) => CarbonDropdown<String>(
             label: 'Required field',
-            value: null,
-            items: [
+            value: _requiredValue,
+            items: const [
               CarbonDropdownItem(value: '1', child: Text('Option 1')),
               CarbonDropdownItem(value: '2', child: Text('Option 2')),
             ],
-            errorText: 'This field is required',
-            onChanged: null,
+            errorText:
+                _requiredValue == null ? 'This field is required' : null,
+            onChanged: (value) {
+              setState(() {
+                _requiredValue = value;
+              });
+            },
           ),
         ),
         DemoSection(
@@ -161,13 +171,17 @@ class _DropdownDemoPageState extends State<DropdownDemoPage> {
           builder: (context) => CarbonDropdown<String>(
             label: 'Select an option',
             hint: 'Please choose...',
-            value: null,
+            value: _hintValue,
             items: const [
               CarbonDropdownItem(value: '1', child: Text('Option 1')),
               CarbonDropdownItem(value: '2', child: Text('Option 2')),
               CarbonDropdownItem(value: '3', child: Text('Option 3')),
             ],
-            onChanged: (value) {},
+            onChanged: (value) {
+              setState(() {
+                _hintValue = value;
+              });
+            },
           ),
         ),
         DemoSection(
@@ -176,7 +190,7 @@ class _DropdownDemoPageState extends State<DropdownDemoPage> {
           builder: (context) => CarbonDropdown<String>(
             label: 'Select an option',
             helperText: 'Some options are disabled',
-            value: null,
+            value: _partiallyDisabledValue,
             items: const [
               CarbonDropdownItem(
                 value: '1',
@@ -197,7 +211,11 @@ class _DropdownDemoPageState extends State<DropdownDemoPage> {
                 enabled: false,
               ),
             ],
-            onChanged: (value) {},
+            onChanged: (value) {
+              setState(() {
+                _partiallyDisabledValue = value;
+              });
+            },
           ),
         ),
         DemoSection(
@@ -205,7 +223,7 @@ class _DropdownDemoPageState extends State<DropdownDemoPage> {
           description: 'Scrollable dropdown with many items',
           builder: (context) => CarbonDropdown<int>(
             label: 'Select a number',
-            value: null,
+            value: _manyOptionsValue,
             items: List.generate(
               50,
               (index) => CarbonDropdownItem(
@@ -213,7 +231,11 @@ class _DropdownDemoPageState extends State<DropdownDemoPage> {
                 child: Text('Option ${index + 1}'),
               ),
             ),
-            onChanged: (value) {},
+            onChanged: (value) {
+              setState(() {
+                _manyOptionsValue = value;
+              });
+            },
           ),
         ),
       ],

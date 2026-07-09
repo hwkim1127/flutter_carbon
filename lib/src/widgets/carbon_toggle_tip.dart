@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
+import '../base/carbon_anchored_overlay.dart';
 import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
-import 'carbon_popover.dart';
 
 /// Carbon Design System Toggle Tip.
 ///
@@ -78,7 +78,7 @@ class _CarbonToggleTipState extends State<CarbonToggleTip> {
   bool _isOpen = false;
   final FocusNode _focusNode = FocusNode();
   OverlayEntry? _overlayEntry;
-  final LayerLink _layerLink = LayerLink();
+  final GlobalKey _triggerKey = GlobalKey();
 
   @override
   void initState() {
@@ -92,7 +92,14 @@ class _CarbonToggleTipState extends State<CarbonToggleTip> {
 
   @override
   void dispose() {
-    _close();
+    // Remove the overlay directly — _close() calls setState, which is not
+    // allowed during dispose. Still deliver onClose so paired
+    // onOpen/onClose consumers stay balanced.
+    if (_isOpen) {
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+      widget.onClose?.call();
+    }
     _focusNode.dispose();
     super.dispose();
   }
@@ -124,68 +131,22 @@ class _CarbonToggleTipState extends State<CarbonToggleTip> {
   }
 
   OverlayEntry _createOverlayEntry() {
+    final anchorRect =
+        CarbonAnchoredOverlay.anchorRectGetterFor(_triggerKey.currentContext!);
+
     return OverlayEntry(
-      builder: (context) => GestureDetector(
-        onTap: _close,
-        behavior: HitTestBehavior.translucent,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Container(color: CarbonPalette.transparent),
-            ),
-            Positioned(
-              width: widget.maxWidth,
-              child: CompositedTransformFollower(
-                link: _layerLink,
-                showWhenUnlinked: false,
-                offset: _getOffset(),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: _ToggleTipContent(
-                    content: widget.content,
-                    actions: widget.actions,
-                    alignment: widget.alignment,
-                  ),
-                ),
-              ),
-            ),
-          ],
+      builder: (context) => CarbonAnchoredOverlay(
+        anchorRect: anchorRect,
+        alignment: widget.alignment,
+        maxWidth: widget.maxWidth ?? 288,
+        onDismiss: _close,
+        contentBuilder: (context, effectiveAlignment) => _ToggleTipContent(
+          content: widget.content,
+          actions: widget.actions,
+          alignment: effectiveAlignment,
         ),
       ),
     );
-  }
-
-  Offset _getOffset() {
-    const caretSize = 8.0;
-    const spacing = 4.0;
-
-    switch (widget.alignment) {
-      case CarbonPopoverAlignment.top:
-      case CarbonPopoverAlignment.topStart:
-      case CarbonPopoverAlignment.topEnd:
-        return Offset(_getHorizontalOffset(), -(caretSize + spacing));
-
-      case CarbonPopoverAlignment.bottom:
-      case CarbonPopoverAlignment.bottomStart:
-      case CarbonPopoverAlignment.bottomEnd:
-        return Offset(_getHorizontalOffset(), caretSize + spacing);
-
-      default:
-        return Offset(_getHorizontalOffset(), 0);
-    }
-  }
-
-  double _getHorizontalOffset() {
-    switch (widget.alignment) {
-      case CarbonPopoverAlignment.topStart:
-      case CarbonPopoverAlignment.bottomStart:
-        return 0;
-      case CarbonPopoverAlignment.topEnd:
-      case CarbonPopoverAlignment.bottomEnd:
-        return -(widget.maxWidth ?? 288);
-      default:
-        return -(widget.maxWidth ?? 288) / 2;
-    }
   }
 
   @override
@@ -212,8 +173,8 @@ class _CarbonToggleTipState extends State<CarbonToggleTip> {
             ),
             const SizedBox(width: 8),
           ],
-          CompositedTransformTarget(
-            link: _layerLink,
+          KeyedSubtree(
+            key: _triggerKey,
             child: _ToggleTipButton(
               isOpen: _isOpen,
               onPressed: _toggle,

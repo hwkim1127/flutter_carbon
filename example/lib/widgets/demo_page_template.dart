@@ -22,10 +22,10 @@ class DemoPageTemplate extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
         elevation: 0,
-        backgroundColor: carbon.layer.layer01,
+        backgroundColor: carbon.layer.background,
         foregroundColor: carbon.text.textPrimary,
       ),
-      backgroundColor: carbon.layer.layer01,
+      backgroundColor: carbon.layer.background,
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: sections.length + (description != null ? 1 : 0),

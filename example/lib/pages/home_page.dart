@@ -11,12 +11,12 @@ class HomePage extends StatelessWidget {
     final carbon = context.carbon;
 
     return Scaffold(
-      backgroundColor: carbon.layer.layer01,
+      backgroundColor: carbon.layer.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
             title: const Text('Carbon Design System'),
-            backgroundColor: carbon.layer.layer01,
+            backgroundColor: carbon.layer.background,
             foregroundColor: carbon.text.textPrimary,
             elevation: 0,
           ),

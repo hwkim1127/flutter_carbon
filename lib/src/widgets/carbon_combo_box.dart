@@ -89,6 +89,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final LayerLink _layerLink = LayerLink();
+  final GlobalKey _fieldKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   OverlayEntry? _overlayEntry;
   List<CarbonComboBoxItem<T>> _filteredItems = [];
@@ -130,7 +131,10 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
 
   @override
   void dispose() {
-    _closeDropdown();
+    // Remove directly — _closeDropdown() calls setState, which is not
+    // allowed during dispose.
+    _overlayEntry?.remove();
+    _overlayEntry = null;
     _searchController.dispose();
     _focusNode.dispose();
     _scrollController.dispose();
@@ -165,8 +169,10 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
       if (!_isOpen) _openDropdown();
       if (_filteredItems.isEmpty) return KeyEventResult.handled;
       setState(() {
-        _highlightedIndex =
-            (_highlightedIndex + 1).clamp(0, _filteredItems.length - 1);
+        _highlightedIndex = (_highlightedIndex + 1).clamp(
+          0,
+          _filteredItems.length - 1,
+        );
       });
       _overlayEntry?.markNeedsBuild();
       _scrollToHighlighted();
@@ -176,8 +182,10 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
       if (!_isOpen || _filteredItems.isEmpty) return KeyEventResult.ignored;
       setState(() {
-        _highlightedIndex =
-            (_highlightedIndex - 1).clamp(0, _filteredItems.length - 1);
+        _highlightedIndex = (_highlightedIndex - 1).clamp(
+          0,
+          _filteredItems.length - 1,
+        );
       });
       _overlayEntry?.markNeedsBuild();
       _scrollToHighlighted();
@@ -246,9 +254,12 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
         _filteredItems = query.isEmpty
             ? widget.items
             : widget.items
-                .where((item) =>
-                    item.filterText.toLowerCase().contains(query.toLowerCase()))
-                .toList();
+                  .where(
+                    (item) => item.filterText.toLowerCase().contains(
+                      query.toLowerCase(),
+                    ),
+                  )
+                  .toList();
       });
     }
     _overlayEntry?.markNeedsBuild();
@@ -267,7 +278,12 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
   }
 
   OverlayEntry _createOverlayEntry() {
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    // Measure the field itself (the transform target), not the whole widget
+    // with its label/helper text — the menu must sit flush to the field.
+    final RenderBox renderBox =
+        (_fieldKey.currentContext?.findRenderObject() ??
+                context.findRenderObject())!
+            as RenderBox;
     final size = renderBox.size;
 
     return OverlayEntry(
@@ -275,6 +291,20 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
         final carbon = context.carbon;
         final theme = carbon.comboBox;
         final items = _filteredItems;
+
+        // Flip the menu above the field when there's no room below. Computed
+        // per rebuild — filtering changes the item count and thus the height.
+        // The software keyboard (viewInsets.bottom) does not shrink
+        // MediaQuery.size, so subtract it or the menu opens under the
+        // keyboard on mobile.
+        final triggerTop = renderBox.localToGlobal(Offset.zero).dy;
+        final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+        final usableHeight = MediaQuery.sizeOf(context).height - bottomInset;
+        final menuHeight = items.isEmpty
+            ? 56.0
+            : (items.length * _itemHeight + 2).clamp(0.0, 300.0);
+        final spaceBelow = usableHeight - triggerTop - size.height;
+        final showAbove = spaceBelow < menuHeight && triggerTop > spaceBelow;
 
         return GestureDetector(
           behavior: HitTestBehavior.translucent,
@@ -286,78 +316,81 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                 child: CompositedTransformFollower(
                   link: _layerLink,
                   showWhenUnlinked: false,
-                  offset: Offset(0, size.height),
+                  offset: showAbove
+                      ? Offset(0, -menuHeight - 1)
+                      : Offset(0, size.height),
                   child: CarbonOverlaySurface(
                     child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: theme.menuBackground,
-                      boxShadow: [
-                        // Replaces the previous Material elevation.
-                        BoxShadow(
-                          color: CarbonPalette.black.withValues(alpha: 0.2),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 300),
-                      child: items.isEmpty
-                          ? Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                'No results found',
-                                style: TextStyle(
-                                  color: theme.menuItemText,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            )
-                          : ListView.builder(
-                              controller: _scrollController,
-                              padding: EdgeInsets.zero,
-                              shrinkWrap: true,
-                              itemCount: items.length,
-                              itemExtent: _itemHeight,
-                              itemBuilder: (context, index) {
-                                final item = items[index];
-                                final isSelected = item.value == widget.value;
-                                final isHighlighted =
-                                    index == _highlightedIndex;
-
-                                return CarbonPressable(
-                                  onTap: item.enabled
-                                      ? () => _selectItem(item.value)
-                                      : null,
-                                  builder: (context, state) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 12,
-                                    ),
-                                    color: state.hovered || isHighlighted
-                                        ? theme.menuItemHover
-                                        : isSelected
-                                            ? theme.menuItemSelected
-                                            : null,
-                                    child: item.child ??
-                                        Text(
-                                          item.label!,
-                                          style: TextStyle(
-                                            color: item.enabled
-                                                ? theme.menuItemText
-                                                : theme.menuItemTextDisabled,
-                                            fontSize: 14,
-                                            fontWeight: isSelected
-                                                ? FontWeight.w600
-                                                : FontWeight.w400,
-                                          ),
-                                        ),
+                      decoration: BoxDecoration(
+                        color: theme.menuBackground,
+                        boxShadow: [
+                          // Replaces the previous Material elevation.
+                          BoxShadow(
+                            color: CarbonPalette.black.withValues(alpha: 0.2),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 300),
+                        child: items.isEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  'No results found',
+                                  style: TextStyle(
+                                    color: theme.menuItemText,
+                                    fontSize: 14,
                                   ),
-                                );
-                              },
-                            ),
+                                ),
+                              )
+                            : ListView.builder(
+                                controller: _scrollController,
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                itemCount: items.length,
+                                itemExtent: _itemHeight,
+                                itemBuilder: (context, index) {
+                                  final item = items[index];
+                                  final isSelected = item.value == widget.value;
+                                  final isHighlighted =
+                                      index == _highlightedIndex;
+
+                                  return CarbonPressable(
+                                    onTap: item.enabled
+                                        ? () => _selectItem(item.value)
+                                        : null,
+                                    builder: (context, state) => Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 12,
+                                      ),
+                                      color: state.hovered || isHighlighted
+                                          ? theme.menuItemHover
+                                          : isSelected
+                                          ? theme.menuItemSelected
+                                          : null,
+                                      child:
+                                          item.child ??
+                                          Text(
+                                            item.label!,
+                                            style: TextStyle(
+                                              color: item.enabled
+                                                  ? theme.menuItemText
+                                                  : theme.menuItemTextDisabled,
+                                              fontSize: 14,
+                                              fontWeight: isSelected
+                                                  ? FontWeight.w600
+                                                  : FontWeight.w400,
+                                            ),
+                                          ),
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
                     ),
-                  ),
                   ),
                 ),
               ),
@@ -374,29 +407,31 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
     final theme = carbon.comboBox;
     final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
 
-    return CompositedTransformTarget(
-      link: _layerLink,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Label
-          if (widget.label != null) ...[
-            Text(
-              widget.label!,
-              style: TextStyle(
-                color: widget.enabled
-                    ? carbon.text.textSecondary
-                    : theme.textColorDisabled,
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Label
+        if (widget.label != null) ...[
+          Text(
+            widget.label!,
+            style: TextStyle(
+              color: widget.enabled
+                  ? carbon.text.textSecondary
+                  : theme.textColorDisabled,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
             ),
-            const SizedBox(height: 8),
-          ],
+          ),
+          const SizedBox(height: 8),
+        ],
 
-          // Input field with search
-          Container(
+        // Input field with search. The transform target wraps only the
+        // field (not label/helper) so the menu anchors flush to it.
+        CompositedTransformTarget(
+          link: _layerLink,
+          child: Container(
+            key: _fieldKey,
             height: 40,
             decoration: BoxDecoration(
               color: widget.enabled
@@ -406,8 +441,8 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                 color: hasError
                     ? theme.fieldBorderError
                     : (_focusNode.hasFocus
-                        ? theme.fieldBorderFocus
-                        : theme.fieldBorder),
+                          ? theme.fieldBorderFocus
+                          : theme.fieldBorder),
                 width: hasError || _focusNode.hasFocus ? 2 : 1,
               ),
               borderRadius: BorderRadius.zero,
@@ -486,9 +521,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Icon(
-                      _isOpen
-                          ? CarbonIcons.chevronUp
-                          : CarbonIcons.chevronDown,
+                      _isOpen ? CarbonIcons.chevronUp : CarbonIcons.chevronDown,
                       color: widget.enabled
                           ? theme.iconColor
                           : theme.iconColorDisabled,
@@ -499,21 +532,20 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
               ],
             ),
           ),
+        ),
 
-          // Helper or error text
-          if (widget.helperText != null || widget.errorText != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              widget.errorText ?? widget.helperText!,
-              style: TextStyle(
-                color:
-                    hasError ? theme.fieldBorderError : carbon.text.textHelper,
-                fontSize: 12,
-              ),
+        // Helper or error text
+        if (widget.helperText != null || widget.errorText != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            widget.errorText ?? widget.helperText!,
+            style: TextStyle(
+              color: hasError ? theme.fieldBorderError : carbon.text.textHelper,
+              fontSize: 12,
             ),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 }
@@ -543,9 +575,9 @@ class CarbonComboBoxItem<T> {
     this.child,
     this.enabled = true,
   }) : assert(
-          (label != null) ^ (child != null),
-          'Exactly one of label or child must be provided.',
-        );
+         (label != null) ^ (child != null),
+         'Exactly one of label or child must be provided.',
+       );
 
   /// The string used for filtering, regardless of display mode.
   String get filterText => label ?? value.toString();

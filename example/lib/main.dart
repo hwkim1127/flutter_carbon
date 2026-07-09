@@ -450,10 +450,10 @@ class PlaceholderPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(route),
         elevation: 0,
-        backgroundColor: carbon.layer.layer01,
+        backgroundColor: carbon.layer.background,
         foregroundColor: carbon.text.textPrimary,
       ),
-      backgroundColor: carbon.layer.layer01,
+      backgroundColor: carbon.layer.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
+import '../base/carbon_anchored_overlay.dart';
 import '../base/carbon_divider.dart';
 import '../base/carbon_overlay_surface.dart';
-import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 
@@ -52,7 +52,9 @@ class CarbonOverflowMenu extends StatefulWidget {
   /// The size of the menu.
   final CarbonOverflowMenuSize size;
 
-  /// Whether the menu should appear above the trigger button instead of below.
+  /// Whether the menu prefers to appear above the trigger button instead of
+  /// below. When the preferred side doesn't fit on screen but the other side
+  /// does, the menu opens on the other side.
   final bool flipped;
 
   /// Optional custom icon for the trigger button.
@@ -75,7 +77,6 @@ class CarbonOverflowMenu extends StatefulWidget {
 }
 
 class _CarbonOverflowMenuState extends State<CarbonOverflowMenu> {
-  final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
   bool _isOpen = false;
 
@@ -113,33 +114,28 @@ class _CarbonOverflowMenuState extends State<CarbonOverflowMenu> {
   }
 
   void _open() {
+    if (_isOpen) return;
+
     final carbon = context.carbon;
     final overlayState = Overlay.of(context);
 
+    final anchorRect = CarbonAnchoredOverlay.anchorRectGetterFor(context);
+
     _overlayEntry = OverlayEntry(
-      builder: (context) => GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: _close,
-        child: Stack(
-          children: [
-            Positioned.fill(child: Container(color: CarbonPalette.transparent)),
-            CompositedTransformFollower(
-              link: _layerLink,
-              targetAnchor:
-                  widget.flipped ? Alignment.topLeft : Alignment.bottomLeft,
-              followerAnchor:
-                  widget.flipped ? Alignment.bottomLeft : Alignment.topLeft,
-              offset: Offset(0, widget.flipped ? -8 : 8),
-              child: CarbonOverlaySurface(
-                child: _MenuContent(
-                  items: widget.items,
-                  size: widget.size,
-                  onItemTapped: _close,
-                  theme: carbon.overflowMenu,
-                ),
-              ),
-            ),
-          ],
+      builder: (context) => CarbonAnchoredOverlay(
+        anchorRect: anchorRect,
+        alignment: widget.flipped
+            ? CarbonPopoverAlignment.topStart
+            : CarbonPopoverAlignment.bottomStart,
+        spacing: 8,
+        onDismiss: _close,
+        contentBuilder: (context, _) => CarbonOverlaySurface(
+          child: _MenuContent(
+            items: widget.items,
+            size: widget.size,
+            onItemTapped: _close,
+            theme: carbon.overflowMenu,
+          ),
         ),
       ),
     );
@@ -149,6 +145,8 @@ class _CarbonOverflowMenuState extends State<CarbonOverflowMenu> {
   }
 
   void _close() {
+    if (!_isOpen) return;
+
     if (mounted) {
       setState(() => _isOpen = false);
     }
@@ -158,6 +156,9 @@ class _CarbonOverflowMenuState extends State<CarbonOverflowMenu> {
 
   @override
   void dispose() {
+    // Remove directly — _close() calls setState, not allowed during dispose.
+    _overlayEntry?.remove();
+    _overlayEntry = null;
     super.dispose();
   }
 
@@ -168,25 +169,22 @@ class _CarbonOverflowMenuState extends State<CarbonOverflowMenu> {
     return Semantics(
       button: true,
       label: widget.ariaLabel ?? 'Options',
-      child: CompositedTransformTarget(
-        link: _layerLink,
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: _toggleMenu,
-            child: Container(
-              width: _triggerSize,
-              height: _triggerSize,
-              decoration: BoxDecoration(
-                color: _isOpen
-                    ? carbon.overflowMenu.triggerBackgroundHover
-                    : carbon.overflowMenu.triggerBackground,
-              ),
-              child: Icon(
-                widget.icon ?? CarbonIcons.overflowMenuVertical,
-                size: _iconSize,
-                color: carbon.overflowMenu.triggerIcon,
-              ),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: _toggleMenu,
+          child: Container(
+            width: _triggerSize,
+            height: _triggerSize,
+            decoration: BoxDecoration(
+              color: _isOpen
+                  ? carbon.overflowMenu.triggerBackgroundHover
+                  : carbon.overflowMenu.triggerBackground,
+            ),
+            child: Icon(
+              widget.icon ?? CarbonIcons.overflowMenuVertical,
+              size: _iconSize,
+              color: carbon.overflowMenu.triggerIcon,
             ),
           ),
         ),

@@ -20,6 +20,28 @@ void main() {
       expect(find.byType(CarbonOverflowMenu), findsOneWidget);
     });
 
+    testWidgets('removes an open menu overlay when unmounted', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonOverflowMenu(
+            items: [CarbonOverflowMenuItem(label: 'Leaky?', onTap: () {})],
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(CarbonOverflowMenu));
+      await tester.pumpAndSettle();
+      expect(find.text('Leaky?'), findsOneWidget);
+
+      // Unmount the widget while the menu is open — the overlay entry must
+      // be removed with it, not linger over the replacement UI.
+      await tester.pumpWidget(buildTestApp(child: const SizedBox()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Leaky?'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('displays menu icon', (tester) async {
       await tester.pumpWidget(
         buildTestApp(

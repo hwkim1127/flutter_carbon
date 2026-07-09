@@ -185,18 +185,22 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     // Capture theme and items snapshot to avoid context access after disposal
     final carbon = context.carbon;
     final items = widget.items;
-    final currentValue = widget.value;
-    final currentHighlighted = _highlightedValue;
 
     // Calculate available space below and above
     final screenHeight = MediaQuery.of(context).size.height;
     final spaceBelow = screenHeight - offset.dy - size.height;
     const maxMenuHeight = 300.0;
 
-    // Show menu above if there's not enough space below
-    final showAbove = spaceBelow < maxMenuHeight && offset.dy > spaceBelow;
+    // The rendered menu height is capped at maxMenuHeight (the list scrolls),
+    // so both the flip decision and the upward offset must use the actual
+    // height — not items × height, which would flip short menus needlessly
+    // and place long menus far off-screen.
+    final menuHeight =
+        (widget.items.length * size.height + 2).clamp(0.0, maxMenuHeight);
+    // Show menu above only when the real menu doesn't fit below.
+    final showAbove = spaceBelow < menuHeight && offset.dy > spaceBelow;
     final menuOffset = showAbove
-        ? Offset(0, -(size.height * widget.items.length))
+        ? Offset(0, -menuHeight - 1)
         : Offset(0, size.height + 1);
 
     return OverlayEntry(
@@ -216,12 +220,14 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
                 showWhenUnlinked: false,
                 offset: menuOffset,
                 child: CarbonOverlaySurface(
+                  // Read value/highlight live (not captured) so hover and
+                  // selection changes render via markNeedsBuild.
                   child: _buildDropdownMenu(
                     width: size.width,
                     carbon: carbon,
                     items: items,
-                    currentValue: currentValue,
-                    highlightedValue: currentHighlighted,
+                    currentValue: widget.value,
+                    highlightedValue: _highlightedValue,
                   ),
                 ),
               ),
@@ -283,6 +289,9 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
       onEnter: (_) {
         if (item.enabled && mounted) {
           setState(() => _highlightedValue = item.value);
+          // The menu lives in an OverlayEntry — it only repaints the
+          // highlight when the entry itself is rebuilt.
+          _overlayEntry?.markNeedsBuild();
         }
       },
       child: GestureDetector(

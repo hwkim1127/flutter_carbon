@@ -26,10 +26,10 @@ class AllComponentsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('All Components'),
         elevation: 0,
-        backgroundColor: carbon.layer.layer01,
+        backgroundColor: carbon.layer.background,
         foregroundColor: carbon.text.textPrimary,
       ),
-      backgroundColor: carbon.layer.layer01,
+      backgroundColor: carbon.layer.background,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: const [
