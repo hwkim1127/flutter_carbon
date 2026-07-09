@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../flutter_carbon.dart';
 
@@ -161,7 +161,8 @@ class CarbonDataTable extends StatefulWidget {
   /// (per-column opt-in) and a non-null [onSort] callback. To disable sort
   /// UI on a table, pass `onSort: null` (or omit it). Will be removed in 2.0.0.
   @Deprecated(
-      'No-op since 1.2.1. A column is sortable iff its header has sortable: true AND onSort is non-null. Will be removed in 2.0.0.')
+    'No-op since 1.2.1. A column is sortable iff its header has sortable: true AND onSort is non-null. Will be removed in 2.0.0.',
+  )
   final bool sortable;
 
   /// The key of the currently sorted column.
@@ -182,7 +183,7 @@ class CarbonDataTable extends StatefulWidget {
   /// 2. Sorting the [rows] data
   /// 3. Rebuilding the table with sorted data
   final void Function(String key, CarbonDataTableSortDirection direction)?
-      onSort;
+  onSort;
 
   /// Whether to apply zebra striping to rows.
   ///
@@ -236,7 +237,10 @@ class CarbonDataTable extends StatefulWidget {
     this.onSelectAll,
     this.stickyHeader = false,
     this.size = CarbonDataTableSize.medium,
-    @Deprecated('No-op since 1.2.1. A column is sortable iff its header has sortable: true AND onSort is non-null. Will be removed in 2.0.0.') this.sortable = false,
+    @Deprecated(
+      'No-op since 1.2.1. A column is sortable iff its header has sortable: true AND onSort is non-null. Will be removed in 2.0.0.',
+    )
+    this.sortable = false,
     this.sortKey,
     this.sortDirection = CarbonDataTableSortDirection.none,
     this.onSort,
@@ -246,37 +250,37 @@ class CarbonDataTable extends StatefulWidget {
     this.toolbar,
     this.skeleton = false,
     this.skeletonRowCount = 5,
-  })  : assert(
-          hasExpandableRows || !rows.any((row) => row.expandedContent != null),
-          'Cannot have rows with expandedContent when hasExpandableRows is false. '
-          'Set hasExpandableRows: true on CarbonDataTable to enable expandable rows.',
-        ),
-        assert(
-          hasSelectableRows ||
-              !rows.any((row) => row.selected || row.onSelectChanged != null),
-          'Cannot have rows with selected or onSelectChanged when hasSelectableRows is false. '
-          'Set hasSelectableRows: true on CarbonDataTable to enable selectable rows.',
-        ),
-        assert(
-          !radio || hasSelectableRows,
-          'Cannot use radio mode when hasSelectableRows is false. '
-          'Set hasSelectableRows: true on CarbonDataTable to enable radio selection.',
-        ),
-        assert(
-          !radio || rows.where((row) => row.selected).length <= 1,
-          'In radio mode, at most one row can be selected. '
-          'Found ${rows.where((row) => row.selected).length} selected rows.',
-        ),
-        assert(
-          !batchSelection || hasSelectableRows,
-          'Cannot use batchSelection when hasSelectableRows is false. '
-          'Set hasSelectableRows: true on CarbonDataTable to enable batch selection.',
-        ),
-        assert(
-          !batchSelection || !radio,
-          'Cannot use batchSelection in radio mode. '
-          'Batch selection is only available for checkbox selection (radio: false).',
-        );
+  }) : assert(
+         hasExpandableRows || !rows.any((row) => row.expandedContent != null),
+         'Cannot have rows with expandedContent when hasExpandableRows is false. '
+         'Set hasExpandableRows: true on CarbonDataTable to enable expandable rows.',
+       ),
+       assert(
+         hasSelectableRows ||
+             !rows.any((row) => row.selected || row.onSelectChanged != null),
+         'Cannot have rows with selected or onSelectChanged when hasSelectableRows is false. '
+         'Set hasSelectableRows: true on CarbonDataTable to enable selectable rows.',
+       ),
+       assert(
+         !radio || hasSelectableRows,
+         'Cannot use radio mode when hasSelectableRows is false. '
+         'Set hasSelectableRows: true on CarbonDataTable to enable radio selection.',
+       ),
+       assert(
+         !radio || rows.where((row) => row.selected).length <= 1,
+         'In radio mode, at most one row can be selected. '
+         'Found ${rows.where((row) => row.selected).length} selected rows.',
+       ),
+       assert(
+         !batchSelection || hasSelectableRows,
+         'Cannot use batchSelection when hasSelectableRows is false. '
+         'Set hasSelectableRows: true on CarbonDataTable to enable batch selection.',
+       ),
+       assert(
+         !batchSelection || !radio,
+         'Cannot use batchSelection in radio mode. '
+         'Batch selection is only available for checkbox selection (radio: false).',
+       );
 
   @override
   State<CarbonDataTable> createState() => _CarbonDataTableState();
@@ -362,8 +366,8 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
       builder: (context, constraints) {
         final double effectiveWidth =
             widget.minWidth != null && widget.minWidth! > constraints.maxWidth
-                ? widget.minWidth!
-                : constraints.maxWidth;
+            ? widget.minWidth!
+            : constraints.maxWidth;
 
         final bool isScrollable = effectiveWidth > constraints.maxWidth;
 
@@ -385,10 +389,7 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
                 _buildHeader(context),
                 // Build rows with zebra striping indices
                 for (int i = 0; i < widget.rows.length; i++)
-                  _ZebraRow(
-                    index: i,
-                    child: widget.rows[i],
-                  ),
+                  _ZebraRow(index: i, child: widget.rows[i]),
               ],
             ),
           ),
@@ -456,7 +457,7 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
                 width: 48,
                 height: widget.size.headerHeight,
                 child: Center(
-                  child: Checkbox(
+                  child: CarbonCheckbox(
                     value: someSelected ? null : allSelected,
                     tristate: true,
                     onChanged: widget.onSelectAll != null
@@ -484,14 +485,17 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
   }
 
   Widget _buildHeaderCell(
-      CarbonDataTableHeader header, CarbonThemeData carbon) {
+    CarbonDataTableHeader header,
+    CarbonThemeData carbon,
+  ) {
     // A column is interactive iff the header opted in AND the caller wired a
     // sort handler. No separate table-level kill-switch: pass `onSort: null`
     // to disable sort UI altogether.
     final bool isSortable = header.sortable && widget.onSort != null;
     final bool isSorted = widget.sortKey == header.key;
-    final sortDirection =
-        isSorted ? widget.sortDirection : CarbonDataTableSortDirection.none;
+    final sortDirection = isSorted
+        ? widget.sortDirection
+        : CarbonDataTableSortDirection.none;
 
     Widget headerContent = Row(
       mainAxisAlignment: header.mainAxisAlignment,
@@ -556,18 +560,12 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
     if (width != null) {
       return SizedBox(
         width: width,
-        child: Padding(
-          padding: padding ?? EdgeInsets.zero,
-          child: child,
-        ),
+        child: Padding(padding: padding ?? EdgeInsets.zero, child: child),
       );
     }
     return Expanded(
       flex: flex,
-      child: Padding(
-        padding: padding ?? EdgeInsets.zero,
-        child: child,
-      ),
+      child: Padding(padding: padding ?? EdgeInsets.zero, child: child),
     );
   }
 
@@ -579,16 +577,10 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (widget.title != null)
-            const CarbonSkeleton.rectangle(
-              width: 200,
-              height: 24,
-            ),
+            const CarbonSkeleton.rectangle(width: 200, height: 24),
           if (widget.description != null) ...[
             const SizedBox(height: 8),
-            const CarbonSkeleton.rectangle(
-              width: 300,
-              height: 16,
-            ),
+            const CarbonSkeleton.rectangle(width: 300, height: 16),
           ],
         ],
       ),
@@ -600,16 +592,9 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          const Expanded(
-            child: CarbonSkeleton.rectangle(
-              height: 40,
-            ),
-          ),
+          const Expanded(child: CarbonSkeleton.rectangle(height: 40)),
           const SizedBox(width: 16),
-          const CarbonSkeleton.rectangle(
-            width: 100,
-            height: 40,
-          ),
+          const CarbonSkeleton.rectangle(width: 100, height: 40),
         ],
       ),
     );
@@ -622,8 +607,8 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
       builder: (context, constraints) {
         final double effectiveWidth =
             widget.minWidth != null && widget.minWidth! > constraints.maxWidth
-                ? widget.minWidth!
-                : constraints.maxWidth;
+            ? widget.minWidth!
+            : constraints.maxWidth;
 
         final bool isScrollable = effectiveWidth > constraints.maxWidth;
 
@@ -772,10 +757,7 @@ class _CarbonDataTableConfig extends InheritedWidget {
 class _ZebraRow extends InheritedWidget {
   final int index;
 
-  const _ZebraRow({
-    required this.index,
-    required super.child,
-  });
+  const _ZebraRow({required this.index, required super.child});
 
   static _ZebraRow? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<_ZebraRow>();
@@ -834,10 +816,14 @@ class CarbonDataTableHeader {
     this.sortable = false,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
-  })  : assert(label != null || child != null,
-            'Either label or child must be provided'),
-        assert(label == null || child == null,
-            'Cannot provide both label and child');
+  }) : assert(
+         label != null || child != null,
+         'Either label or child must be provided',
+       ),
+       assert(
+         label == null || child == null,
+         'Cannot provide both label and child',
+       );
 }
 
 class CarbonDataTableRow extends StatefulWidget {
@@ -934,7 +920,7 @@ class _CarbonDataTableRowState extends State<CarbonDataTableRow> {
               width: 48,
               height: config.size.rowHeight,
               child: Center(
-                child: Checkbox(
+                child: CarbonCheckbox(
                   value: widget.selected,
                   onChanged: widget.onSelectChanged != null
                       ? (value) => widget.onSelectChanged!(value ?? false)
@@ -1006,10 +992,7 @@ class _CarbonDataTableRowState extends State<CarbonDataTableRow> {
       decoration: BoxDecoration(
         color: backgroundColor,
         border: Border(
-          bottom: BorderSide(
-            color: carbon.layer.borderSubtle01,
-            width: 1,
-          ),
+          bottom: BorderSide(color: carbon.layer.borderSubtle01, width: 1),
         ),
       ),
       child: Row(children: rowChildren),
@@ -1053,7 +1036,8 @@ class _CarbonDataTableRowState extends State<CarbonDataTableRow> {
             ),
             child: Padding(
               padding: EdgeInsets.only(
-                left: (config.hasSelectableRows ? 48.0 : 0.0) +
+                left:
+                    (config.hasSelectableRows ? 48.0 : 0.0) +
                     (config.hasExpandableRows ? 48.0 : 0.0),
               ),
               child: widget.expandedContent!,
@@ -1075,18 +1059,12 @@ class _CarbonDataTableRowState extends State<CarbonDataTableRow> {
     if (width != null) {
       return SizedBox(
         width: width,
-        child: Padding(
-          padding: padding ?? EdgeInsets.zero,
-          child: child,
-        ),
+        child: Padding(padding: padding ?? EdgeInsets.zero, child: child),
       );
     }
     return Expanded(
       flex: flex,
-      child: Padding(
-        padding: padding ?? EdgeInsets.zero,
-        child: child,
-      ),
+      child: Padding(padding: padding ?? EdgeInsets.zero, child: child),
     );
   }
 }
@@ -1096,10 +1074,7 @@ class _SortIndicator extends StatelessWidget {
   final CarbonDataTableSortDirection direction;
   final Color color;
 
-  const _SortIndicator({
-    required this.direction,
-    required this.color,
-  });
+  const _SortIndicator({required this.direction, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -1159,8 +1134,9 @@ class _CustomRadioButton extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color:
-              selected ? effectiveColor : effectiveColor.withValues(alpha: 0.5),
+          color: selected
+              ? effectiveColor
+              : effectiveColor.withValues(alpha: 0.5),
           width: selected ? 2 : 1.5,
         ),
         color: CarbonPalette.transparent,

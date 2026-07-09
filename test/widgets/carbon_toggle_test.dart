@@ -23,6 +23,27 @@ void main() {
       expect(find.byType(CarbonToggle), findsOneWidget);
     });
 
+    testWidgets('shows the focus ring without crashing when focused', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildTestApp(child: CarbonToggle(value: false, onChanged: (_) {})),
+      );
+
+      final focusWidget = tester.widget<Focus>(
+        find
+            .descendant(
+              of: find.byType(CarbonToggle),
+              matching: find.byType(Focus),
+            )
+            .first,
+      );
+      focusWidget.focusNode!.requestFocus();
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('displays on and off text', (tester) async {
       await tester.pumpWidget(
         buildTestApp(

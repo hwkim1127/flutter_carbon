@@ -10,7 +10,7 @@ void main() {
       await tester.pumpWidget(buildTestApp(child: const CarbonLoading()));
 
       expect(find.byType(CarbonLoading), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(CarbonSpinner), findsOneWidget);
     });
 
     testWidgets('displays with small size', (tester) async {
@@ -18,15 +18,7 @@ void main() {
         buildTestApp(child: const CarbonLoading(size: CarbonLoadingSize.small)),
       );
 
-      final sizedBox = tester.widget<SizedBox>(
-        find.ancestor(
-          of: find.byType(CircularProgressIndicator),
-          matching: find.byType(SizedBox),
-        ),
-      );
-
-      expect(sizedBox.width, 16.0);
-      expect(sizedBox.height, 16.0);
+      expect(tester.getSize(find.byType(CarbonSpinner)), const Size(16, 16));
     });
 
     testWidgets('displays with medium size', (tester) async {
@@ -36,15 +28,7 @@ void main() {
         ),
       );
 
-      final sizedBox = tester.widget<SizedBox>(
-        find.ancestor(
-          of: find.byType(CircularProgressIndicator),
-          matching: find.byType(SizedBox),
-        ),
-      );
-
-      expect(sizedBox.width, 48.0);
-      expect(sizedBox.height, 48.0);
+      expect(tester.getSize(find.byType(CarbonSpinner)), const Size(48, 48));
     });
 
     testWidgets('displays with large size', (tester) async {
@@ -52,15 +36,7 @@ void main() {
         buildTestApp(child: const CarbonLoading(size: CarbonLoadingSize.large)),
       );
 
-      final sizedBox = tester.widget<SizedBox>(
-        find.ancestor(
-          of: find.byType(CircularProgressIndicator),
-          matching: find.byType(SizedBox),
-        ),
-      );
-
-      expect(sizedBox.width, 88.0);
-      expect(sizedBox.height, 88.0);
+      expect(tester.getSize(find.byType(CarbonSpinner)), const Size(88, 88));
     });
 
     testWidgets('displays description when provided', (tester) async {
@@ -92,6 +68,21 @@ void main() {
       );
 
       expect(find.byType(Column), findsOneWidget);
+    });
+
+    testWidgets('spinner animates without Material', (tester) async {
+      await tester.pumpWidget(
+        CarbonApp(
+          theme: WhiteTheme.theme,
+          home: const Center(child: CarbonSpinner(size: 88)),
+        ),
+      );
+
+      expect(find.byType(CarbonSpinner), findsOneWidget);
+      // Advance a few frames — the repeating rotation must not throw.
+      await tester.pump(const Duration(milliseconds: 345));
+      await tester.pump(const Duration(milliseconds: 345));
+      expect(tester.takeException(), isNull);
     });
   });
 

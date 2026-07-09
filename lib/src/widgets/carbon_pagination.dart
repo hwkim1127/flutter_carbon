@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_pressable.dart';
 import '../icons/carbon_icons.dart';
 import 'carbon_dropdown.dart';
+import 'carbon_tooltip.dart';
 import '../theme/carbon_theme.dart';
 
 /// Defines the localized labels and formatters for [CarbonPagination].
@@ -44,9 +46,9 @@ class CarbonPaginationLabels {
 
   /// Default English labels
   factory CarbonPaginationLabels.en() => CarbonPaginationLabels(
-        itemsRange: (start, end, total) => '$start-$end of $total items',
-        pageRange: (total) => 'of $total page${total <= 1 ? '' : 's'}',
-      );
+    itemsRange: (start, end, total) => '$start-$end of $total items',
+    pageRange: (total) => 'of $total page${total <= 1 ? '' : 's'}',
+  );
 }
 
 /// Carbon Design System pagination.
@@ -160,8 +162,10 @@ class CarbonPagination extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 _getItemsText(effectiveLabels),
-                style:
-                    TextStyle(color: carbon.text.textSecondary, fontSize: 14),
+                style: TextStyle(
+                  color: carbon.text.textSecondary,
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
@@ -178,8 +182,10 @@ class CarbonPagination extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 effectiveLabels.pageRange(totalPages),
-                style:
-                    TextStyle(color: carbon.text.textSecondary, fontSize: 14),
+                style: TextStyle(
+                  color: carbon.text.textSecondary,
+                  fontSize: 14,
+                ),
               ),
               const SizedBox(width: 8),
               Container(
@@ -188,33 +194,19 @@ class CarbonPagination extends StatelessWidget {
                 color: carbon.layer.borderSubtle01,
                 margin: const EdgeInsets.symmetric(horizontal: 8),
               ),
-              IconButton(
-                visualDensity: VisualDensity.compact,
+              _PaginationIconButton(
                 tooltip: effectiveLabels.previousPageLabel,
-                onPressed: currentPage > 1
+                icon: CarbonIcons.chevronLeft,
+                onTap: currentPage > 1
                     ? () => onPageChanged?.call(currentPage - 1)
                     : null,
-                icon: Icon(
-                  CarbonIcons.chevronLeft,
-                  color: currentPage > 1
-                      ? carbon.text.iconPrimary
-                      : carbon.text.iconDisabled,
-                ),
-                iconSize: 20,
               ),
-              IconButton(
-                visualDensity: VisualDensity.compact,
+              _PaginationIconButton(
                 tooltip: effectiveLabels.nextPageLabel,
-                onPressed: currentPage < totalPages
+                icon: CarbonIcons.chevronRight,
+                onTap: currentPage < totalPages
                     ? () => onPageChanged?.call(currentPage + 1)
                     : null,
-                icon: Icon(
-                  CarbonIcons.chevronRight,
-                  color: currentPage < totalPages
-                      ? carbon.text.iconPrimary
-                      : carbon.text.iconDisabled,
-                ),
-                iconSize: 20,
               ),
             ],
           ),
@@ -230,6 +222,52 @@ class CarbonPagination extends StatelessWidget {
     final start = (currentPage - 1) * itemsPerPage + 1;
     final end = (currentPage * itemsPerPage).clamp(0, totalItems);
     return labels.itemsRange(start, end, totalItems);
+  }
+}
+
+/// Internal prev/next button: native pressable with a Carbon tooltip
+/// (replaces Material `IconButton(tooltip: ...)`).
+class _PaginationIconButton extends StatelessWidget {
+  final String? tooltip;
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const _PaginationIconButton({
+    required this.tooltip,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final carbon = context.carbon;
+    final enabled = onTap != null;
+
+    Widget button = Semantics(
+      button: true,
+      enabled: enabled,
+      label: tooltip,
+      child: CarbonPressable(
+        onTap: onTap,
+        // Keyboard parity with the Material IconButton this replaced.
+        focusable: true,
+        builder: (context, state) => Container(
+          width: 40,
+          height: 40,
+          color: state.hovered && enabled ? carbon.layer.layerHover01 : null,
+          child: Icon(
+            icon,
+            size: 20,
+            color: enabled ? carbon.text.iconPrimary : carbon.text.iconDisabled,
+          ),
+        ),
+      ),
+    );
+
+    if (tooltip != null) {
+      button = CarbonTooltip(message: tooltip!, child: button);
+    }
+    return button;
   }
 }
 
@@ -264,10 +302,12 @@ class _PageSizeSelector extends StatelessWidget {
           showBorder: false,
           value: currentSize,
           items: sizes
-              .map((size) => CarbonDropdownItem(
-                    value: size,
-                    child: Text(size.toString()),
-                  ))
+              .map(
+                (size) => CarbonDropdownItem(
+                  value: size,
+                  child: Text(size.toString()),
+                ),
+              )
               .toList(),
           onChanged: onChanged == null
               ? null

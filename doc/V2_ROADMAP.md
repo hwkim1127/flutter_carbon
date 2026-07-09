@@ -136,14 +136,17 @@ in `doc/implementation/01-token-audit.md`; deferred past 2.0.
 
 ### Phase 2 — Native primitives (v2.x)
 
-In dependency order:
+In dependency order (1–3 ✅ shipped as wave 1, see
+`doc/implementation/07-native-primitives.md` — Material import count in
+`lib/src/widgets/` dropped 13 → 9):
 
-1. `CarbonSpinner` (unblocks `carbon_loading`, `carbon_file_uploader`) — small.
-2. `CarbonCheckbox`, `CarbonRadio` (unblocks `carbon_data_table`,
-   `carbon_multi_select`) — small, and Carbon spec differs visibly from
+1. ✅ `CarbonSpinner` (unblocked `carbon_loading`, `carbon_file_uploader`).
+2. ✅ `CarbonCheckbox`, `CarbonRadio` (unblocked `carbon_data_table`,
+   `carbon_multi_select`'s checkbox) — Carbon spec differs visibly from
    Material so this is also a fidelity win.
-3. `CarbonTooltip` (unblocks `carbon_pagination`, `carbon_combo_button`) —
-   reuse the popover/toggle-tip overlay machinery.
+3. ✅ `CarbonTooltip` (unblocked `carbon_pagination`) — built on the shared
+   `CarbonAnchoredOverlay`; `carbon_combo_button` still needs its menu API
+   redesign.
 4. `CarbonTextInput` on `EditableText` — **the risk item**, see below. Unblocks
    `carbon_combo_box`, `carbon_number_input`, `carbon_toolbar`,
    `carbon_multi_select`, `carbon_modal`. Ship it standalone first (it's also

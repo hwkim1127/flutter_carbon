@@ -15,6 +15,13 @@ class _PaginationDemoPageState extends State<PaginationDemoPage> {
   int _pageSize = 10;
   final int _totalItems = 95;
 
+  // Per-demo state — CarbonPagination is a controlled widget, so each demo
+  // must own its page (and size) or clicking prev/next changes nothing.
+  int _largePage = 1;
+  int _selectorPage = 1;
+  int _selectorSize = 25;
+  int _smallPage = 1;
+
   int get _totalPages => (_totalItems / _pageSize).ceil();
 
   @override
@@ -116,36 +123,39 @@ class _PaginationDemoPageState extends State<PaginationDemoPage> {
           title: 'Large Dataset Pagination',
           description: 'Pagination with many pages',
           builder: (context) => CarbonPagination(
-            currentPage: 1,
+            currentPage: _largePage,
             totalPages: 100,
             totalItems: 1000,
             itemsPerPage: 10,
-            onPageChanged: (page) {},
+            onPageChanged: (page) => setState(() => _largePage = page),
           ),
         ),
         DemoSection(
           title: 'Pagination with Page Size Selector',
           description: 'Allows changing items per page',
           builder: (context) => CarbonPagination(
-            currentPage: 1,
-            totalPages: 4,
+            currentPage: _selectorPage,
+            totalPages: (100 / _selectorSize).ceil(),
             totalItems: 100,
-            itemsPerPage: 25,
+            itemsPerPage: _selectorSize,
             showPageSizeSelector: true,
             pageSizes: const [10, 25, 50, 100],
-            onPageChanged: (page) {},
-            onPageSizeChanged: (size) {},
+            onPageChanged: (page) => setState(() => _selectorPage = page),
+            onPageSizeChanged: (size) => setState(() {
+              _selectorSize = size;
+              _selectorPage = 1; // Reset to first page
+            }),
           ),
         ),
         DemoSection(
           title: 'Small Dataset',
           description: 'Pagination with fewer items',
           builder: (context) => CarbonPagination(
-            currentPage: 1,
+            currentPage: _smallPage,
             totalPages: 3,
             totalItems: 25,
             itemsPerPage: 10,
-            onPageChanged: (page) {},
+            onPageChanged: (page) => setState(() => _smallPage = page),
           ),
         ),
         DemoSection(

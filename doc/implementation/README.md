@@ -33,6 +33,7 @@ package-wide Material freedom waits for the native primitives in later phases �
 | 04 | [Theming core (atomic breaking change)](04-theming-core.md) | ✅ |
 | 05 | [CarbonApp](05-carbon-app.md) | ✅ |
 | 06 | [Docs & release](06-docs-and-release.md) | ✅ |
+| 07 | [Native primitives, wave 1 (Phase 2)](07-native-primitives.md) | ✅ |
 
 Update this table (⬜ → ✅) as steps complete.
 

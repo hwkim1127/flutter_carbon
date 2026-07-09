@@ -44,14 +44,14 @@ class CarbonToggle extends StatefulWidget {
     this.hideLabel = false,
     this.hideStateText = false,
     this.readOnly = false,
-  })  : assert(
-          !hideStateText || size == CarbonToggleSize.small,
-          'hideStateText can only be true for small toggles',
-        ),
-        assert(
-          labelText != null || !hideStateText,
-          'If hideStateText is true, labelText must be provided for accessibility',
-        );
+  }) : assert(
+         !hideStateText || size == CarbonToggleSize.small,
+         'hideStateText can only be true for small toggles',
+       ),
+       assert(
+         labelText != null || !hideStateText,
+         'If hideStateText is true, labelText must be provided for accessibility',
+       );
 
   /// Whether the toggle is on (checked).
   final bool value;
@@ -250,16 +250,24 @@ class _CarbonToggleState extends State<CarbonToggle>
             border: borderColor != null ? Border.all(color: borderColor) : null,
           ),
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              // Focus ring
+              // Focus ring: 2px, offset 1px outside the track. Drawn with a
+              // negatively-positioned child (negative Container margins are
+              // negative Padding, which asserts).
               if (_isFocused && widget.enabled)
-                Positioned.fill(
-                  child: Container(
+                Positioned(
+                  left: -3,
+                  top: -3,
+                  right: -3,
+                  bottom: -3,
+                  child: DecoratedBox(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(trackHeight / 2),
+                      borderRadius: BorderRadius.circular(
+                        (trackHeight + 6) / 2,
+                      ),
                       border: Border.all(color: theme.focusColor, width: 2),
                     ),
-                    margin: const EdgeInsets.all(-2),
                   ),
                 ),
 
@@ -274,7 +282,8 @@ class _CarbonToggleState extends State<CarbonToggle>
                     color: thumbColor,
                     shape: BoxShape.circle,
                   ),
-                  child: widget.value &&
+                  child:
+                      widget.value &&
                           !isRegular &&
                           widget.enabled &&
                           !widget.readOnly

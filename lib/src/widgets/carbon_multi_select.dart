@@ -6,6 +6,7 @@ import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
+import 'carbon_checkbox.dart';
 import 'carbon_tag.dart';
 
 /// Item for Carbon multi-select dropdown.
@@ -195,9 +196,9 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         spacing: 4,
         onDismiss: _closeMenu,
         contentBuilder: (context, _) => CarbonOverlaySurface(
-          // The menu still uses Material widgets (TextField, Checkbox) —
-          // give them the Material ancestor the overlay doesn't provide.
-          // TODO(v2 Phase 2): replace with Carbon-native internals.
+          // The filter TextField still needs the Material ancestor the
+          // overlay doesn't provide.
+          // TODO(v2 Phase 2): replace with CarbonTextInput when it exists.
           child: Material(
             type: MaterialType.transparency,
             child: _buildMenu(context.carbon),
@@ -271,41 +272,45 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
                 final item = filteredItems[index];
                 final isSelected = widget.values.contains(item.value);
 
-                return InkWell(
-                  onTap: item.enabled
-                      ? () => _toggleSelection(item.value)
-                      : null,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected ? carbon.layer.layerSelected01 : null,
-                    ),
-                    child: Row(
-                      children: [
-                        Checkbox(
-                          value: isSelected,
-                          onChanged: item.enabled
-                              ? (value) => _toggleSelection(item.value)
-                              : null,
-                          activeColor: carbon.button.buttonPrimary,
-                          checkColor: carbon.text.textOnColor,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: DefaultTextStyle(
-                            style: TextStyle(
-                              color: item.enabled
-                                  ? carbon.text.textPrimary
-                                  : carbon.text.textDisabled,
-                              fontSize: 14,
-                            ),
-                            child: item.child,
+                return MouseRegion(
+                  cursor: item.enabled
+                      ? SystemMouseCursors.click
+                      : SystemMouseCursors.forbidden,
+                  child: GestureDetector(
+                    onTap: item.enabled
+                        ? () => _toggleSelection(item.value)
+                        : null,
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected ? carbon.layer.layerSelected01 : null,
+                      ),
+                      child: Row(
+                        children: [
+                          CarbonCheckbox(
+                            value: isSelected,
+                            onChanged: item.enabled
+                                ? (value) => _toggleSelection(item.value)
+                                : null,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: DefaultTextStyle(
+                              style: TextStyle(
+                                color: item.enabled
+                                    ? carbon.text.textPrimary
+                                    : carbon.text.textDisabled,
+                                fontSize: 14,
+                              ),
+                              child: item.child,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

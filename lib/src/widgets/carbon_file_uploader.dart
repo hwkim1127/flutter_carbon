@@ -1,9 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../base/carbon_pressable.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 import '../theme/carbon_theme_data.dart';
+import 'carbon_button.dart';
+import 'carbon_loading.dart';
+import 'carbon_tooltip.dart';
 
 /// File uploader item state from Carbon Design System.
 enum CarbonFileUploaderItemState {
@@ -120,10 +123,7 @@ class CarbonFileUploader extends StatelessWidget {
           const SizedBox(height: 16),
         ],
         child,
-        if (items.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          ...items,
-        ],
+        if (items.isNotEmpty) ...[const SizedBox(height: 16), ...items],
       ],
     );
   }
@@ -170,8 +170,9 @@ class CarbonFileUploaderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton(
+    return CarbonButton(
       onPressed: disabled ? null : onPressed,
+      size: CarbonButtonSize.md,
       child: child,
     );
   }
@@ -263,14 +264,14 @@ class CarbonFileUploaderDropZone extends StatelessWidget {
     final backgroundColor = disabled
         ? fileUploaderTheme.dropZoneBackground.withValues(alpha: 0.5)
         : (isDragging
-            ? fileUploaderTheme.dropZoneDragBackground
-            : fileUploaderTheme.dropZoneBackground);
+              ? fileUploaderTheme.dropZoneDragBackground
+              : fileUploaderTheme.dropZoneBackground);
 
     final borderColor = disabled
         ? fileUploaderTheme.dropZoneBorder.withValues(alpha: 0.5)
         : (isDragging
-            ? fileUploaderTheme.dropZoneDragBorder
-            : fileUploaderTheme.dropZoneBorder);
+              ? fileUploaderTheme.dropZoneDragBorder
+              : fileUploaderTheme.dropZoneBorder);
 
     return CarbonPressable(
       onTap: disabled ? null : onBrowseFiles,
@@ -278,10 +279,7 @@ class CarbonFileUploaderDropZone extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: backgroundColor,
-          border: Border.all(
-            color: borderColor,
-            width: isDragging ? 2 : 1,
-          ),
+          border: Border.all(color: borderColor, width: isDragging ? 2 : 1),
           borderRadius: BorderRadius.circular(0),
         ),
         child: DefaultTextStyle(
@@ -294,7 +292,8 @@ class CarbonFileUploaderDropZone extends StatelessWidget {
             letterSpacing: 0.16,
           ),
           textAlign: TextAlign.center,
-          child: child ??
+          child:
+              child ??
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -460,13 +459,11 @@ class CarbonFileUploaderItem extends StatelessWidget {
   ) {
     switch (state) {
       case CarbonFileUploaderItemState.uploading:
-        return SizedBox(
-          width: 16,
-          height: 16,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation(theme.fileItemIconColor),
-          ),
+        return CarbonSpinner(
+          size: 16,
+          small: true,
+          color: theme.fileItemIconColor,
+          semanticsLabel: iconDescription,
         );
 
       case CarbonFileUploaderItemState.complete:
@@ -487,22 +484,33 @@ class CarbonFileUploaderItem extends StatelessWidget {
                 color: theme.errorColor,
               ),
             const SizedBox(width: 8),
-            IconButton(
-              icon: Icon(
-                CarbonIcons.close,
-                size: 16,
-                color: theme.fileItemIconColor,
-              ),
-              onPressed: onDelete,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(
-                minWidth: 24,
-                minHeight: 24,
-              ),
-              tooltip: iconDescription,
-            ),
+            _buildDeleteButton(theme),
           ],
         );
     }
+  }
+
+  Widget _buildDeleteButton(CarbonFileUploaderThemeData theme) {
+    Widget button = Semantics(
+      button: true,
+      enabled: onDelete != null,
+      label: iconDescription,
+      child: CarbonPressable(
+        onTap: onDelete,
+        // Keyboard parity with the Material IconButton this replaced.
+        focusable: true,
+        builder: (context, state) => SizedBox(
+          width: 24,
+          height: 24,
+          child: Icon(
+            CarbonIcons.close,
+            size: 16,
+            color: theme.fileItemIconColor,
+          ),
+        ),
+      ),
+    );
+
+    return CarbonTooltip(message: iconDescription, child: button);
   }
 }
