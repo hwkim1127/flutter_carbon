@@ -236,12 +236,8 @@ class CarbonStructuredListRow {
   /// The cells in this row.
   final List<CarbonStructuredListCell> cells;
 
-  /// Optional data associated with this row.
-  final dynamic data;
-
   const CarbonStructuredListRow({
     required this.cells,
-    this.data,
   });
 }
 

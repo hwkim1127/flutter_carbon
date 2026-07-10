@@ -6,12 +6,19 @@ import '../base/carbon_divider.dart';
 import '../base/carbon_overlay_surface.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
+import '../theme/component_themes/overflow_menu_theme_data.dart';
 
 /// Size options for the overflow menu.
 enum CarbonOverflowMenuSize { xs, sm, md, lg }
 
+/// Base type for entries in a [CarbonOverflowMenu]: either a
+/// [CarbonOverflowMenuItem] or a [CarbonOverflowMenuDivider].
+sealed class CarbonOverflowMenuEntry {
+  const CarbonOverflowMenuEntry();
+}
+
 /// A menu item for the CarbonOverflowMenu.
-class CarbonOverflowMenuItem {
+class CarbonOverflowMenuItem extends CarbonOverflowMenuEntry {
   /// The text label for this menu item.
   final String label;
 
@@ -37,7 +44,7 @@ class CarbonOverflowMenuItem {
 }
 
 /// A divider for the CarbonOverflowMenu.
-class CarbonOverflowMenuDivider {
+class CarbonOverflowMenuDivider extends CarbonOverflowMenuEntry {
   const CarbonOverflowMenuDivider();
 }
 
@@ -47,7 +54,7 @@ class CarbonOverflowMenuDivider {
 /// Commonly used for actions like Edit, Delete, Share, etc.
 class CarbonOverflowMenu extends StatefulWidget {
   /// The items to display in the menu.
-  final List<dynamic> items;
+  final List<CarbonOverflowMenuEntry> items;
 
   /// The size of the menu.
   final CarbonOverflowMenuSize size;
@@ -194,10 +201,10 @@ class _CarbonOverflowMenuState extends State<CarbonOverflowMenu> {
 }
 
 class _MenuContent extends StatefulWidget {
-  final List<dynamic> items;
+  final List<CarbonOverflowMenuEntry> items;
   final CarbonOverflowMenuSize size;
   final VoidCallback onItemTapped;
-  final dynamic theme;
+  final CarbonOverflowMenuThemeData theme;
 
   const _MenuContent({
     required this.items,
@@ -354,13 +361,10 @@ class _MenuContentState extends State<_MenuContent> {
     final List<Widget> widgets = [];
 
     for (int i = 0; i < widget.items.length; i++) {
-      final item = widget.items[i];
-
-      if (item is CarbonOverflowMenuDivider) {
-        widgets.add(CarbonDivider(color: widget.theme.divider));
-      } else if (item is CarbonOverflowMenuItem) {
-        widgets.add(_buildMenuItem(item, i));
-      }
+      widgets.add(switch (widget.items[i]) {
+        CarbonOverflowMenuDivider() => CarbonDivider(color: widget.theme.divider),
+        final CarbonOverflowMenuItem item => _buildMenuItem(item, i),
+      });
     }
 
     return widgets;

@@ -89,10 +89,6 @@ class CarbonUIShell extends StatefulWidget {
   /// Called when a header nav item is tapped.
   final ValueChanged<int>? onHeaderNavItemTap;
 
-  /// Called when a side nav item is tapped.
-  @Deprecated('Use CarbonNavItem.onTap instead. This will be removed in v2.0.0')
-  final ValueChanged<int>? onSideNavItemTap;
-
   const CarbonUIShell({
     super.key,
     required this.appName,
@@ -108,7 +104,6 @@ class CarbonUIShell extends StatefulWidget {
     this.rightPanelOpen,
     this.onSideNavExpandedChanged,
     this.onHeaderNavItemTap,
-    this.onSideNavItemTap,
   });
 
   @override
@@ -156,30 +151,6 @@ class _CarbonUIShellState extends State<CarbonUIShell> {
   Widget build(BuildContext context) {
     final carbon = context.carbon;
 
-    assert(() {
-      if (widget.onSideNavItemTap != null && widget.sideNavItems != null) {
-        for (final item in widget.sideNavItems!) {
-          if (item.onTap != null) {
-            throw FlutterError(
-              'Cannot use both CarbonUIShell.onSideNavItemTap and CarbonNavItem.onTap.\n'
-              'CarbonUIShell.onSideNavItemTap is deprecated. Please remove it and use CarbonNavItem.onTap for each item instead.',
-            );
-          }
-          if (item.children != null) {
-            for (final child in item.children!) {
-              if (child.onTap != null) {
-                throw FlutterError(
-                  'Cannot use both CarbonUIShell.onSideNavItemTap and CarbonNavItem.onTap.\n'
-                  'CarbonUIShell.onSideNavItemTap is deprecated. Please remove it and use CarbonNavItem.onTap for each item instead.',
-                );
-              }
-            }
-          }
-        }
-      }
-      return true;
-    }());
-
     // Keyboard-aware colored box replaces the previous Scaffold (which only
     // provided a background and a Material ancestor). The inset padding is
     // Scaffold's resizeToAvoidBottomInset equivalent; removeViewInsets keeps
@@ -218,7 +189,6 @@ class _CarbonUIShellState extends State<CarbonUIShell> {
                           setState(() => _expandedSideNavMenuIndex = index);
                         },
                         theme: carbon.uiShell,
-                        onItemTap: widget.onSideNavItemTap,
                       ),
                     Expanded(child: widget.child),
                     if (widget.rightPanel != null &&
@@ -425,7 +395,6 @@ class _SideNav extends StatelessWidget {
   final int? expandedMenuIndex;
   final ValueChanged<int?> onExpandedMenuChanged;
   final CarbonUIShellThemeData theme;
-  final ValueChanged<int>? onItemTap;
 
   const _SideNav({
     required this.items,
@@ -434,7 +403,6 @@ class _SideNav extends StatelessWidget {
     required this.expandedMenuIndex,
     required this.onExpandedMenuChanged,
     required this.theme,
-    this.onItemTap,
   });
 
   double get _width {
@@ -476,7 +444,6 @@ class _SideNav extends StatelessWidget {
                       );
                     },
                     theme: theme,
-                    onItemTap: () => onItemTap?.call(index),
                   );
                 }
                 return _SideNavItem(
@@ -484,10 +451,7 @@ class _SideNav extends StatelessWidget {
                   showLabel:
                       expanded ||
                       collapseMode == CarbonSideNavCollapseMode.fixed,
-                  onTap: () {
-                    item.onTap?.call();
-                    onItemTap?.call(index);
-                  },
+                  onTap: () => item.onTap?.call(),
                   theme: theme,
                 );
               },
@@ -583,7 +547,6 @@ class _SideNavMenu extends StatelessWidget {
   final bool showLabel;
   final VoidCallback onToggle;
   final CarbonUIShellThemeData theme;
-  final VoidCallback? onItemTap;
 
   const _SideNavMenu({
     required this.item,
@@ -591,7 +554,6 @@ class _SideNavMenu extends StatelessWidget {
     required this.showLabel,
     required this.onToggle,
     required this.theme,
-    this.onItemTap,
   });
 
   @override
@@ -604,7 +566,6 @@ class _SideNavMenu extends StatelessWidget {
           expanded: expanded,
           onTap: () {
             item.onTap?.call();
-            onItemTap?.call();
             onToggle();
           },
           theme: theme,
@@ -616,10 +577,7 @@ class _SideNavMenu extends StatelessWidget {
               child: _SideNavItem(
                 item: child,
                 showLabel: true,
-                onTap: () {
-                  child.onTap?.call();
-                  onItemTap?.call();
-                },
+                onTap: () => child.onTap?.call(),
                 theme: theme,
               ),
             ),

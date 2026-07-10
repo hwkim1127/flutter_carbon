@@ -11,32 +11,45 @@ import '../theme/carbon_theme.dart';
 /// - Selection support
 /// - Sharp corners (zero border radius)
 ///
+/// Selection is value-based: give selectable nodes a [CarbonTreeNode.value]
+/// and control the tree with [selectedValue], mirroring the id-based
+/// selection of Carbon's TreeView. Values also key the expand/collapse
+/// state, so it survives rebuilding the [nodes] list; nodes without a value
+/// fall back to instance identity (keep those instances stable across
+/// builds if they can expand).
+///
 /// Example:
 /// ```dart
-/// CarbonTreeView(
+/// CarbonTreeView<String>(
+///   selectable: true,
+///   selectedValue: _selected,
+///   onNodeSelected: (node) => setState(() => _selected = node.value),
 ///   nodes: [
 ///     CarbonTreeNode(
 ///       label: 'Parent 1',
+///       value: 'parent-1',
 ///       children: [
-///         CarbonTreeNode(label: 'Child 1'),
-///         CarbonTreeNode(label: 'Child 2'),
+///         CarbonTreeNode(label: 'Child 1', value: 'child-1'),
+///         CarbonTreeNode(label: 'Child 2', value: 'child-2'),
 ///       ],
 ///     ),
 ///   ],
 /// )
 /// ```
-class CarbonTreeView extends StatefulWidget {
+class CarbonTreeView<T> extends StatefulWidget {
   /// The root nodes of the tree.
-  final List<CarbonTreeNode> nodes;
+  final List<CarbonTreeNode<T>> nodes;
 
   /// Whether nodes are selectable.
   final bool selectable;
 
-  /// Currently selected node.
-  final CarbonTreeNode? selectedNode;
+  /// Value of the currently selected node.
+  ///
+  /// A node is selected when its [CarbonTreeNode.value] equals this.
+  final T? selectedValue;
 
   /// Called when a node is selected.
-  final ValueChanged<CarbonTreeNode>? onNodeSelected;
+  final ValueChanged<CarbonTreeNode<T>>? onNodeSelected;
 
   /// Whether to show borders.
   final bool showBorder;
@@ -45,18 +58,21 @@ class CarbonTreeView extends StatefulWidget {
     super.key,
     required this.nodes,
     this.selectable = false,
-    this.selectedNode,
+    this.selectedValue,
     this.onNodeSelected,
     this.showBorder = true,
   });
 
   @override
-  State<CarbonTreeView> createState() => _CarbonTreeViewState();
+  State<CarbonTreeView<T>> createState() => _CarbonTreeViewState<T>();
 }
 
-class _CarbonTreeViewState extends State<CarbonTreeView> {
-  final Set<CarbonTreeNode> _expandedNodes = {};
-  CarbonTreeNode? _hoveredNode;
+class _CarbonTreeViewState<T> extends State<CarbonTreeView<T>> {
+  /// Keyed by [CarbonTreeNode.value] when present, node identity otherwise.
+  final Set<Object> _expandedKeys = {};
+  Object? _hoveredKey;
+
+  Object _keyOf(CarbonTreeNode<T> node) => node.value ?? node;
 
   @override
   Widget build(BuildContext context) {
@@ -78,28 +94,30 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
     );
   }
 
-  Widget _buildNode(CarbonTreeNode node, int depth) {
+  Widget _buildNode(CarbonTreeNode<T> node, int depth) {
     final carbon = context.carbon;
     final theme = carbon.treeView;
+    final key = _keyOf(node);
     final hasChildren = node.children != null && node.children!.isNotEmpty;
-    final isExpanded = _expandedNodes.contains(node);
-    final isSelected = widget.selectedNode == node;
-    final isHovered = _hoveredNode == node;
+    final isExpanded = _expandedKeys.contains(key);
+    final isSelected =
+        node.value != null && node.value == widget.selectedValue;
+    final isHovered = _hoveredKey == key;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         MouseRegion(
-          onEnter: (_) => setState(() => _hoveredNode = node),
-          onExit: (_) => setState(() => _hoveredNode = null),
+          onEnter: (_) => setState(() => _hoveredKey = key),
+          onExit: (_) => setState(() => _hoveredKey = null),
           child: CarbonPressable(
             onTap: () {
               if (hasChildren) {
                 setState(() {
                   if (isExpanded) {
-                    _expandedNodes.remove(node);
+                    _expandedKeys.remove(key);
                   } else {
-                    _expandedNodes.add(node);
+                    _expandedKeys.add(key);
                   }
                 });
               }
@@ -160,7 +178,7 @@ class _CarbonTreeViewState extends State<CarbonTreeView> {
 }
 
 /// A node in a [CarbonTreeView].
-class CarbonTreeNode {
+class CarbonTreeNode<T> {
   /// The label text for the node.
   final String label;
 
@@ -168,15 +186,19 @@ class CarbonTreeNode {
   final IconData? icon;
 
   /// Child nodes.
-  final List<CarbonTreeNode>? children;
+  final List<CarbonTreeNode<T>>? children;
 
-  /// Optional data associated with this node.
-  final dynamic data;
+  /// The value this node represents.
+  ///
+  /// Used for selection (compared against [CarbonTreeView.selectedValue])
+  /// and as the key for the node's expand/collapse state. Should be unique
+  /// within the tree.
+  final T? value;
 
   const CarbonTreeNode({
     required this.label,
     this.icon,
     this.children,
-    this.data,
+    this.value,
   });
 }

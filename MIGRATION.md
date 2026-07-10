@@ -98,11 +98,42 @@ Reading the Carbon data back off a Material `ThemeData` (rare):
   )
   ```
 
+* **`CarbonTreeView` → `CarbonTreeView<T>`** with value-based selection:
+
+  ```dart
+  // 1.x (selection by node instance — broke if the node list was rebuilt)
+  CarbonTreeView(
+    selectable: true,
+    selectedNode: _selectedNode,               // CarbonTreeNode?
+    onNodeSelected: (node) => setState(() => _selectedNode = node),
+    nodes: [CarbonTreeNode(label: 'Item 1', data: anything)],
+  )
+
+  // 2.0 (selection by value; expansion also keyed by value)
+  CarbonTreeView<String>(
+    selectable: true,
+    selectedValue: _selected,                  // String?
+    onNodeSelected: (node) => setState(() => _selected = node.value),
+    nodes: const [CarbonTreeNode(label: 'Item 1', value: 'item-1')],
+  )
+  ```
+
+  `CarbonTreeNode.data` (untyped) is replaced by the typed
+  `CarbonTreeNode<T>.value`.
+* **`CarbonOverflowMenu.items`** is now `List<CarbonOverflowMenuEntry>`
+  instead of `List<dynamic>`. Plain literals of
+  `CarbonOverflowMenuItem`/`CarbonOverflowMenuDivider` compile unchanged;
+  remove any other element types.
 * **`CarbonFloatingMenu.heroTag` removed** — it only existed for Material's
   FloatingActionButton Hero animation; delete the argument.
 * **`CarbonDataTable.sortable` removed** (deprecated no-op since 1.2.1) —
   a column sorts iff its header has `sortable: true` and the table has a
   non-null `onSort`; delete the argument.
+* **`CarbonUIShell.onSideNavItemTap` removed** (deprecated) — set
+  `CarbonNavItem.onTap` on each nav item instead.
+* **`CarbonStructuredListRow.data` removed** — the widget never read it;
+  track row payloads on your side, keyed by the `selectedIndex` the list
+  reports.
 * **Behavioral:** `CarbonUIShell` and `CarbonModal` no longer provide
   `Scaffold`/`Material` ancestors. Material widgets passed as their content
   (e.g. `ListTile`, `TextButton`) need their own `Material` ancestor:

@@ -11,8 +11,8 @@ class TreeViewDemoPage extends StatefulWidget {
 }
 
 class _TreeViewDemoPageState extends State<TreeViewDemoPage> {
-  CarbonTreeNode? _selectedNode1;
-  CarbonTreeNode? _selectedNode2;
+  String? _selectedValue1;
+  String? _selectedValue2;
 
   @override
   Widget build(BuildContext context) {
@@ -111,29 +111,31 @@ class _TreeViewDemoPageState extends State<TreeViewDemoPage> {
           title: 'Selectable Tree',
           description: 'Tree with selectable nodes',
           builder: (context) {
-            final node1 = const CarbonTreeNode(label: 'Item 1');
-            final node2 = const CarbonTreeNode(label: 'Item 2');
-            final node3 = const CarbonTreeNode(label: 'Item 3');
-            final parent = CarbonTreeNode(
-              label: 'Parent',
-              children: [node1, node2, node3],
-            );
-
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CarbonTreeView(
+                CarbonTreeView<String>(
                   selectable: true,
-                  selectedNode: _selectedNode1,
+                  selectedValue: _selectedValue1,
                   onNodeSelected: (node) {
-                    setState(() => _selectedNode1 = node);
+                    setState(() => _selectedValue1 = node.value);
                   },
-                  nodes: [parent],
+                  nodes: const [
+                    CarbonTreeNode(
+                      label: 'Parent',
+                      value: 'parent',
+                      children: [
+                        CarbonTreeNode(label: 'Item 1', value: 'item-1'),
+                        CarbonTreeNode(label: 'Item 2', value: 'item-2'),
+                        CarbonTreeNode(label: 'Item 3', value: 'item-3'),
+                      ],
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  _selectedNode1 != null
-                      ? 'Selected: ${_selectedNode1!.label}'
+                  _selectedValue1 != null
+                      ? 'Selected: $_selectedValue1'
                       : 'No selection',
                   style: TextStyle(
                     fontSize: 14,
@@ -166,64 +168,76 @@ class _TreeViewDemoPageState extends State<TreeViewDemoPage> {
           title: 'File System Example',
           description: 'Complete file system tree',
           builder: (context) {
-            final readme = const CarbonTreeNode(
-              label: 'README.md',
-              icon: Icons.description,
-            );
-            final package = const CarbonTreeNode(
-              label: 'package.json',
-              icon: Icons.description,
-            );
-            final index = const CarbonTreeNode(
-              label: 'index.html',
-              icon: Icons.description,
-            );
-            final app = const CarbonTreeNode(
-              label: 'App.tsx',
-              icon: Icons.description,
-            );
-            final main = const CarbonTreeNode(
-              label: 'main.tsx',
-              icon: Icons.description,
-            );
-            final style = const CarbonTreeNode(
-              label: 'style.css',
-              icon: Icons.description,
-            );
-
-            final srcFolder = CarbonTreeNode(
-              label: 'src',
-              icon: Icons.folder,
-              children: [app, main, style],
-            );
-
-            final publicFolder = const CarbonTreeNode(
-              label: 'public',
-              icon: Icons.folder,
-              children: [
-                CarbonTreeNode(label: 'favicon.ico', icon: Icons.image),
-              ],
-            );
-
-            final root = CarbonTreeNode(
-              label: 'my-project',
-              icon: Icons.folder_open,
-              children: [readme, package, srcFolder, publicFolder, index],
-            );
-
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CarbonTreeView(
+                CarbonTreeView<String>(
                   selectable: true,
-                  selectedNode: _selectedNode2,
+                  selectedValue: _selectedValue2,
                   onNodeSelected: (node) {
-                    setState(() => _selectedNode2 = node);
+                    setState(() => _selectedValue2 = node.value);
                   },
-                  nodes: [root],
+                  nodes: const [
+                    CarbonTreeNode(
+                      label: 'my-project',
+                      value: 'my-project',
+                      icon: Icons.folder_open,
+                      children: [
+                        CarbonTreeNode(
+                          label: 'README.md',
+                          value: 'my-project/README.md',
+                          icon: Icons.description,
+                        ),
+                        CarbonTreeNode(
+                          label: 'package.json',
+                          value: 'my-project/package.json',
+                          icon: Icons.description,
+                        ),
+                        CarbonTreeNode(
+                          label: 'src',
+                          value: 'my-project/src',
+                          icon: Icons.folder,
+                          children: [
+                            CarbonTreeNode(
+                              label: 'App.tsx',
+                              value: 'my-project/src/App.tsx',
+                              icon: Icons.description,
+                            ),
+                            CarbonTreeNode(
+                              label: 'main.tsx',
+                              value: 'my-project/src/main.tsx',
+                              icon: Icons.description,
+                            ),
+                            CarbonTreeNode(
+                              label: 'style.css',
+                              value: 'my-project/src/style.css',
+                              icon: Icons.description,
+                            ),
+                          ],
+                        ),
+                        CarbonTreeNode(
+                          label: 'public',
+                          value: 'my-project/public',
+                          icon: Icons.folder,
+                          children: [
+                            CarbonTreeNode(
+                              label: 'favicon.ico',
+                              value: 'my-project/public/favicon.ico',
+                              icon: Icons.image,
+                            ),
+                          ],
+                        ),
+                        CarbonTreeNode(
+                          label: 'index.html',
+                          value: 'my-project/index.html',
+                          icon: Icons.description,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
-                if (_selectedNode2 != null)
+                if (_selectedValue2 != null)
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -245,7 +259,7 @@ class _TreeViewDemoPageState extends State<TreeViewDemoPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          _selectedNode2!.label,
+                          _selectedValue2!,
                           style: TextStyle(
                             fontSize: 14,
                             color: context.carbon.text.textPrimary,

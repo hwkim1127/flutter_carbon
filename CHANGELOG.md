@@ -33,6 +33,21 @@ one `builder:` line.
 * `CarbonDataTable.sortable` removed, as scheduled when it was deprecated in
   1.2.1 (no-op since then — a column sorts iff its header has
   `sortable: true` and the table has a non-null `onSort`).
+* `CarbonUIShell.onSideNavItemTap` removed, as scheduled when it was
+  deprecated (use `CarbonNavItem.onTap` on each item).
+* `CarbonOverflowMenu.items` is now `List<CarbonOverflowMenuEntry>` (was
+  `List<dynamic>`); `CarbonOverflowMenuItem` and `CarbonOverflowMenuDivider`
+  extend the new sealed `CarbonOverflowMenuEntry` base, so existing item
+  lists compile unchanged — only lists explicitly typed `List<dynamic>` (or
+  containing other types) need updating.
+* `CarbonTreeView` is now generic `CarbonTreeView<T>` with **value-based
+  selection**: `selectedNode` is replaced by `selectedValue` (`T?`), compared
+  against the new `CarbonTreeNode<T>.value` (which replaces the untyped
+  `CarbonTreeNode.data`). Expansion state is also keyed by `value` when
+  present, so it survives rebuilding the `nodes` list; value-less nodes fall
+  back to instance identity as before.
+* `CarbonStructuredListRow.data` removed (an untyped payload the widget never
+  read; selection is index-based via `selectedIndex`/`onRowSelected`).
 * Behavioral: `CarbonUIShell` and `CarbonModal` no longer create
   `Scaffold`/`Material` ancestors — Material widgets passed as content need
   their own `Material`.
