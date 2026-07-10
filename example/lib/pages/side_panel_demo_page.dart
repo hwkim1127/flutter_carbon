@@ -86,26 +86,26 @@ class SidePanelDemoPage extends StatelessWidget {
                 title: 'Configure Settings',
                 builder: (context) => ListView(
                   padding: const EdgeInsets.all(16),
-                  children: [
-                    const TextField(
-                      decoration: InputDecoration(labelText: 'Setting 1'),
-                    ),
-                    const SizedBox(height: 16),
-                    const TextField(
-                      decoration: InputDecoration(labelText: 'Setting 2'),
-                    ),
-                    const SizedBox(height: 16),
-                    const TextField(
-                      decoration: InputDecoration(labelText: 'Setting 3'),
-                    ),
+                  children: const [
+                    // Carbon inputs: the side panel provides no Material
+                    // ancestor (Material-free since 2.0), so Material
+                    // TextFields would throw here.
+                    CarbonTextInput(labelText: 'Setting 1'),
+                    SizedBox(height: 16),
+                    CarbonTextInput(labelText: 'Setting 2'),
+                    SizedBox(height: 16),
+                    CarbonTextInput(labelText: 'Setting 3'),
                   ],
                 ),
                 actions: [
-                  OutlinedButton(
+                  CarbonButton(
+                    kind: CarbonButtonKind.secondary,
+                    size: CarbonButtonSize.xl,
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Cancel'),
                   ),
-                  ElevatedButton(
+                  CarbonButton(
+                    size: CarbonButtonSize.xl,
                     onPressed: () {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(

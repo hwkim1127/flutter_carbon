@@ -47,22 +47,26 @@ class TearsheetDemoPage extends StatelessWidget {
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(16),
                   children: const [
-                    TextField(
-                      decoration: InputDecoration(labelText: 'Resource Name'),
-                    ),
+                    // Carbon inputs: the tearsheet provides no Material
+                    // ancestor (Material-free since 2.0).
+                    CarbonTextInput(labelText: 'Resource Name'),
                     SizedBox(height: 16),
-                    TextField(
-                      decoration: InputDecoration(labelText: 'Description'),
+                    CarbonTextArea(
+                      labelText: 'Description',
+                      minLines: 3,
                       maxLines: 3,
                     ),
                   ],
                 ),
                 actions: [
-                  OutlinedButton(
+                  CarbonButton(
+                    kind: CarbonButtonKind.secondary,
+                    size: CarbonButtonSize.xl,
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Cancel'),
                   ),
-                  ElevatedButton(
+                  CarbonButton(
+                    size: CarbonButtonSize.xl,
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Continue'),
                   ),
@@ -136,11 +140,14 @@ class TearsheetDemoPage extends StatelessWidget {
                   ),
                 ),
                 actions: [
-                  OutlinedButton(
+                  CarbonButton(
+                    kind: CarbonButtonKind.secondary,
+                    size: CarbonButtonSize.twoXl,
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Cancel'),
                   ),
-                  ElevatedButton(
+                  CarbonButton(
+                    size: CarbonButtonSize.twoXl,
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Submit'),
                   ),
@@ -161,30 +168,44 @@ class TearsheetDemoPage extends StatelessWidget {
                 description: 'Edit your document',
                 width: CarbonTearsheetWidth.wide,
                 headerActions: [
-                  IconButton(
-                    icon: const Icon(Icons.print),
-                    onPressed: () {},
-                    tooltip: 'Print',
+                  // Carbon ghost icon buttons: IconButton needs a Material
+                  // ancestor, which the tearsheet no longer provides.
+                  CarbonTooltip(
+                    message: 'Print',
+                    child: CarbonButton(
+                      kind: CarbonButtonKind.ghost,
+                      size: CarbonButtonSize.sm,
+                      icon: const Icon(CarbonIcons.printer),
+                      onPressed: () {},
+                    ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: () {},
-                    tooltip: 'Share',
+                  CarbonTooltip(
+                    message: 'Share',
+                    child: CarbonButton(
+                      kind: CarbonButtonKind.ghost,
+                      size: CarbonButtonSize.sm,
+                      icon: const Icon(CarbonIcons.share),
+                      onPressed: () {},
+                    ),
                   ),
                 ],
                 builder: (context) => const Padding(
                   padding: EdgeInsets.all(16),
-                  child: TextField(
-                    decoration: InputDecoration(labelText: 'Document content'),
+                  child: CarbonTextArea(
+                    labelText: 'Document content',
+                    minLines: 10,
                     maxLines: 10,
                   ),
                 ),
                 actions: [
-                  OutlinedButton(
+                  CarbonButton(
+                    kind: CarbonButtonKind.secondary,
+                    size: CarbonButtonSize.twoXl,
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Cancel'),
                   ),
-                  ElevatedButton(
+                  CarbonButton(
+                    size: CarbonButtonSize.twoXl,
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Save'),
                   ),
@@ -246,23 +267,22 @@ class TearsheetDemoPage extends StatelessWidget {
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(16),
                   children: const [
-                    TextField(decoration: InputDecoration(labelText: 'Region')),
+                    CarbonTextInput(labelText: 'Region'),
                     SizedBox(height: 16),
-                    TextField(
-                      decoration: InputDecoration(labelText: 'Instance Type'),
-                    ),
+                    CarbonTextInput(labelText: 'Instance Type'),
                     SizedBox(height: 16),
-                    TextField(
-                      decoration: InputDecoration(labelText: 'Environment'),
-                    ),
+                    CarbonTextInput(labelText: 'Environment'),
                   ],
                 ),
                 actions: [
-                  OutlinedButton(
+                  CarbonButton(
+                    kind: CarbonButtonKind.secondary,
+                    size: CarbonButtonSize.twoXl,
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Cancel'),
                   ),
-                  ElevatedButton(
+                  CarbonButton(
+                    size: CarbonButtonSize.twoXl,
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Deploy'),
                   ),

@@ -1,5 +1,5 @@
 name: example
-description: "A complete 'Kitchen Sink' demo app showcasing all 48 components and Material Theme integration features of the flutter_carbon_theme package."
+description: "A complete 'Kitchen Sink' demo app showcasing all 46 components and the optional Material bridge of the flutter_carbon package."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

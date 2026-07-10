@@ -171,9 +171,13 @@ In dependency order (1–3 ✅ shipped as wave 1, see
    are native and left the "Material Theming" category; Slider got its own
    demo under Forms. "Material Theming" now demos Tooltip and the
    checkbox/radio/switch selection controls only.
-2. `CarbonDatePicker` / `CarbonTimePicker` last (largest scope: calendar
-   grid, range selection, keyboard navigation, localization) — retires the
-   date/time picker demo and, with it, the last Material-themed demos.
+2. ✅ Wave 2 (`doc/implementation/wave5/`): native **`CarbonDatePicker`**
+   (simple/single/range, keyboard-navigable calendar grid, spec year
+   input, `CarbonDatePickerLabels` localization — zero dependencies) and
+   **`CarbonTimePicker`** + **`CarbonTimePickerSelect`** (masked `hh:mm`
+   input + compact selects, per spec). The Date & Time Picker demo is
+   native; **Phase 3 is complete** — the example's remaining Material
+   usage is the deliberate bridge showcase only.
 
 ✅ **Code snippet syntax highlighting** (shipped alongside wave 3) — the
 41 `carbon.syntax` tokens now drive an optional pluggable highlighter with
@@ -212,4 +216,4 @@ a built-in zero-dependency Dart tokenizer; see
 | --- | --- | --- | --- |
 | 1 | ✅ 2.0.0 | Yes | `CarbonTheme` + `CarbonApp`; Material becomes an explicit bridge |
 | 2 | ✅ 2.0.0 | Yes (combo button) | Native checkbox/radio/spinner/tooltip/text input/menu; `import material.dart` count in `lib/src/widgets/` reaches 0 |
-| 3 | ✅ wave 1 in 2.0.0; pickers 2.x | No | Native accordion/search/select/slider, then date/time pickers |
+| 3 | ✅ 2.0.0 | No | Native accordion/search/select/slider + date/time pickers |

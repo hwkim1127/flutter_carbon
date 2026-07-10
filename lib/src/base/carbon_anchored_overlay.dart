@@ -73,11 +73,18 @@ class CarbonAnchoredOverlay extends StatefulWidget {
   /// Gap between the anchor edge and the content.
   final double spacing;
 
-  /// Optional max content width. Ignored when [matchAnchorWidth] is true.
+  /// Optional max content width. With [matchAnchorWidth] it opts the
+  /// content into growing BEYOND the anchor width up to this cap (the
+  /// anchor width itself wins when larger) — only for content that sizes
+  /// intrinsically; greedy content (ListViews) would always balloon to
+  /// the cap. Null keeps the exact-width match.
   final double? maxWidth;
 
-  /// Forces the content to exactly the anchor's width (dropdown-style menus
-  /// that must sit flush with their trigger field).
+  /// Sizes the content to the anchor's width (dropdown-style menus that
+  /// must sit flush with their trigger field): exactly when [maxWidth] is
+  /// null, as a minimum otherwise — a tight match squeezes labels out of
+  /// narrow fields (e.g. a compact AM/PM select whose selected row also
+  /// carries a checkmark).
   final bool matchAnchorWidth;
 
   /// Builds an anchor-rect getter for [triggerContext]'s render box, in the
@@ -157,6 +164,7 @@ class _CarbonAnchoredOverlayState extends State<CarbonAnchoredOverlay> {
                 alignment: widget.alignment,
                 spacing: widget.spacing,
                 matchAnchorWidth: widget.matchAnchorWidth,
+                matchedGrowthCap: widget.maxWidth,
                 bottomInset: bottomInset,
                 onEffectiveAlignment: _reportEffectiveAlignment,
               ),
@@ -178,6 +186,7 @@ class _AnchoredOverlayDelegate extends SingleChildLayoutDelegate {
     required this.alignment,
     required this.spacing,
     required this.matchAnchorWidth,
+    required this.matchedGrowthCap,
     required this.bottomInset,
     required this.onEffectiveAlignment,
   });
@@ -188,6 +197,9 @@ class _AnchoredOverlayDelegate extends SingleChildLayoutDelegate {
   final CarbonPopoverAlignment alignment;
   final double spacing;
   final bool matchAnchorWidth;
+
+  /// Non-null opts width-matched content into growing beyond the anchor.
+  final double? matchedGrowthCap;
   final double bottomInset;
   final ValueChanged<CarbonPopoverAlignment> onEffectiveAlignment;
 
@@ -195,7 +207,23 @@ class _AnchoredOverlayDelegate extends SingleChildLayoutDelegate {
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
     final loosened = constraints.loosen();
     if (!matchAnchorWidth) return loosened;
-    return loosened.tighten(width: anchorRect.width);
+    final cap = matchedGrowthCap;
+    if (cap == null) return loosened.tighten(width: anchorRect.width);
+    // At least the anchor's width (flush with the field); may grow for
+    // intrinsically-sized content up to max(anchor, cap). A tight match
+    // squeezes labels out of narrow fields.
+    final minWidth = anchorRect.width < loosened.maxWidth
+        ? anchorRect.width
+        : loosened.maxWidth;
+    final grownMax = anchorRect.width > cap ? anchorRect.width : cap;
+    final maxWidth = grownMax < loosened.maxWidth
+        ? grownMax
+        : loosened.maxWidth;
+    return BoxConstraints(
+      minWidth: minWidth,
+      maxWidth: maxWidth < minWidth ? minWidth : maxWidth,
+      maxHeight: loosened.maxHeight,
+    );
   }
 
   @override

@@ -1,4 +1,5 @@
-import 'package:flutter/services.dart' show KeyDownEvent, LogicalKeyboardKey;
+import 'package:flutter/services.dart'
+    show KeyDownEvent, KeyRepeatEvent, LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
 import '../base/carbon_anchored_overlay.dart';
@@ -160,7 +161,11 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
       _close();
     } else if (_isOpen &&
         (widget.value != oldWidget.value || widget.items != oldWidget.items)) {
-      _entry?.markNeedsBuild();
+      // didUpdateWidget runs during the build phase and the overlay entry
+      // is not our descendant — marking it now asserts. Defer a frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _isOpen) _entry?.markNeedsBuild();
+      });
     }
   }
 
@@ -199,6 +204,10 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
         anchorRect: anchorRect,
         alignment: CarbonPopoverAlignment.bottomStart,
         matchAnchorWidth: true,
+        // Opt into growth beyond narrow fields (the panel sizes
+        // intrinsically): the selected row's checkmark must never squeeze
+        // the label out.
+        maxWidth: 288,
         spacing: 1,
         onDismiss: _close,
         contentBuilder: (context, _) => CarbonOverlaySurface(
@@ -213,6 +222,9 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
             ],
             selectedValue: widget.value,
             size: widget.size.menuSize,
+            // The anchor (field) width is the real minimum — the menu
+            // spec's 160px floor would balloon compact selects (AM/PM).
+            minWidth: 0,
             maxHeight: widget.menuMaxHeight,
             onSelected: (value) => widget.onChanged?.call(value),
             onClose: _close,
@@ -234,7 +246,12 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
   /// Enter/Space/Arrows open the closed menu (the open menu's panel owns
   /// its own keyboard handling).
   KeyEventResult _handleFieldKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent || _isOpen) return KeyEventResult.ignored;
+    if (_isOpen) return KeyEventResult.ignored;
+    // Repeats matter only for the read-only swallow below — the app-level
+    // arrow shortcuts act on repeats too.
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
     final key = event.logicalKey;
     final isValueKey =
         key == LogicalKeyboardKey.enter ||
@@ -250,6 +267,7 @@ class _CarbonSelectState<T> extends State<CarbonSelect<T>> {
           ? KeyEventResult.handled
           : KeyEventResult.ignored;
     }
+    if (event is KeyRepeatEvent) return KeyEventResult.handled;
     _open();
     return KeyEventResult.handled;
   }

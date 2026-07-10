@@ -123,4 +123,100 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('wave-5 demo interactions', () {
+    testWidgets('date picker opens its calendar and picks a day', (
+      tester,
+    ) async {
+      await openRoute(tester, AppRoutes.dateTimePicker);
+
+      // The "Single with calendar" section's input field.
+      final picker = find.ancestor(
+        of: find.text('Appointment date'),
+        matching: find.byType(CarbonDatePicker),
+      );
+      await tester.scrollUntilVisible(
+        picker,
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
+      await tester.tap(
+        find.descendant(of: picker, matching: find.byType(EditableText)),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+
+      // The weekday header proves the calendar is open.
+      expect(find.text('Su'), findsOneWidget);
+
+      await tester.tap(find.text('15').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(tester.takeException(), isNull);
+      expect(find.text('Su'), findsNothing); // closed on select
+    });
+
+    testWidgets('every overlay trigger opens without Material-ancestor '
+        'errors', (tester) async {
+      // Overlay/route content (side panels, tearsheets, modals, popovers)
+      // does NOT inherit the page's Material ancestor — Material widgets
+      // placed inside them throw. Route-level smoke can't catch that;
+      // every trigger must actually be pressed.
+      for (final route in [
+        AppRoutes.sidePanel,
+        AppRoutes.tearsheet,
+        AppRoutes.modal,
+        AppRoutes.popover,
+      ]) {
+        await openRoute(tester, route);
+        final triggerCount = tester
+            .widgetList(find.byWidgetPredicate((w) => w is ButtonStyleButton))
+            .length;
+
+        for (var i = 0; i < triggerCount; i++) {
+          await openRoute(tester, route); // fresh app per trigger
+          final triggers = find.byWidgetPredicate(
+            (w) => w is ButtonStyleButton,
+          );
+          await tester.scrollUntilVisible(
+            triggers.at(i),
+            300,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.pump();
+          await tester.tap(triggers.at(i), warnIfMissed: false);
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 600));
+          expect(
+            tester.takeException(),
+            isNull,
+            reason: '$route trigger #$i',
+          );
+        }
+      }
+    });
+
+    testWidgets('time picker accepts masked input', (tester) async {
+      await openRoute(tester, AppRoutes.dateTimePicker);
+
+      await tester.scrollUntilVisible(
+        find.text('Select a time'),
+        400,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
+
+      final input = find
+          .descendant(
+            of: find.byType(CarbonTimePicker),
+            matching: find.byType(EditableText),
+          )
+          .first;
+      await tester.enterText(input, '4:5x9');
+      await tester.pump();
+      expect(tester.widget<EditableText>(input).controller.text, '4:59');
+      expect(tester.takeException(), isNull);
+    });
+  });
 }

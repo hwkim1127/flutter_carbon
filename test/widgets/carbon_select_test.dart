@@ -2,6 +2,8 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:flutter_carbon/src/widgets/carbon_menu.dart'
+    show CarbonMenuPanel;
 
 import '../shared/build.dart';
 
@@ -243,6 +245,44 @@ void main() {
 
       expect(find.byIcon(CarbonIcons.warningAltFilled), findsOneWidget);
       expect(find.text('Careful'), findsOneWidget);
+    });
+
+    testWidgets('narrow select menus grow so the selected label is not '
+        'squeezed out by the checkmark', (tester) async {
+      // Regression (AM/PM-style compact selects): the width-matched menu
+      // was tightened to the tiny field width, and the selected row's
+      // label + gap + checkmark lost the space fight — only the checkmark
+      // rendered. The match is now a minimum, growing for content.
+      await tester.pumpWidget(
+        buildTestApp(
+          child: const CarbonSelect<String>(
+            labelText: 'Period',
+            hideLabel: true,
+            width: 60,
+            items: [
+              CarbonSelectItem(value: 'am', label: 'Morning'),
+              CarbonSelectItem(value: 'pm', label: 'Evening'),
+            ],
+            value: 'am',
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Morning'));
+      await tester.pumpAndSettle();
+
+      // The menu grew beyond the 60px field...
+      expect(
+        tester.getSize(find.byType(CarbonMenuPanel<String>)).width,
+        greaterThan(60),
+      );
+      // ...and the selected row renders its full label (Ahem: 7 glyphs at
+      // 14px ≈ 98) alongside the checkmark.
+      expect(
+        tester.getSize(find.text('Morning').last).width,
+        greaterThan(90),
+      );
+      expect(find.byIcon(CarbonIcons.checkmark), findsOneWidget);
     });
 
     testWidgets('disposing while open removes the menu cleanly', (

@@ -185,7 +185,7 @@ final List<ComponentCategory> componentCategories = [
       ComponentItem(
         title: 'Date & Time Picker',
         route: AppRoutes.dateTimePicker,
-        description: 'Material pickers with Carbon theming',
+        description: 'CarbonDatePicker & CarbonTimePicker — native calendar',
       ),
       ComponentItem(
         title: 'Toggle',

@@ -84,6 +84,21 @@ New native widgets (previously themed-Material or missing):
   chevron align start/end, flush rules, disabled items, controlled
   (`open`/`onHeadingClick`) and uncontrolled sections, the Carbon 110ms
   height-and-fade motion, and the spec's responsive content padding.
+* **`CarbonDatePicker`** — native date picker in three variants: simple
+  (masked `m/d/Y` input), single (input + calendar popup), and range (two
+  inputs sharing one calendar with in-range highlighting). Fully
+  keyboard-navigable calendar (arrows cross month boundaries,
+  PageUp/PageDown ±month, Shift+PageUp/PageDown ±year, Home/End, Enter,
+  Escape), spec month/year header with an editable year input and hover
+  spinners, today dot, min/max bounds (selection hard-capped to years
+  1–9999), typed input with `formatDate`/`parseDate` escape hatches, and
+  localizable strings via **`CarbonDatePickerLabels`**. Zero dependencies —
+  no `intl`.
+* **`CarbonTimePicker`** + **`CarbonTimePickerSelect`** — the Carbon time
+  picker: a masked `hh:mm` text input (spec widths, invalid/warn states,
+  consumer-driven validation with the `time12h` convenience pattern) plus
+  compact label-less companion selects (AM/PM, timezone) composed in a
+  row — not a clock dial, per spec.
 * **`CarbonMenuItem<T>` / `CarbonMenuItemDivider`** — native menu model per
   the Carbon Menu spec: per-item `onTap` plus typed values, danger kind
   (red on hover/focus only, per spec), disabled items, icons, shortcut
@@ -136,6 +151,14 @@ Keyboard and focus:
   out of the "Material Theming" category (Slider gets its own demo under
   Forms); "Material Theming" now demos Tooltip and the Checkbox/Radio/Switch
   selection controls only.
+* Example app: the Date & Time Picker demo is fully native
+  (`CarbonDatePicker`/`CarbonTimePicker`) — `showDatePicker`,
+  `showDateRangePicker`, and `showTimePicker` remain available to bridge
+  users (their Material themes stay in `carbonTheme()`).
+* Example app: side-panel and tearsheet demo content uses Carbon inputs
+  and buttons — the Material `TextField`s/`IconButton`s previously passed
+  as overlay content threw "No Material widget found" once those overlays
+  stopped providing a Material ancestor in 2.0.
 
 ### Bug Fixes
 
@@ -144,6 +167,17 @@ Keyboard and focus:
   loading scrims now render per spec across all four themes.
 * Menu/panel shadows no longer double-apply alpha (the `$shadow` token
   already encodes it).
+* Select and combo-button menus grow beyond a narrow trigger when their
+  content needs it (previously the width match was exact, and a compact
+  select's selected row — label + checkmark — could squeeze the label out
+  entirely, leaving only the checkmark).
+* Content switcher: small-size labels no longer clip vertically (a fixed
+  vertical padding exceeded the 32px height); labels use `body-compact-01`
+  at every size per spec (small previously rendered 12px).
+* Side panel: `actions` render as a Carbon action set — stretched to equal
+  widths and flush with the panel edges (the modal/tearsheet footer
+  convention) instead of a right-aligned padded row. Pass `CarbonButton`s
+  with `CarbonButtonSize.xl`.
 * `carbonTheme()`: the chip theme no longer makes standard Material `Chip`s
   fail a layout assertion in debug builds (the Carbon-tag-like compact
   sizing used negative vertical label padding; prefer `CarbonTag` for

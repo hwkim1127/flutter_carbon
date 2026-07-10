@@ -107,10 +107,16 @@ class _CarbonComboButtonState<T> extends State<CarbonComboButton<T>> {
         alignment: CarbonPopoverAlignment.bottomEnd,
         spacing: 0,
         matchAnchorWidth: true,
+        // Opt into growth beyond narrow buttons (the panel sizes
+        // intrinsically) so long item labels are not squeezed out.
+        maxWidth: 288,
         onDismiss: _closeMenu,
         contentBuilder: (context, _) => CarbonOverlaySurface(
           child: CarbonMenuPanel<T>(
             entries: widget.menuItems,
+            // The anchor (button row) width is the real minimum; the menu
+            // spec's 160px floor would exceed narrow combo buttons.
+            minWidth: 0,
             onSelected: widget.onMenuItemSelected,
             onClose: _closeMenu,
           ),

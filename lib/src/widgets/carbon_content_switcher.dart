@@ -218,24 +218,39 @@ class _ContentSwitcherButtonState<T> extends State<_ContentSwitcherButton<T>> {
       child: CarbonPressable(
         onTap: widget.item.disabled ? null : widget.onTap,
         builder: (context, _) => Container(
-          padding: _getPadding(),
+          // Fill the switcher height (minus its 1px border) and center the
+          // content — a fixed vertical padding clipped the label at the
+          // small size (11+11 padding + 16px text exceeded 32px).
+          height: _buttonHeight(),
+          padding: widget.isIconOnly
+              ? EdgeInsets.zero
+              : const EdgeInsets.symmetric(horizontal: 16),
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.zero,
           ),
           child: widget.isIconOnly && widget.item.icon != null
-              ? IconTheme(
-                  data: IconThemeData(
-                    color: textColor,
-                    size: 16,
+              ? Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: (_buttonHeight() - 16) / 2,
                   ),
-                  child: widget.item.icon!,
+                  child: IconTheme(
+                    data: IconThemeData(
+                      color: textColor,
+                      size: 16,
+                    ),
+                    child: widget.item.icon!,
+                  ),
                 )
               : Text(
                   widget.item.label ?? '',
+                  // body-compact-01 at every size, per spec.
                   style: TextStyle(
                     color: textColor,
-                    fontSize: _getFontSize(),
+                    fontSize: 14,
+                    height: 18 / 14,
+                    letterSpacing: 0.16,
                     fontWeight: FontWeight.w400,
                   ),
                   textAlign: TextAlign.center,
@@ -247,28 +262,14 @@ class _ContentSwitcherButtonState<T> extends State<_ContentSwitcherButton<T>> {
     );
   }
 
-  EdgeInsets _getPadding() {
-    if (widget.isIconOnly) {
-      switch (widget.size) {
-        case CarbonContentSwitcherSize.small:
-          return const EdgeInsets.all(7);
-        case CarbonContentSwitcherSize.medium:
-          return const EdgeInsets.all(11);
-        case CarbonContentSwitcherSize.large:
-          return const EdgeInsets.all(15);
-      }
-    } else {
-      return const EdgeInsets.symmetric(horizontal: 16, vertical: 11);
-    }
-  }
-
-  double _getFontSize() {
+  double _buttonHeight() {
     switch (widget.size) {
       case CarbonContentSwitcherSize.small:
-        return 12;
+        return 30; // 32 minus the container's 1px borders
       case CarbonContentSwitcherSize.medium:
+        return 38;
       case CarbonContentSwitcherSize.large:
-        return 14;
+        return 46;
     }
   }
 }

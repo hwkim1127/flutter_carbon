@@ -12,6 +12,7 @@ export 'src/theme/carbon_theme_data.dart';
 export 'src/widgets/carbon_accordion.dart';
 export 'src/widgets/carbon_button.dart';
 export 'src/widgets/carbon_checkbox.dart';
+export 'src/widgets/carbon_date_picker.dart';
 export 'src/widgets/carbon_menu.dart'
     show
         CarbonMenuEntry,
@@ -25,6 +26,7 @@ export 'src/widgets/carbon_select.dart';
 export 'src/widgets/carbon_slider.dart';
 export 'src/widgets/carbon_syntax.dart';
 export 'src/widgets/carbon_text_input.dart';
+export 'src/widgets/carbon_time_picker.dart';
 export 'src/widgets/carbon_tooltip.dart';
 export 'src/text/carbon_text_selection_labels.dart';
 export 'src/widgets/carbon_skeleton.dart';

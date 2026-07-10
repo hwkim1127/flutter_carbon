@@ -93,7 +93,9 @@ class CarbonSidePanel extends StatelessWidget {
   /// Whether to show the close button in the header.
   final bool showCloseButton;
 
-  /// Action buttons (typically Cancel and Submit).
+  /// Action buttons (typically Cancel and Submit), rendered as a Carbon
+  /// action set: stretched to equal widths, flush with the panel edges and
+  /// each other. Pass `CarbonButton`s with `CarbonButtonSize.xl`.
   final List<Widget>? actions;
 
   /// Panel content.
@@ -242,18 +244,14 @@ class CarbonSidePanel extends StatelessWidget {
     );
   }
 
+  /// Carbon action set: the buttons fill the footer width in equal parts,
+  /// flush with the panel edges and each other (the modal/tearsheet footer
+  /// convention). Pass `CarbonButton`s with `CarbonButtonSize.xl`.
   Widget _buildActions(CarbonSidePanelThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          for (int i = 0; i < actions!.length; i++) ...[
-            if (i > 0) const SizedBox(width: 8),
-            actions![i],
-          ],
-        ],
-      ),
+    return Row(
+      children: [
+        for (final action in actions!) Expanded(child: action),
+      ],
     );
   }
 }
