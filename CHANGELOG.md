@@ -1,50 +1,12 @@
-## Unreleased (2.0.0-dev.2)
+## 2.0.0 (Unreleased)
 
-Phase 2 of `doc/V2_ROADMAP.md` — native primitives.
-
-### New Features
-
-* **`CarbonTextInput`** / **`CarbonTextArea`** — Material-free text fields
-  built on `EditableText` with full Carbon spec styling (sizes xs/sm/md/lg,
-  invalid/warn states with icons, read-only, hidden label) and a complete
-  Carbon-styled selection experience: custom selection handles and a
-  Cut/Copy/Paste/Select-all context menu with overridable labels
-  (**`CarbonTextSelectionLabels`**). Works under pure `CarbonApp` and the
-  Material bridge. Deferred: password visibility toggle, character counter
-  UI (`maxLength` still enforces the limit), inline/fluid variants, skeleton.
-* **`CarbonCheckbox`**, **`CarbonRadio`**, **`CarbonTooltip`**,
-  **`CarbonSpinner`** — spec-accurate native replacements for the Material
-  controls previously used internally (wave 1).
-
-### Changes
-
-* Combo box, number input, toolbar search, and multi-select no longer import
-  Material — their text fields now use the native Carbon editable core.
-  Modal's input uses `CarbonTextInput`/`CarbonTextArea`; with `maxLength` the
-  Material character counter UI is no longer shown (the limit still applies).
-* Toolbar batch-action buttons and the search clear button are now native
-  pressables (keyboard-focusable, no ripple).
-* Loading spinner uses the `$interactive` token and Carbon's exact arc
-  geometry/rotation; pagination prev/next buttons show Carbon tooltips.
-* Dropdown-style menus (dropdown, combo box, multi-select) share one overlay
-  positioner with real-height flip decisions and keyboard avoidance;
-  multi-select's menu now floats and dismisses on outside tap.
-
-### Bug Fixes
-
-* Number input: the focus border now repaints when focus changes.
-* Toolbar search: the clear button appears while typing (was only updating on
-  incidental rebuilds).
-* Toggle: focusing no longer crashes in debug builds (negative-margin focus
-  ring), with a regression test.
-* Dropdown: menu hover highlight renders again.
-
-## 2.0.0-dev.1
-
-The theming rearchitecture (Phase 1 of `doc/V2_ROADMAP.md`): the theming core
-is now Material-free, and Material interop became an explicit bridge library.
-See `MIGRATION.md` ("1.x → 2.0.0") — for Material apps the migration is one
-import change plus one `builder:` line.
+The V2 rearchitecture (`doc/V2_ROADMAP.md`): `flutter_carbon` is now a
+self-contained implementation of Carbon Design System on the widgets layer —
+theming core, app shell, and **every widget** are Material-free (guard-test
+enforced). Material interop is an explicit bridge library
+(`package:flutter_carbon/material.dart`). See `MIGRATION.md`
+("1.x → 2.0.0") — for Material apps the migration is one import change plus
+one `builder:` line.
 
 ### Breaking Changes
 
@@ -60,8 +22,24 @@ import change plus one `builder:` line.
   `package:flutter_carbon/flutter_carbon.dart` to
   `package:flutter_carbon/material.dart` (which re-exports the core library —
   switching the import is enough).
+* `CarbonComboButton` is now generic `CarbonComboButton<T>`: `menuItems` is
+  `List<CarbonMenuEntry<T>>` (was Material's `List<PopupMenuEntry<dynamic>>`)
+  and `onMenuItemSelected` is `ValueChanged<T>` (was `void Function(dynamic)`).
+  Migration: `PopupMenuItem(value: 'x', child: Text('X'))` →
+  `CarbonMenuItem(value: 'x', label: 'X')`; `PopupMenuDivider()` →
+  `CarbonMenuItemDivider()`.
+* `CarbonFloatingMenu.heroTag` removed (it existed only for Material's
+  FloatingActionButton Hero animation; the trigger is native now).
+* `CarbonDataTable.sortable` removed, as scheduled when it was deprecated in
+  1.2.1 (no-op since then — a column sorts iff its header has
+  `sortable: true` and the table has a non-null `onSort`).
+* Behavioral: `CarbonUIShell` and `CarbonModal` no longer create
+  `Scaffold`/`Material` ancestors — Material widgets passed as content need
+  their own `Material`.
 
 ### New Features
+
+Theming and app shell:
 
 * **`CarbonApp`** — a pure-Carbon application shell on `WidgetsApp`: no
   `MaterialApp` needed. Provides Navigator/Overlay, localizations, Carbon
@@ -74,13 +52,110 @@ import change plus one `builder:` line.
   animation for runtime theme switches).
 * **`CarbonMaterialBridge`** / **`CarbonMaterialThemeExtension`** — the
   Material interop layer in `package:flutter_carbon/material.dart`.
-* The theming core (`lib/src/theme`, `foundation`, `base`, `app`) contains no
-  `material.dart`/`cupertino.dart` imports — enforced by a guard test.
 
-### Bug Fixes (token audit vs Carbon v11.96)
+New native widgets (previously themed-Material or missing):
 
-Theme token values were audited against the `@carbon/themes` v11.96 sources;
-corrected drift:
+* **`CarbonTextInput`** / **`CarbonTextArea`** — Material-free text fields
+  built on `EditableText` with full Carbon spec styling (sizes xs/sm/md/lg,
+  invalid/warn states with icons, read-only, hidden label) and a complete
+  Carbon-styled selection experience: custom selection handles and a
+  Cut/Copy/Paste/Select-all context menu with overridable labels
+  (**`CarbonTextSelectionLabels`**). Works under pure `CarbonApp` and the
+  Material bridge. Deferred: password visibility toggle, character counter
+  UI (`maxLength` still enforces the limit), inline/fluid variants, skeleton.
+* **`CarbonCheckbox`**, **`CarbonRadio`**, **`CarbonTooltip`**,
+  **`CarbonSpinner`** — spec-accurate native replacements for the Material
+  controls previously used internally.
+* **`CarbonSearch`** — native search input: sizes xs–lg, magnifier and
+  clear button per spec (hidden with layout retained while empty), Carbon
+  Escape semantics (clear when text, collapse when empty and expandable),
+  and the expandable square-button variant with the 70ms width animation.
+* **`CarbonSelect`** — the native-select form control: text-input-like
+  field with invalid/warn status icons and text, read-only, hidden label,
+  sizes xs–lg; opens a Carbon menu where the selected option is highlighted
+  with a checkmark and keyboard arrows continue from the selection.
+* **`CarbonSlider`** — native slider including the two-handle range mode
+  (`valueUpper`): drag and track-tap with nearest-handle picking (handles
+  cannot cross), keyboard per handle (arrows, Shift × `stepMultiplier`,
+  Home/End), embedded number input (out-of-range values clamp on commit),
+  RTL-aware, per-handle slider semantics, `onChanged`/`onRelease` reporting
+  `CarbonSliderChange{value, valueUpper}`.
+* **`CarbonAccordion`** — native accordion: sm/md/lg heading heights,
+  chevron align start/end, flush rules, disabled items, controlled
+  (`open`/`onHeadingClick`) and uncontrolled sections, the Carbon 110ms
+  height-and-fade motion, and the spec's responsive content padding.
+* **`CarbonMenuItem<T>` / `CarbonMenuItemDivider`** — native menu model per
+  the Carbon Menu spec: per-item `onTap` plus typed values, danger kind
+  (red on hover/focus only, per spec), disabled items, icons, shortcut
+  hints, and keyboard navigation (arrows/Home/End/Enter/Escape).
+* **Syntax highlighting for `CarbonCodeSnippet`** — new optional
+  `highlighter` parameter with a pluggable `CarbonSyntaxHighlighter`
+  interface, `CarbonSyntaxSpan`/`CarbonSyntaxKind` model, and a built-in
+  zero-dependency `CarbonDartHighlighter`. Colors come from the theme's
+  previously unused `carbon.syntax` tokens, so highlighting follows all
+  four themes and animated theme switches. Selection/copy are unaffected.
+
+Keyboard and focus:
+
+* Overlay keyboard/focus pass across the library: dropdown, overflow menu,
+  multi-select, combo-button, and select menus take focus on open
+  (arrows/Home/End/Enter drive the menu, Escape closes, previous focus
+  restored); popover and toggle tip close on Escape; dismissible modals
+  close on Escape.
+
+### Changes
+
+* `CarbonToolbarSearch` is now a thin wrapper over `CarbonSearch`: the focus
+  outline is the spec 2px (was 1px), the expanded magnifier uses
+  `$icon-secondary`, and clearing no longer collapses the field — collapse
+  happens on blur or Escape while empty (React parity).
+* Modal adopts the Carbon spec: 64px footer buttons filling the width in
+  halves and flush with the container, `secondary`-kind cancel, danger modal
+  uses the `danger` button kind (the non-spec red header band is gone),
+  240ms entrance motion, `$overlay` barrier token, `heading-03` titles,
+  left-aligned passive content.
+* Combo box, number input, toolbar search, and multi-select text fields use
+  the native Carbon editable core. Modal's input uses
+  `CarbonTextInput`/`CarbonTextArea`; with `maxLength` the Material
+  character counter UI is no longer shown (the limit still applies).
+* Code snippet selection uses the Carbon-native editable core (Carbon
+  context menu instead of Material's).
+* Combo button halves separate with the `$button-separator` token; the
+  chevron rotates 180° while open; the menu matches the container width.
+* Dropdown-style menus (dropdown, combo box, multi-select, select) share one
+  overlay positioner with real-height flip decisions and keyboard avoidance;
+  multi-select's menu now floats and dismisses on outside tap.
+* `CarbonButton` labels now ellipsize inside width-constrained buttons
+  instead of overflowing.
+* Toolbar batch-action buttons are native pressables (keyboard-focusable,
+  no ripple); floating menu trigger gains hover/pressed feedback.
+* Loading spinner uses the `$interactive` token and Carbon's exact arc
+  geometry/rotation; pagination prev/next buttons show Carbon tooltips.
+* `CarbonTooltip` gained an `enabled` flag (suppress without unmounting).
+* Example app: the Accordion, Search, and Select demos are native and moved
+  out of the "Material Theming" category (Slider gets its own demo under
+  Forms); "Material Theming" now demos Tooltip and the Checkbox/Radio/Switch
+  selection controls only.
+
+### Bug Fixes
+
+* **`CarbonPalette.overlay` corrected to the Carbon spec** `rgba(black, 0.6)`
+  (was a custom light gray at 32%): modal, side panel, tearsheet, and
+  loading scrims now render per spec across all four themes.
+* Menu/panel shadows no longer double-apply alpha (the `$shadow` token
+  already encodes it).
+* `carbonTheme()`: the chip theme no longer makes standard Material `Chip`s
+  fail a layout assertion in debug builds (the Carbon-tag-like compact
+  sizing used negative vertical label padding; prefer `CarbonTag` for
+  spec-accurate tags).
+* Number input: the focus border now repaints when focus changes.
+* Toolbar search: the clear button appears while typing (was only updating on
+  incidental rebuilds).
+* Toggle: focusing no longer crashes in debug builds (negative-margin focus
+  ring), with a regression test.
+* Dropdown: menu hover highlight renders again.
+
+Token audit vs Carbon v11.96 (`@carbon/themes` sources); corrected drift:
 
 * **Content switcher (white theme)**: adopted the 2025 redesign — container
   `gray-20`, selected `white`, hover `gray-20-hover` (was inverted).

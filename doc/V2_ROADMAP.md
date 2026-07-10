@@ -114,9 +114,9 @@ flutter_carbon_material (separate package or opt-in library file)
 
 ## Phases
 
-### Phase 1 — Theming rearchitecture (v2.0, breaking) — ✅ shipped in 2.0.0-dev.1
+### Phase 1 — Theming rearchitecture (v2.0, breaking) — ✅ shipped in 2.0.0
 
-Executed per `doc/implementation/` (steps 01–06):
+Executed per `doc/implementation/wave2/` (steps 01–06):
 
 1. ✅ `CarbonThemeData` (and all component theme data classes) dropped
    `ThemeExtension`; `CarbonTheme` inherited widget + `AnimatedCarbonTheme`;
@@ -127,17 +127,17 @@ Executed per `doc/implementation/` (steps 01–06):
    `CarbonMaterialThemeExtension`.
 4. ✅ Migration guide in `MIGRATION.md` ("1.x → 2.0.0").
 5. ✅ Bonus: theme token audit against Carbon v11.96 sources in `carbon/`
-   (see `doc/implementation/01-token-audit.md` findings).
+   (see `doc/implementation/wave2/01-token-audit.md` findings).
 
 **TODO: token codegen pipeline** — generate `lib/src/theme/themes/**` from the
 `carbon/packages/themes` TS sources (theme files + component tokens) so future
 Carbon releases sync mechanically instead of via one-off audits. Script specs
-in `doc/implementation/01-token-audit.md`; deferred past 2.0.
+in `doc/implementation/wave2/01-token-audit.md`; deferred past 2.0.
 
 ### Phase 2 — Native primitives (v2.x)
 
 In dependency order (1–3 ✅ shipped as wave 1, see
-`doc/implementation/07-native-primitives.md` — Material import count in
+`doc/implementation/wave2/07-native-primitives.md` — Material import count in
 `lib/src/widgets/` dropped 13 → 9):
 
 1. ✅ `CarbonSpinner` (unblocked `carbon_loading`, `carbon_file_uploader`).
@@ -148,21 +148,37 @@ In dependency order (1–3 ✅ shipped as wave 1, see
    `CarbonAnchoredOverlay`; `carbon_combo_button` still needs its menu API
    redesign.
 4. ✅ `CarbonTextInput` + `CarbonTextArea` on `EditableText` — **the risk
-   item**, shipped as wave 2 (`doc/implementation/08-carbon-text-input.md`)
+   item**, shipped as wave 2 (`doc/implementation/wave2/08-carbon-text-input.md`)
    with full selection UX (custom handles + Carbon context menu with
    localizable labels). All five dependents migrated in the same wave:
    `carbon_combo_box`, `carbon_number_input`, `carbon_toolbar`,
    `carbon_multi_select` are now Material-free; `carbon_modal` swapped its
    TextField (Scaffold/buttons remain). Material import count in
    `lib/src/widgets/`: 9 → 5.
-5. Replace `FloatingActionButton` and the remaining `Scaffold` usages.
+5. ✅ Wave 3 (`doc/implementation/wave3/`): combo button rebuilt on the new
+   `CarbonMenuItem<T>` model (breaking), modal restructured to the spec
+   footer, UI shell / floating menu / code snippet de-materialized.
+   **Material import count in `lib/src/widgets/`: 0** — the bridge is the
+   only Material left in the package (guard-test enforced).
 
 ### Phase 3 — Retire the "Material Theming" category
 
-Native `CarbonAccordion`, `CarbonSearch`, `CarbonSelect`, `CarbonSlider`, then
-`CarbonDatePicker` / `CarbonTimePicker` last (largest scope: calendar grid,
-range selection, keyboard navigation, localization). The example app's
-"Material Theming" section moves to the bridge package's docs.
+1. ✅ Wave 1 (`doc/implementation/wave4/`): native **`CarbonSearch`**
+   (incl. the expandable variant; `CarbonToolbarSearch` is now a thin
+   wrapper over it), **`CarbonSelect`** (separate widget with the Select
+   form states), **`CarbonSlider`** (incl. two-handle range mode), and
+   **`CarbonAccordion`**. The example app's Accordion/Search/Select demos
+   are native and left the "Material Theming" category; Slider got its own
+   demo under Forms. "Material Theming" now demos Tooltip and the
+   checkbox/radio/switch selection controls only.
+2. `CarbonDatePicker` / `CarbonTimePicker` last (largest scope: calendar
+   grid, range selection, keyboard navigation, localization) — retires the
+   date/time picker demo and, with it, the last Material-themed demos.
+
+✅ **Code snippet syntax highlighting** (shipped alongside wave 3) — the
+41 `carbon.syntax` tokens now drive an optional pluggable highlighter with
+a built-in zero-dependency Dart tokenizer; see
+`doc/proposals/syntax-highlighting.md`.
 
 ---
 
@@ -194,6 +210,6 @@ range selection, keyboard navigation, localization). The example app's
 
 | Phase | Version | Breaking? | Headline |
 | --- | --- | --- | --- |
-| 1 | ✅ 2.0.0-dev.1 | Yes | `CarbonTheme` + `CarbonApp`; Material becomes an explicit bridge |
-| 2 | 2.1–2.x | No | Native checkbox/radio/spinner/tooltip/text input |
-| 3 | 2.x | No | Native accordion/search/select/slider/date picker; `import material.dart` count in `lib/` reaches 0 |
+| 1 | ✅ 2.0.0 | Yes | `CarbonTheme` + `CarbonApp`; Material becomes an explicit bridge |
+| 2 | ✅ 2.0.0 | Yes (combo button) | Native checkbox/radio/spinner/tooltip/text input/menu; `import material.dart` count in `lib/src/widgets/` reaches 0 |
+| 3 | ✅ wave 1 in 2.0.0; pickers 2.x | No | Native accordion/search/select/slider, then date/time pickers |

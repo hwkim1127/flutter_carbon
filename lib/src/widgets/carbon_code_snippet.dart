@@ -1,10 +1,9 @@
-// Material import retained for SelectableText (no widgets-layer equivalent
-// until the V2 text primitives land).
-import 'package:flutter/material.dart' show SelectableText;
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 import '../base/carbon_pressable.dart';
+import '../text/carbon_editable_core.dart';
+import 'carbon_syntax.dart';
 import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
@@ -52,6 +51,11 @@ class CarbonCodeSnippet extends StatefulWidget {
   /// Whether to use monospace font.
   final bool useMonospace;
 
+  /// Optional syntax highlighter (e.g. [CarbonDartHighlighter]). When null
+  /// the code renders in the single `codeText` color. Colors come from the
+  /// theme's `carbon.syntax` tokens.
+  final CarbonSyntaxHighlighter? highlighter;
+
   const CarbonCodeSnippet({
     super.key,
     required this.code,
@@ -60,6 +64,7 @@ class CarbonCodeSnippet extends StatefulWidget {
     this.feedbackMessage = 'Copied!',
     this.maxCollapsedLines = 10,
     this.useMonospace = true,
+    this.highlighter,
   });
 
   @override
@@ -70,10 +75,63 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
   bool _isExpanded = false;
   bool _showFeedback = false;
 
+  /// Backs the read-only editable in the multi-line variant. Text is
+  /// assigned only from state changes (never in build).
+  late final _HighlightingController _codeController = _HighlightingController(
+    text: _displayedLines,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshHighlight();
+  }
+
+  /// Recomputes highlight spans for the controller's current text. Called
+  /// wherever the text or highlighter changes — never in build.
+  void _refreshHighlight() {
+    final highlighter = widget.highlighter;
+    _codeController
+      ..highlightSpans =
+          highlighter?.highlight(_codeController.text) ?? const []
+      ..highlightEnabled = highlighter != null;
+  }
+
   int get _lineCount => widget.code.split('\n').length;
   bool get _canExpand =>
       widget.type == CarbonCodeSnippetType.multi &&
       _lineCount > widget.maxCollapsedLines;
+
+  String get _displayedLines => _canExpand && !_isExpanded
+      ? widget.code.split('\n').take(widget.maxCollapsedLines).join('\n')
+      : widget.code;
+
+  @override
+  void didUpdateWidget(CarbonCodeSnippet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.code != oldWidget.code ||
+        widget.maxCollapsedLines != oldWidget.maxCollapsedLines ||
+        widget.type != oldWidget.type) {
+      _codeController.text = _displayedLines;
+      _refreshHighlight();
+    } else if (widget.highlighter != oldWidget.highlighter) {
+      _refreshHighlight();
+    }
+  }
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
+  }
+
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      _codeController.text = _displayedLines;
+      _refreshHighlight();
+    });
+  }
 
   void _copyToClipboard() {
     Clipboard.setData(ClipboardData(text: widget.code));
@@ -96,6 +154,25 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
     }
   }
 
+  /// Plain or syntax-highlighted code text for the non-editable variants.
+  Widget _codeText(String code, TextStyle style, CarbonThemeData carbon) {
+    final highlighter = widget.highlighter;
+    if (highlighter == null) {
+      return Text(code, style: style);
+    }
+    return Text.rich(
+      TextSpan(
+        style: style,
+        children: carbonSyntaxTextSpans(
+          code: code,
+          spans: highlighter.highlight(code),
+          baseStyle: style,
+          syntax: carbon.syntax,
+        ),
+      ),
+    );
+  }
+
   Widget _buildInline(CarbonThemeData carbon) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -103,13 +180,14 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
         color: carbon.codeSnippet.background,
         border: Border.all(color: carbon.codeSnippet.border),
       ),
-      child: Text(
+      child: _codeText(
         widget.code,
-        style: TextStyle(
+        TextStyle(
           color: carbon.codeSnippet.codeText,
           fontFamily: widget.useMonospace ? 'monospace' : null,
           fontSize: 12,
         ),
+        carbon,
       ),
     );
   }
@@ -126,13 +204,14 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.all(16),
-              child: Text(
+              child: _codeText(
                 widget.code,
-                style: TextStyle(
+                TextStyle(
                   color: carbon.codeSnippet.codeText,
                   fontFamily: widget.useMonospace ? 'monospace' : null,
                   fontSize: 14,
                 ),
+                carbon,
               ),
             ),
           ),
@@ -143,10 +222,28 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
   }
 
   Widget _buildMulti(CarbonThemeData carbon) {
-    final lines = widget.code.split('\n');
-    final displayedLines = _canExpand && !_isExpanded
-        ? lines.take(widget.maxCollapsedLines).join('\n')
-        : widget.code;
+    final codeStyle = TextStyle(
+      color: carbon.codeSnippet.codeText,
+      fontFamily: widget.useMonospace ? 'monospace' : null,
+      fontSize: 14,
+      height: 1.5,
+    );
+
+    // A multiline EditableText needs bounded width inside the horizontal
+    // scroll view — measure the widest laid-out line. Match the render
+    // conditions (text scaler, accessibility bold), and pad by the caret
+    // margin RenderEditable reserves inside its width (cursor 1px + 1px
+    // gap) or the longest line wraps.
+    final measureStyle = MediaQuery.boldTextOf(context)
+        ? codeStyle.copyWith(fontWeight: FontWeight.bold)
+        : codeStyle;
+    final painter = TextPainter(
+      text: TextSpan(text: _codeController.text, style: measureStyle),
+      textDirection: TextDirection.ltr,
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    final textWidth = painter.width + 4;
+    painter.dispose();
 
     return Container(
       decoration: BoxDecoration(
@@ -163,13 +260,15 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.all(16),
-                  child: SelectableText(
-                    displayedLines,
-                    style: TextStyle(
-                      color: carbon.codeSnippet.codeText,
-                      fontFamily: widget.useMonospace ? 'monospace' : null,
-                      fontSize: 14,
-                      height: 1.5,
+                  child: SizedBox(
+                    width: textWidth,
+                    // Read-only selectable text with the Carbon-native
+                    // selection UX (context menu, handles).
+                    child: CarbonEditableCore(
+                      controller: _codeController,
+                      readOnly: true,
+                      maxLines: null,
+                      style: codeStyle,
                     ),
                   ),
                 ),
@@ -179,7 +278,7 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
           ),
           if (_canExpand)
             CarbonPressable(
-              onTap: () => setState(() => _isExpanded = !_isExpanded),
+              onTap: _toggleExpanded,
               builder: (context, _) => Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -282,11 +381,7 @@ class _CopyButtonState extends State<_CopyButton> {
                   ),
                 ),
               ),
-              child: Icon(
-                CarbonIcons.copy,
-                color: widget.iconColor,
-                size: 16,
-              ),
+              child: Icon(CarbonIcons.copy, color: widget.iconColor, size: 16),
             ),
           ),
         ),
@@ -314,6 +409,38 @@ class _CopyButtonState extends State<_CopyButton> {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Controller whose [buildTextSpan] paints cached highlight spans — the
+/// standard rich-code pattern for [EditableText]: the text itself is
+/// unchanged, so selection and copy keep working.
+class _HighlightingController extends TextEditingController {
+  _HighlightingController({super.text});
+
+  /// Spans matching the CURRENT [text]; owner updates both together.
+  List<CarbonSyntaxSpan> highlightSpans = const [];
+  bool highlightEnabled = false;
+
+  @override
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    TextStyle? style,
+    required bool withComposing,
+  }) {
+    // withComposing is irrelevant: the snippet's editable is read-only.
+    if (!highlightEnabled || highlightSpans.isEmpty) {
+      return TextSpan(style: style, text: text);
+    }
+    return TextSpan(
+      style: style,
+      children: carbonSyntaxTextSpans(
+        code: text,
+        spans: highlightSpans,
+        baseStyle: style,
+        syntax: context.carbon.syntax,
+      ),
     );
   }
 }

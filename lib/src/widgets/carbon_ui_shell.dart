@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_pressable.dart';
 import '../foundation/motion.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
@@ -179,47 +180,60 @@ class _CarbonUIShellState extends State<CarbonUIShell> {
       return true;
     }());
 
-    return Scaffold(
-      body: Column(
-        children: [
-          _Header(
-            appName: widget.appName,
-            appNamePrefix: widget.appNamePrefix,
-            navItems: widget.headerNavItems,
-            actions: widget.headerActions,
-            showMenuButton:
-                widget.collapseMode != CarbonSideNavCollapseMode.fixed,
-            onMenuButtonPressed: _toggleSideNav,
-            onNavItemTap: widget.onHeaderNavItemTap,
-            theme: carbon.uiShell,
+    // Keyboard-aware colored box replaces the previous Scaffold (which only
+    // provided a background and a Material ancestor). The inset padding is
+    // Scaffold's resizeToAvoidBottomInset equivalent; removeViewInsets keeps
+    // inner scrollables from double-handling it.
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    return ColoredBox(
+      color: carbon.layer.background,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: MediaQuery.removeViewInsets(
+          context: context,
+          removeBottom: true,
+          child: Column(
+            children: [
+              _Header(
+                appName: widget.appName,
+                appNamePrefix: widget.appNamePrefix,
+                navItems: widget.headerNavItems,
+                actions: widget.headerActions,
+                showMenuButton:
+                    widget.collapseMode != CarbonSideNavCollapseMode.fixed,
+                onMenuButtonPressed: _toggleSideNav,
+                onNavItemTap: widget.onHeaderNavItemTap,
+                theme: carbon.uiShell,
+              ),
+              Expanded(
+                child: Row(
+                  children: [
+                    if (widget.sideNavItems != null)
+                      _SideNav(
+                        items: widget.sideNavItems!,
+                        expanded: _sideNavExpanded,
+                        collapseMode: widget.collapseMode,
+                        expandedMenuIndex: _expandedSideNavMenuIndex,
+                        onExpandedMenuChanged: (index) {
+                          setState(() => _expandedSideNavMenuIndex = index);
+                        },
+                        theme: carbon.uiShell,
+                        onItemTap: widget.onSideNavItemTap,
+                      ),
+                    Expanded(child: widget.child),
+                    if (widget.rightPanel != null &&
+                        (widget.rightPanelOpen ?? _rightPanelOpen))
+                      _RightPanel(
+                        onClose: _toggleRightPanel,
+                        theme: carbon.uiShell,
+                        child: widget.rightPanel!,
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: Row(
-              children: [
-                if (widget.sideNavItems != null)
-                  _SideNav(
-                    items: widget.sideNavItems!,
-                    expanded: _sideNavExpanded,
-                    collapseMode: widget.collapseMode,
-                    expandedMenuIndex: _expandedSideNavMenuIndex,
-                    onExpandedMenuChanged: (index) {
-                      setState(() => _expandedSideNavMenuIndex = index);
-                    },
-                    theme: carbon.uiShell,
-                    onItemTap: widget.onSideNavItemTap,
-                  ),
-                Expanded(child: widget.child),
-                if (widget.rightPanel != null &&
-                    (widget.rightPanelOpen ?? _rightPanelOpen))
-                  _RightPanel(
-                    onClose: _toggleRightPanel,
-                    theme: carbon.uiShell,
-                    child: widget.rightPanel!,
-                  ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -321,13 +335,22 @@ class _MenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 48,
-      height: 48,
-      child: IconButton(
-        onPressed: onPressed,
-        icon: Icon(CarbonIcons.menu, color: icon, size: 20),
-        padding: EdgeInsets.zero,
+    final carbon = context.carbon;
+
+    return Semantics(
+      button: true,
+      label: 'Menu',
+      child: CarbonPressable(
+        onTap: onPressed,
+        focusable: true,
+        builder: (context, state) => Container(
+          width: 48,
+          height: 48,
+          color: state.hovered
+              ? carbon.uiShell.headerNavItemBackgroundHover
+              : null,
+          child: Icon(CarbonIcons.menu, color: icon, size: 20),
+        ),
       ),
     );
   }
@@ -356,8 +379,8 @@ class _HeaderNavItemState extends State<_HeaderNavItem> {
     final backgroundColor = widget.item.isSelected
         ? widget.theme.headerNavItemBackgroundSelected
         : _isHovered
-            ? widget.theme.headerNavItemBackgroundHover
-            : widget.theme.headerNavItemBackground;
+        ? widget.theme.headerNavItemBackgroundHover
+        : widget.theme.headerNavItemBackground;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -444,7 +467,8 @@ class _SideNav extends StatelessWidget {
                   return _SideNavMenu(
                     item: item,
                     expanded: expandedMenuIndex == index,
-                    showLabel: expanded ||
+                    showLabel:
+                        expanded ||
                         collapseMode == CarbonSideNavCollapseMode.fixed,
                     onToggle: () {
                       onExpandedMenuChanged(
@@ -457,7 +481,8 @@ class _SideNav extends StatelessWidget {
                 }
                 return _SideNavItem(
                   item: item,
-                  showLabel: expanded ||
+                  showLabel:
+                      expanded ||
                       collapseMode == CarbonSideNavCollapseMode.fixed,
                   onTap: () {
                     item.onTap?.call();
@@ -499,8 +524,8 @@ class _SideNavItemState extends State<_SideNavItem> {
     final backgroundColor = widget.item.isSelected
         ? widget.theme.sideNavItemBackgroundHover
         : _isHovered
-            ? widget.theme.sideNavItemBackgroundHover
-            : widget.theme.sideNavItemBackground;
+        ? widget.theme.sideNavItemBackgroundHover
+        : widget.theme.sideNavItemBackground;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),

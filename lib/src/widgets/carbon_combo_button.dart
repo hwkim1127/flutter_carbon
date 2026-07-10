@@ -1,33 +1,39 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_anchored_overlay.dart';
+import '../base/carbon_overlay_surface.dart';
+import '../foundation/motion.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
+import 'carbon_button.dart';
+import 'carbon_menu.dart';
+import 'carbon_tooltip.dart';
 
 /// A Carbon Design System combo button (split button).
 ///
-/// Combines a primary action button with a dropdown menu for additional actions.
-/// The primary button executes the main action immediately, while the chevron
-/// button opens a menu with secondary actions.
+/// Combines a primary action button with a dropdown menu for additional
+/// actions. The primary button executes the main action immediately; the
+/// chevron button opens a Carbon menu with secondary actions.
 ///
 /// Example:
 /// ```dart
-/// CarbonComboButton(
+/// CarbonComboButton<String>(
 ///   label: 'Save',
 ///   onPressed: () => print('Save clicked'),
-///   menuItems: [
-///     PopupMenuItem(value: 'save-as', child: Text('Save as...')),
-///     PopupMenuItem(value: 'save-copy', child: Text('Save a copy')),
+///   menuItems: const [
+///     CarbonMenuItem(value: 'save-as', label: 'Save as...'),
+///     CarbonMenuItem(value: 'save-copy', label: 'Save a copy'),
 ///   ],
 ///   onMenuItemSelected: (value) => print('Selected: $value'),
 /// )
 /// ```
-class CarbonComboButton extends StatelessWidget {
+class CarbonComboButton<T> extends StatefulWidget {
   /// Creates a Carbon combo button.
   const CarbonComboButton({
     super.key,
     required this.label,
     this.onPressed,
-    required this.menuItems,
+    this.menuItems = const [],
     this.onMenuItemSelected,
     this.size = CarbonComboButtonSize.large,
     this.disabled = false,
@@ -40,11 +46,12 @@ class CarbonComboButton extends StatelessWidget {
   /// Callback when the primary button is pressed.
   final VoidCallback? onPressed;
 
-  /// List of menu items for the dropdown.
-  final List<PopupMenuEntry<dynamic>> menuItems;
+  /// The dropdown menu content.
+  final List<CarbonMenuEntry<T>> menuItems;
 
-  /// Callback when a menu item is selected.
-  final void Function(dynamic value)? onMenuItemSelected;
+  /// Called with an activated item's [CarbonMenuItem.value] when non-null.
+  /// Per-item [CarbonMenuItem.onTap] callbacks fire first.
+  final ValueChanged<T>? onMenuItemSelected;
 
   /// Size of the combo button.
   final CarbonComboButtonSize size;
@@ -56,103 +63,144 @@ class CarbonComboButton extends StatelessWidget {
   final String tooltipContent;
 
   @override
+  State<CarbonComboButton<T>> createState() => _CarbonComboButtonState<T>();
+}
+
+class _CarbonComboButtonState<T> extends State<CarbonComboButton<T>> {
+  /// Anchors the menu to the FULL container (primary + separator + trigger),
+  /// so `matchAnchorWidth` makes the menu exactly container-width (spec).
+  final GlobalKey _containerKey = GlobalKey();
+
+  OverlayEntry? _overlayEntry;
+  bool _menuOpen = false;
+
+  CarbonButtonSize get _buttonSize {
+    switch (widget.size) {
+      case CarbonComboButtonSize.small:
+        return CarbonButtonSize.sm;
+      case CarbonComboButtonSize.medium:
+        return CarbonButtonSize.md;
+      case CarbonComboButtonSize.large:
+        return CarbonButtonSize.lg;
+    }
+  }
+
+  void _toggleMenu() {
+    if (_menuOpen) {
+      _closeMenu();
+    } else {
+      _openMenu();
+    }
+  }
+
+  void _openMenu() {
+    if (_menuOpen) return;
+
+    final overlayState = Overlay.of(context);
+    final anchorRect = CarbonAnchoredOverlay.anchorRectGetterFor(
+      _containerKey.currentContext!,
+    );
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => CarbonAnchoredOverlay(
+        anchorRect: anchorRect,
+        alignment: CarbonPopoverAlignment.bottomEnd,
+        spacing: 0,
+        matchAnchorWidth: true,
+        onDismiss: _closeMenu,
+        contentBuilder: (context, _) => CarbonOverlaySurface(
+          child: CarbonMenuPanel<T>(
+            entries: widget.menuItems,
+            onSelected: widget.onMenuItemSelected,
+            onClose: _closeMenu,
+          ),
+        ),
+      ),
+    );
+
+    overlayState.insert(_overlayEntry!);
+    setState(() => _menuOpen = true);
+  }
+
+  void _closeMenu() {
+    if (!_menuOpen) return;
+
+    if (mounted) {
+      setState(() => _menuOpen = false);
+    }
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  @override
+  void didUpdateWidget(CarbonComboButton<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.disabled && _menuOpen) {
+      _closeMenu();
+    }
+  }
+
+  @override
+  void dispose() {
+    // Remove directly — _closeMenu() calls setState, not allowed in dispose.
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final carbon = context.carbon;
 
-    final height = size.height;
-    final fontSize = size.fontSize;
+    final trigger = CarbonButton(
+      onPressed: widget.disabled ? null : _toggleMenu,
+      kind: CarbonButtonKind.primary,
+      size: _buttonSize,
+      icon: AnimatedRotation(
+        turns: _menuOpen ? 0.5 : 0.0,
+        duration: CarbonMotion.fast02,
+        curve: CarbonMotion.standardProductive,
+        child: const Icon(CarbonIcons.chevronDown),
+      ),
+    );
 
     return Row(
+      key: _containerKey,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Primary action button
-        SizedBox(
-          height: height,
-          child: FilledButton(
-            onPressed: disabled ? null : onPressed,
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.disabled)) {
-                  return carbon.button.buttonDisabled;
-                }
-                if (states.contains(WidgetState.hovered)) {
-                  return carbon.button.buttonPrimaryHover;
-                }
-                if (states.contains(WidgetState.pressed)) {
-                  return carbon.button.buttonPrimaryActive;
-                }
-                return carbon.button.buttonPrimary;
-              }),
-              foregroundColor: WidgetStateProperty.all(carbon.text.textOnColor),
-              padding: WidgetStateProperty.all(
-                EdgeInsets.symmetric(horizontal: size.horizontalPadding),
-              ),
-              shape: WidgetStateProperty.all(
-                const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-              textStyle: WidgetStateProperty.all(
-                TextStyle(fontSize: fontSize, fontWeight: FontWeight.w400),
-              ),
-              // Remove right border radius to connect with icon button
-              side: WidgetStateProperty.all(BorderSide.none),
+        // Primary action (spec: nowrap ellipsis, max width 239).
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 239),
+          child: CarbonButton(
+            onPressed: widget.disabled ? null : widget.onPressed,
+            kind: CarbonButtonKind.primary,
+            size: _buttonSize,
+            child: Text(
+              widget.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            child: Text(label),
           ),
         ),
 
-        // Divider between buttons
-        Container(
+        // 1px separator between the halves.
+        SizedBox(
           width: 1,
-          height: height,
-          color: disabled
-              ? carbon.layer.borderDisabled
-              : carbon.button.buttonPrimaryHover,
+          height: widget.size.height,
+          child: ColoredBox(
+            color: widget.disabled
+                ? carbon.layer.borderDisabled
+                : carbon.button.buttonSeparator,
+          ),
         ),
 
-        // Menu trigger button
-        SizedBox(
-          width: height,
-          height: height,
-          child: PopupMenuButton<dynamic>(
-            enabled: !disabled,
-            itemBuilder: (context) => menuItems,
-            onSelected: onMenuItemSelected,
-            tooltip: tooltipContent,
-            offset: Offset(0, height),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-            color: carbon.layer.layer02,
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.disabled)) {
-                  return carbon.button.buttonDisabled;
-                }
-                if (states.contains(WidgetState.hovered)) {
-                  return carbon.button.buttonPrimaryHover;
-                }
-                if (states.contains(WidgetState.pressed)) {
-                  return carbon.button.buttonPrimaryActive;
-                }
-                return carbon.button.buttonPrimary;
-              }),
-              foregroundColor: WidgetStateProperty.all(carbon.text.textOnColor),
-              padding: WidgetStateProperty.all(EdgeInsets.zero),
-              shape: WidgetStateProperty.all(
-                const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-            ),
-            icon: Icon(
-              CarbonIcons.chevronDown,
-              size: 16,
-              color:
-                  disabled ? carbon.text.textDisabled : carbon.text.textOnColor,
-            ),
-          ),
+        // Menu trigger. The tooltip stays mounted (a conditional wrapper
+        // would recreate the trigger subtree and kill the chevron rotation
+        // animation) but is suppressed while the menu is open.
+        CarbonTooltip(
+          message: widget.tooltipContent,
+          enabled: !_menuOpen,
+          child: trigger,
         ),
       ],
     );
@@ -171,7 +219,10 @@ enum CarbonComboButtonSize {
   large(48, 16, 16);
 
   const CarbonComboButtonSize(
-      this.height, this.fontSize, this.horizontalPadding);
+    this.height,
+    this.fontSize,
+    this.horizontalPadding,
+  );
 
   /// Height in pixels.
   final double height;

@@ -1,4 +1,5 @@
 import 'package:flutter/gestures.dart' show kPrimaryButton, kTouchSlop;
+import 'package:flutter/services.dart' show KeyDownEvent, LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
 import '../base/carbon_anchored_overlay.dart';
@@ -79,6 +80,22 @@ class _CarbonPopoverState extends State<CarbonPopover> {
   OverlayEntry? _overlayEntry;
   bool _isOpen = false;
 
+  /// Carries the Escape-to-close handler for the trigger side.
+  final FocusNode _escapeNode = FocusNode(
+    debugLabel: 'CarbonPopover',
+    skipTraversal: true,
+  );
+
+  KeyEventResult _handleEscape(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.escape &&
+        _isOpen) {
+      _hidePopover();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -99,6 +116,7 @@ class _CarbonPopoverState extends State<CarbonPopover> {
       _overlayEntry = null;
       widget.onClose?.call();
     }
+    _escapeNode.dispose();
     super.dispose();
   }
 
@@ -115,6 +133,12 @@ class _CarbonPopoverState extends State<CarbonPopover> {
 
     _overlayEntry = _createOverlayEntry();
     Overlay.of(context).insert(_overlayEntry!);
+    // Make Escape work for mouse users: focus the wrapper unless something
+    // inside the trigger (e.g. a focused button) already holds focus —
+    // `hasFocus` covers descendants.
+    if (!_escapeNode.hasFocus) {
+      _escapeNode.requestFocus();
+    }
     setState(() => _isOpen = true);
     widget.onOpen?.call();
   }
@@ -137,13 +161,20 @@ class _CarbonPopoverState extends State<CarbonPopover> {
         alignment: widget.alignment,
         maxWidth: widget.maxWidth ?? 368,
         onDismiss: _hidePopover,
-        contentBuilder: (context, effectiveAlignment) => _PopoverContent(
-          content: widget.content,
-          alignment: effectiveAlignment,
-          caret: widget.caret,
-          dropShadow: widget.dropShadow,
-          border: widget.border,
-          highContrast: widget.highContrast,
+        // Escape also closes when focus moved INTO the popover's
+        // interactive content.
+        contentBuilder: (context, effectiveAlignment) => Focus(
+          canRequestFocus: false,
+          skipTraversal: true,
+          onKeyEvent: _handleEscape,
+          child: _PopoverContent(
+            content: widget.content,
+            alignment: effectiveAlignment,
+            caret: widget.caret,
+            dropShadow: widget.dropShadow,
+            border: widget.border,
+            highContrast: widget.highContrast,
+          ),
         ),
       ),
     );
@@ -159,28 +190,32 @@ class _CarbonPopoverState extends State<CarbonPopover> {
     // recognizer entirely. A primary-button down/up pair within touch slop
     // counts as a tap on the trigger — drags (scrolls) move past slop and
     // are ignored, and no recognizer state is involved.
-    return Listener(
-      behavior: HitTestBehavior.opaque,
-      onPointerDown: (event) {
-        if (event.buttons & kPrimaryButton == 0) return;
-        _pointerDownId = event.pointer;
-        _pointerDownPosition = event.position;
-      },
-      onPointerUp: (event) {
-        if (event.pointer != _pointerDownId) return;
-        final down = _pointerDownPosition;
-        _pointerDownId = null;
-        _pointerDownPosition = null;
-        if (down != null && (event.position - down).distance <= kTouchSlop) {
-          _togglePopover();
-        }
-      },
-      onPointerCancel: (event) {
-        if (event.pointer != _pointerDownId) return;
-        _pointerDownId = null;
-        _pointerDownPosition = null;
-      },
-      child: widget.child,
+    return Focus(
+      focusNode: _escapeNode,
+      onKeyEvent: _handleEscape,
+      child: Listener(
+        behavior: HitTestBehavior.opaque,
+        onPointerDown: (event) {
+          if (event.buttons & kPrimaryButton == 0) return;
+          _pointerDownId = event.pointer;
+          _pointerDownPosition = event.position;
+        },
+        onPointerUp: (event) {
+          if (event.pointer != _pointerDownId) return;
+          final down = _pointerDownPosition;
+          _pointerDownId = null;
+          _pointerDownPosition = null;
+          if (down != null && (event.position - down).distance <= kTouchSlop) {
+            _togglePopover();
+          }
+        },
+        onPointerCancel: (event) {
+          if (event.pointer != _pointerDownId) return;
+          _pointerDownId = null;
+          _pointerDownPosition = null;
+        },
+        child: widget.child,
+      ),
     );
   }
 }

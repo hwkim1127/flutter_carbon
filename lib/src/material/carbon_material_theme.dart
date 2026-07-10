@@ -532,7 +532,11 @@ ThemeData carbonTheme({
       disabledColor: carbon.layer.layerSelectedDisabled,
       selectedColor: carbon.layer.layerSelected01,
       secondarySelectedColor: carbon.layer.layerSelected01,
-      labelPadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: -4.0),
+      // Compact Carbon-tag-like sizing WITHOUT negative vertical padding:
+      // negative values fail Chip's `contentSize >= rawLabelSize.height`
+      // layout assertion in debug builds (prefer CarbonTag for real tags).
+      labelPadding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
       labelStyle: TextStyle(
         color: carbon.text.textPrimary,
         fontSize: 12,

@@ -155,16 +155,6 @@ class CarbonDataTable extends StatefulWidget {
   /// - [CarbonDataTableSize.compact]: 32px rows
   final CarbonDataTableSize size;
 
-  /// Deprecated. No-op since 1.2.1.
-  ///
-  /// Sort UI is now driven by the combination of `header.sortable: true`
-  /// (per-column opt-in) and a non-null [onSort] callback. To disable sort
-  /// UI on a table, pass `onSort: null` (or omit it). Will be removed in 2.0.0.
-  @Deprecated(
-    'No-op since 1.2.1. A column is sortable iff its header has sortable: true AND onSort is non-null. Will be removed in 2.0.0.',
-  )
-  final bool sortable;
-
   /// The key of the currently sorted column.
   ///
   /// Must match a [CarbonDataTableHeader] key. A column shows the sort
@@ -237,10 +227,6 @@ class CarbonDataTable extends StatefulWidget {
     this.onSelectAll,
     this.stickyHeader = false,
     this.size = CarbonDataTableSize.medium,
-    @Deprecated(
-      'No-op since 1.2.1. A column is sortable iff its header has sortable: true AND onSort is non-null. Will be removed in 2.0.0.',
-    )
-    this.sortable = false,
     this.sortKey,
     this.sortDirection = CarbonDataTableSortDirection.none,
     this.onSort,
@@ -796,9 +782,9 @@ class CarbonDataTableHeader {
 
   /// Whether this column is sortable. Defaults to `false` — columns opt in.
   ///
-  /// When `true` and the table has [CarbonDataTable.sortable] = true, the
+  /// When `true` and the table has a non-null [CarbonDataTable.onSort], the
   /// header shows the sort indicator and responds to clicks. When `false`,
-  /// no indicator is shown for this column even if the table is sortable.
+  /// no indicator is shown for this column.
   final bool sortable;
 
   /// Horizontal alignment of header content.

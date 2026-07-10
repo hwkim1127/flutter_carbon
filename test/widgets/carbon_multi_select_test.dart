@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_carbon/material.dart';
 
@@ -277,6 +278,56 @@ void main() {
         tester.getSize(find.byType(ListView)).width,
         closeTo(280, 2.5),
       );
+    });
+
+    testWidgets(
+        'filter is focused on open (even when another widget held focus) '
+        'and Escape closes the menu', (tester) async {
+      final neighborFocus = FocusNode();
+      addTearDown(neighborFocus.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          child: Column(
+            children: [
+              Focus(
+                focusNode: neighborFocus,
+                child: const SizedBox(width: 40, height: 40),
+              ),
+              CarbonMultiSelect<String>(
+                filterable: true,
+                values: const [],
+                items: const [
+                  CarbonMultiSelectItem(value: 'apple', child: Text('Apple')),
+                  CarbonMultiSelectItem(value: 'banana', child: Text('Banana')),
+                ],
+                onChanged: (_) {},
+                itemToString: (v) => v,
+              ),
+            ],
+          ),
+        ),
+      );
+
+      neighborFocus.requestFocus();
+      await tester.pump();
+
+      await tester.tap(find.byType(CarbonMultiSelect<String>));
+      await tester.pumpAndSettle();
+
+      // The filter field takes focus, so typing filters immediately.
+      final filter = tester.widget<EditableText>(find.byType(EditableText));
+      expect(filter.focusNode.hasFocus, isTrue);
+      await tester.enterText(find.byType(EditableText), 'ban');
+      await tester.pumpAndSettle();
+      expect(find.text('Banana'), findsOneWidget);
+      expect(find.text('Apple'), findsNothing);
+
+      // Escape closes and focus returns to the previous holder.
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Banana'), findsNothing);
+      expect(neighborFocus.hasPrimaryFocus, isTrue);
     });
 
     testWidgets('supports filterable mode', (tester) async {

@@ -299,6 +299,20 @@ class _CarbonEditableCoreState extends State<CarbonEditableCore>
     }
   }
 
+  /// Stable instance-method tear-off. An inline closure would change
+  /// identity every build, and `EditableText.didUpdateWidget` responds to a
+  /// changed `contextMenuBuilder` by disposing and recreating its entire
+  /// SelectionOverlay — overlay-entry churn that can crash mid-frame.
+  Widget _buildContextMenu(
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) {
+    return CarbonTextSelectionToolbar.editable(
+      editableTextState: editableTextState,
+      labels: widget.selectionLabels ?? CarbonTextSelectionLabels.en(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final carbon = context.carbon;
@@ -311,7 +325,6 @@ class _CarbonEditableCoreState extends State<CarbonEditableCore>
         widget.selectionColor ??
         selectionStyle.selectionColor ??
         carbon.button.buttonPrimary.withValues(alpha: 0.3);
-    final labels = widget.selectionLabels ?? CarbonTextSelectionLabels.en();
     final style =
         widget.style ??
         DefaultTextStyle.of(
@@ -335,12 +348,7 @@ class _CarbonEditableCoreState extends State<CarbonEditableCore>
       selectionControls: widget.enabled && selectionEnabled
           ? _selectionControls
           : null,
-      contextMenuBuilder: widget.enabled
-          ? (context, editableTextState) => CarbonTextSelectionToolbar.editable(
-              editableTextState: editableTextState,
-              labels: labels,
-            )
-          : null,
+      contextMenuBuilder: widget.enabled ? _buildContextMenu : null,
       onSelectionChanged: _handleSelectionChanged,
       onSelectionHandleTapped: _handleSelectionHandleTapped,
       readOnly: widget.readOnly || !widget.enabled,

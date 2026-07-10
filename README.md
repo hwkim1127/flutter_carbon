@@ -4,16 +4,16 @@
 
 # Flutter Carbon
 
-A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/), providing a complete theming solution with **37 custom Carbon components**, 4 theme variants, and automatic Carbon styling for standard Material widgets.
+A comprehensive Flutter implementation of [IBM's Carbon Design System](https://carbondesignsystem.com/) with **46 custom Carbon widgets** and 4 theme variants — built entirely on the widgets layer, so it works **with or without Material**: as a pure Carbon app via `CarbonApp`, or inside a Material app via the optional bridge.
 
 #### 🔗 [Live Demo](https://hwkim1127.github.io/flutter_carbon/)
 
 **Carbon Design System (v11) ships 85 components** across its `styles` and `web-components` packages. Here is how Flutter Carbon covers them:
 
-- **37 custom `Carbon*` widgets** — full spec implementations
-- **11 via Material theming** — standard Material widgets auto-styled by `carbonTheme()`
+- **46 custom `Carbon*` widgets** — full spec implementations, Material-free
+- **3 via Material theming** — standard Material widgets auto-styled by `carbonTheme()` (bridge setup)
 - **12 architectural / utilities** — layout/structural concepts mapped to Flutter primitives
-- **25 not yet implemented** — planned for future releases (11 of these are the `fluid-*` input variants)
+- **24 not yet implemented** — planned for future releases (11 of these are the `fluid-*` input variants)
 
 ## Overview
 
@@ -30,12 +30,13 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - **Motion System**: Duration and easing values for animations
 - **Layering System**: Background, layer, field, and border tokens for proper visual hierarchy
 
-### 🧱 Spec-First Internals (1.3+)
+### 🧱 Material-Free by Construction (2.0)
+- **Widgets-layer implementation** — no `Carbon*` widget imports `material.dart`; the only Material in the package is the explicit bridge library (`package:flutter_carbon/material.dart`), enforced by a guard test
 - **No Material ink ripple** — interaction feedback is a flat color change, exactly as the Carbon spec defines
 - **Carbon icon glyphs throughout** — every internal icon comes from the bundled `CarbonIcons` font, not Material Icons
-- **Widgets-layer implementation** — 24 of 37 components have no `material.dart` dependency at all; the rest keep it only for primitives (text fields, checkboxes) that get native replacements in V2 (see `V2_ROADMAP.md`)
+- **Native text editing** — text fields build on `EditableText` with Carbon selection handles and a Carbon context menu (localizable labels)
 
-### 🧩 37 Carbon Components
+### 🧩 46 Carbon Components
 
 **Buttons & Actions**
 - `CarbonButton` - Full-spec button with 7 kind variants (primary, secondary, tertiary, ghost, danger, dangerTertiary, dangerGhost) and 5 size variants (sm/md/lg/xl/2xl); supports text, text+icon, and icon-only modes
@@ -44,6 +45,12 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - `CarbonChatButton` - Specialized button for chat interfaces with quick actions
 
 **Forms & Input**
+- `CarbonTextInput` / `CarbonTextArea` - Text fields with validation states, Carbon selection handles, and a Carbon context menu
+- `CarbonSearch` - Search input with clear button, Escape semantics, and an expandable variant
+- `CarbonSelect` - Native-select form control (validation states, read-only) opening a Carbon menu
+- `CarbonSlider` - Slider with keyboard support, embedded number input, and a two-handle range mode
+- `CarbonCheckbox` - Checkbox with indeterminate state
+- `CarbonRadio` - Radio button
 - `CarbonDropdown` - Single-select dropdown with search
 - `CarbonComboBox` - Autocomplete combo box with filtering
 - `CarbonNumberInput` - Numeric input with increment/decrement controls
@@ -64,8 +71,10 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - `CarbonTearsheet` - Bottom sheet with full-height content; action buttons fill the footer width equally — use `CarbonButtonSize.xl` for narrow and `CarbonButtonSize.twoXl` for wide tearsheets
 - `CarbonPopover` - Floating content panel with positioning
 - `CarbonToggleTip` - Interactive tooltip that stays open on click
+- `CarbonTooltip` - Hover/focus tooltip with Carbon positioning and timing
 
 **Content Display**
+- `CarbonAccordion` - Vertically stacked expandable sections (sizes, flush, controlled mode)
 - `CarbonCodeSnippet` - Syntax-highlighted code display (single-line, multi-line, inline)
 - `CarbonContentSwitcher` - Tab-like content switcher
 - `CarbonStructuredList` - Table-like list with selectable rows
@@ -97,24 +106,17 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - `CarbonAILabel` - AI-generated content indicator with gradient
 - `CarbonFloatingMenu` - Expandable floating action menu with animations
 
-#### Handled via Material Theming (11)
+#### Handled via Material Theming (3)
 
 These Carbon components are covered by standard Material widgets that automatically receive Carbon styling through `carbonTheme()` (from `package:flutter_carbon/material.dart`, using the MaterialApp + `CarbonMaterialBridge` setup):
 
 | Carbon Component | Flutter Equivalent |
 |---|---|
-| `accordion` | `ExpansionTile` |
-| `checkbox` | `Checkbox` |
 | `inline-loading` | `CircularProgressIndicator` |
 | `list` | `ListTile` |
 | `progress-bar` | `LinearProgressIndicator` |
-| `radio-button` | `Radio` |
-| `search` | `SearchBar` |
-| `slider` | `Slider` |
-| `text-input` | `TextField` |
-| `textarea` | `TextField(maxLines: null)` |
-| `tooltip` | `Tooltip` |
 
+> In 2.0, `accordion`, `checkbox`, `radio-button`, `search`, `select`, `slider`, `text-input`, `textarea`, and `tooltip` all became native `Carbon*` widgets — the Material-themed equivalents still work under the bridge, but the native widgets are the spec-accurate choice.
 > For buttons, prefer `CarbonButton` over Material variants (`FilledButton`, `ElevatedButton`, etc.) — it implements the full Carbon spec with 7 kind variants and 5 size variants.
 > For tags, prefer `CarbonTag` over `Chip` — it implements the full Carbon tag spec with 12 color types and proper sizing.
 
@@ -137,7 +139,7 @@ These are not renderable widgets — they are structural concepts, token systems
 | `slug` | Deprecated — use `CarbonAILabel` |
 | `stack` | Deprecated utility |
 
-#### Not Yet Implemented (25)
+#### Not Yet Implemented (24)
 
 These components do not have a dedicated `Carbon*` widget yet:
 
@@ -146,34 +148,33 @@ These components do not have a dedicated `Carbon*` widget yet:
 | `ai-skeleton` | Use `CarbonSkeleton` |
 | `badge-indicator` | No current equivalent |
 | `copy` | Use `CarbonCopyButton` |
-| `date-picker` | Use Material `showDatePicker()` (auto-themed) |
+| `date-picker` | Use Material `showDatePicker()` (auto-themed) — native picker planned (see `V2_ROADMAP.md`) |
 | `dialog` | Experimental Carbon primitive (feature-flagged) — use `CarbonModal` |
 | `fluid-*` (11 variants) | `combo-box`, `date-picker`, `dropdown`, `list-box`, `multiselect`, `number-input`, `search`, `select`, `text-area`, `text-input`, `time-picker` — fluid/expressive variants, not yet implemented |
 | `icon-button` | Use `CarbonButton` with icon-only mode |
 | `icon-indicator` | No current equivalent |
-| `menu` | Use Material `MenuBar` / `DropdownMenu` (auto-themed) |
-| `menu-button` | Use Material `MenuAnchor` (auto-themed) |
+| `menu` | The `CarbonMenuItem` model + menu panel power `CarbonComboButton`; a standalone menu widget is planned |
+| `menu-button` | Use `CarbonComboButton` |
 | `pagination-nav` | Page-number button navigation — use `CarbonPagination` (select-based) |
-| `password-input` | Use `TextField(obscureText: true)` (auto-themed) |
-| `select` | Use `CarbonDropdown` |
+| `password-input` | Use `CarbonTextInput(obscureText: true)` (visibility toggle planned) |
 | `shape-indicator` | No current equivalent |
-| `time-picker` | Use Material `showTimePicker()` (auto-themed) |
+| `time-picker` | Use Material `showTimePicker()` (auto-themed) — native picker planned (see `V2_ROADMAP.md`) |
 
-### 📱 49 Demo Pages
+### 📱 50 Demo Pages
 
 The example app includes comprehensive demos for every component, organized into 12 categories:
 - Foundation (4 pages)
 - Buttons (4 pages)
-- Forms (7 pages)
+- Forms (10 pages)
 - Notifications (2 pages)
-- Content (5 pages)
+- Content (6 pages)
 - Navigation (3 pages)
 - Overlays (5 pages)
 - Data Display (2 pages)
 - AI & Syntax (2 pages)
 - Other (2 pages)
 - Carbon Components (8 pages)
-- Material Theming (5 pages)
+- Material Theming (2 pages)
 
 ## 🚀 Quick Start
 
@@ -203,8 +204,9 @@ class MyApp extends StatelessWidget {
 }
 ```
 
-**Option B — Material app with the Carbon bridge** (needed for the
-Material-themed components and the widgets that still use Material internals):
+**Option B — Material app with the Carbon bridge** (for mixing Material
+widgets into a Carbon app, or adding Carbon widgets to an existing Material
+app — `carbonTheme()` auto-styles the Material widgets to match):
 
 ```dart
 import 'package:flutter/material.dart';
@@ -476,24 +478,25 @@ Access via `context.carbon`:
 
 ```dart
 // Background & Layers
-carbon.background
+carbon.layer.background, .backgroundHover
 carbon.layer.layer01, .layer02, .layer03
 
 // Fields & Borders
-carbon.field.field01, .field02
-carbon.layer.borderSubtle00, .borderStrong01
+carbon.layer.field01, .field02
+carbon.layer.borderSubtle01, .borderStrong01
 
-// Text
+// Text & Links
 carbon.text.textPrimary, .textSecondary, .textOnColor, .textDisabled
+carbon.text.linkPrimary, .linkPrimaryHover
 
 // Buttons
-carbon.button.buttonPrimary, .buttonSecondary, .buttonDanger
+carbon.button.buttonPrimary, .buttonSecondary, .buttonDangerPrimary
 
 // Support (Status Colors)
 carbon.layer.supportError, .supportSuccess, .supportWarning, .supportInfo
 
-// Interactive
-carbon.interactive.link, .focus, .hover
+// Interactive & Focus
+carbon.layer.interactive, .focus
 ```
 
 ### Typography
@@ -545,7 +548,7 @@ CarbonSpacing.spacing13  // 160px
 
 A comprehensive example app showcasing every component is included in the `example/` directory. It features:
 
-- **49 demo pages** with interactive examples
+- **50 demo pages** with interactive examples
 - **All 4 theme variants** with live switching
 - **Multiple examples per component** (variants, states, sizes)
 - **Categorized navigation** for easy browsing
@@ -562,22 +565,23 @@ flutter run
 
 ```
 lib/
-├── flutter_carbon.dart          # Main export file
+├── flutter_carbon.dart          # Main export file (Material-free)
+├── material.dart                # Optional Material bridge (re-exports the core)
 ├── src/
 │   ├── theme/
-│   │   ├── carbon_theme.dart          # Theme helper function
+│   │   ├── carbon_theme.dart          # CarbonTheme inherited widget + context.carbon
 │   │   ├── carbon_theme_data.dart     # Main theme data class
 │   │   ├── component_themes/          # Theme data for each component
+│   │   │   ├── layer_theme_data.dart
+│   │   │   ├── text_theme_data.dart
 │   │   │   ├── button_theme_data.dart
-│   │   │   ├── modal_theme_data.dart
-│   │   │   ├── tile_theme_data.dart
-│   │   │   ├── contained_list_theme_data.dart
-│   │   │   └── ... (23 more theme files)
+│   │   │   └── ... (25 more theme files)
 │   │   └── themes/                    # 4 concrete themes
 │   │       ├── white/
 │   │       ├── g10/
 │   │       ├── g90/
 │   │       └── g100/
+│   ├── app/                           # CarbonApp + CarbonPageRoute
 │   ├── foundation/
 │   │   ├── colors.dart                # Color palette
 │   │   ├── typography.dart            # Typography system
@@ -586,26 +590,27 @@ lib/
 │   ├── base/                          # Internal building blocks (not exported)
 │   │   ├── carbon_pressable.dart      # Hover/press/focus detector (no ripple)
 │   │   ├── carbon_divider.dart        # 1px rule
+│   │   ├── carbon_anchored_overlay.dart # Shared overlay positioner
 │   │   └── carbon_overlay_surface.dart # Text style root for overlays
-│   ├── widgets/                       # 37 Carbon components
+│   ├── text/                          # Native text editing core (selection, context menu)
+│   ├── widgets/                       # 46 Carbon components
 │   │   ├── carbon_button.dart
+│   │   ├── carbon_text_input.dart
+│   │   ├── carbon_search.dart
+│   │   ├── carbon_select.dart
+│   │   ├── carbon_slider.dart
+│   │   ├── carbon_accordion.dart
 │   │   ├── carbon_modal.dart
-│   │   ├── carbon_dropdown.dart
-│   │   ├── carbon_tile.dart
-│   │   ├── carbon_tag.dart
 │   │   ├── carbon_data_table.dart
-│   │   ├── carbon_toolbar.dart
-│   │   ├── carbon_multi_select.dart
-│   │   ├── carbon_contained_list.dart
-│   │   ├── carbon_floating_menu.dart
-│   │   └── ... (27 more widgets)
+│   │   └── ... (39 more widget files)
+│   ├── material/                      # The Material bridge implementation
 │   └── icons/                         # Carbon icon font
 │       └── carbon_icons.dart
 └── example/                           # Example app
     ├── lib/
     │   ├── main.dart                  # App entry + routing
     │   ├── routes.dart                # Route definitions
-    │   └── pages/                     # 49 demo pages
+    │   └── pages/                     # 50 demo pages
     └── assets/                        # Example assets
 ```
 
@@ -613,15 +618,15 @@ lib/
 
 This implementation follows the official Carbon Design System V11 specifications:
 
-- ✅ Color tokens match Carbon V11 theme definitions
+- ✅ Color tokens match Carbon V11 theme definitions (audited against `@carbon/themes` v11.96)
 - ✅ Typography follows Carbon type scale
 - ✅ Components match Carbon web component behavior
 - ✅ All 4 official themes (White, G10, G90, G100) supported
 - ✅ Spacing, motion, and layering follow Carbon guidelines
-- ✅ 37 custom `Carbon*` widgets with full spec compliance
-- ✅ No Material ink ripple — flat interaction feedback per Carbon spec (1.3+)
-- ✅ 11 Carbon components covered via automatic Material theming
-- 🚧 25 components not yet implemented (see table above)
+- ✅ 46 custom `Carbon*` widgets with full spec compliance — all Material-free (guard-test enforced)
+- ✅ No Material ink ripple — flat interaction feedback per Carbon spec
+- ✅ 3 remaining Carbon components covered via automatic Material theming (bridge)
+- 🚧 24 components not yet implemented (see table above)
 
 **Reference**: https://carbondesignsystem.com/
 

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_carbon/flutter_carbon.dart';
 import '../widgets/demo_page_template.dart';
 
-/// Demo page for Select/Dropdown functionality using Material's DropdownMenu.
+/// Demo page for the native CarbonSelect widget.
 class SelectDemoPage extends StatefulWidget {
   const SelectDemoPage({super.key});
 
@@ -10,156 +11,129 @@ class SelectDemoPage extends StatefulWidget {
 }
 
 class _SelectDemoPageState extends State<SelectDemoPage> {
-  // String? _selectedFruit;
-  // String? _selectedCountry;
-  // String? _searchableSelection;
+  static const _fruits = [
+    CarbonSelectItem(value: 'apple', label: 'Apple'),
+    CarbonSelectItem(value: 'banana', label: 'Banana'),
+    CarbonSelectItem(value: 'cherry', label: 'Cherry'),
+    CarbonSelectItem(value: 'date', label: 'Date'),
+    CarbonSelectItem(value: 'elderberry', label: 'Elderberry'),
+  ];
+
+  static const _countries = [
+    CarbonSelectItem(value: 'kr', label: 'South Korea'),
+    CarbonSelectItem(value: 'us', label: 'United States'),
+    CarbonSelectItem(value: 'ca', label: 'Canada'),
+    CarbonSelectItem(value: 'au', label: 'Australia'),
+    CarbonSelectItem(value: 'jp', label: 'Japan (unavailable)', disabled: true),
+  ];
+
+  String? _selectedFruit;
+  String? _selectedCountry;
+  String? _sizedSelection = 'apple';
+  String? _invalidSelection;
 
   @override
   Widget build(BuildContext context) {
     return DemoPageTemplate(
-      title: 'Select / Dropdown',
-      description: 'Select menus allow users to choose from a list of options. '
-          'Built using Material DropdownMenu with Carbon theming.',
+      title: 'Select',
+      description:
+          'Select allows users to choose one option from a list. Native '
+          'Carbon implementation with form states and a Carbon menu.',
       sections: [
         DemoSection(
-          title: 'Basic Select',
-          description: 'Simple dropdown selection.',
-          builder: (context) => DropdownMenu<String>(
-            label: const Text('Select a fruit'),
-            hintText: 'Choose one',
-            dropdownMenuEntries: const [
-              DropdownMenuEntry(value: 'apple', label: 'Apple'),
-              DropdownMenuEntry(value: 'banana', label: 'Banana'),
-              DropdownMenuEntry(value: 'cherry', label: 'Cherry'),
-              DropdownMenuEntry(value: 'date', label: 'Date'),
-              DropdownMenuEntry(value: 'elderberry', label: 'Elderberry'),
-            ],
-            onSelected: (value) {
-              // setState(() => _selectedFruit = value);
-            },
+          title: 'Basic',
+          description:
+              'Default (md) select with a placeholder. Keyboard: Enter, '
+              'Space or arrows open the menu; arrows continue from the '
+              'selection.',
+          builder: (context) => CarbonSelect<String>(
+            labelText: 'Fruit',
+            placeholder: 'Choose an option',
+            items: _fruits,
+            value: _selectedFruit,
+            onChanged: (value) => setState(() => _selectedFruit = value),
           ),
         ),
         DemoSection(
-          title: 'Select with Helper Text',
-          description: 'Dropdown with additional helper information.',
-          builder: (context) => DropdownMenu<String>(
-            label: const Text('Country'),
-            hintText: 'Select your country',
+          title: 'Helper text and disabled option',
+          description: 'Guidance below the field; one option is disabled.',
+          builder: (context) => CarbonSelect<String>(
+            labelText: 'Country',
+            placeholder: 'Select your country',
             helperText: 'Choose the country where you reside',
-            dropdownMenuEntries: const [
-              DropdownMenuEntry(value: 'kr', label: 'South Korea'),
-              DropdownMenuEntry(value: 'us', label: 'United States'),
-              DropdownMenuEntry(value: 'ca', label: 'Canada'),
-              DropdownMenuEntry(value: 'au', label: 'Australia'),
-              DropdownMenuEntry(value: 'jp', label: 'Japan'),
-            ],
-            onSelected: (value) {
-              // setState(() => _selectedCountry = value);
-            },
+            items: _countries,
+            value: _selectedCountry,
+            onChanged: (value) => setState(() => _selectedCountry = value),
           ),
         ),
         DemoSection(
-          title: 'Searchable Select',
-          description: 'Dropdown with search/filter capability.',
-          builder: (context) => DropdownMenu<String>(
-            label: const Text('Select product'),
-            hintText: 'Type to search...',
-            enableFilter: true,
-            enableSearch: true,
-            requestFocusOnTap: true,
-            dropdownMenuEntries: const [
-              DropdownMenuEntry(value: 'laptop', label: 'Laptop Computer'),
-              DropdownMenuEntry(value: 'desktop', label: 'Desktop Computer'),
-              DropdownMenuEntry(value: 'tablet', label: 'Tablet Device'),
-              DropdownMenuEntry(value: 'phone', label: 'Mobile Phone'),
-              DropdownMenuEntry(value: 'monitor', label: 'Monitor Screen'),
-              DropdownMenuEntry(value: 'keyboard', label: 'Keyboard'),
-              DropdownMenuEntry(value: 'mouse', label: 'Computer Mouse'),
-            ],
-            onSelected: (value) {
-              // setState(() => _searchableSelection = value);
-            },
-          ),
-        ),
-        DemoSection(
-          title: 'Select with Icons',
-          description: 'Dropdown items with leading icons.',
-          builder: (context) => DropdownMenu<String>(
-            label: const Text('Select action'),
-            leadingIcon: const Icon(Icons.settings),
-            dropdownMenuEntries: const [
-              DropdownMenuEntry(
-                value: 'edit',
-                label: 'Edit',
-                leadingIcon: Icon(Icons.edit),
-              ),
-              DropdownMenuEntry(
-                value: 'copy',
-                label: 'Copy',
-                leadingIcon: Icon(Icons.copy),
-              ),
-              DropdownMenuEntry(
-                value: 'share',
-                label: 'Share',
-                leadingIcon: Icon(Icons.share),
-              ),
-              DropdownMenuEntry(
-                value: 'delete',
-                label: 'Delete',
-                leadingIcon: Icon(Icons.delete),
-              ),
-            ],
-            onSelected: (value) {},
-          ),
-        ),
-        DemoSection(
-          title: 'Disabled Select',
-          description: 'Dropdown in disabled state.',
-          builder: (context) => DropdownMenu<String>(
-            label: const Text('Disabled'),
-            hintText: 'Cannot select',
-            enabled: false,
-            dropdownMenuEntries: const [
-              DropdownMenuEntry(value: '1', label: 'Option 1'),
-              DropdownMenuEntry(value: '2', label: 'Option 2'),
-            ],
-            onSelected: null,
-          ),
-        ),
-        DemoSection(
-          title: 'Select in Form',
-          description: 'Dropdown as part of a form layout.',
+          title: 'Sizes',
+          description: 'Extra small (24px) to large (48px).',
           builder: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  hintText: 'Enter your name',
+              for (final size in CarbonSelectSize.values) ...[
+                CarbonSelect<String>(
+                  labelText: '${size.name} — ${size.height.toInt()}px',
+                  items: _fruits,
+                  value: _sizedSelection,
+                  size: size,
+                  onChanged: (value) =>
+                      setState(() => _sizedSelection = value),
                 ),
+                const SizedBox(height: 16),
+              ],
+            ],
+          ),
+        ),
+        DemoSection(
+          title: 'Invalid and warning',
+          description: 'Validation states with status icons and text.',
+          builder: (context) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CarbonSelect<String>(
+                labelText: 'Required field',
+                placeholder: 'Choose an option',
+                items: _fruits,
+                value: _invalidSelection,
+                invalid: _invalidSelection == null,
+                invalidText: 'A selection is required',
+                onChanged: (value) =>
+                    setState(() => _invalidSelection = value),
               ),
               const SizedBox(height: 16),
-              DropdownMenu<String>(
-                label: const Text('Department'),
-                hintText: 'Select department',
-                dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: 'eng', label: 'Engineering'),
-                  DropdownMenuEntry(value: 'design', label: 'Design'),
-                  DropdownMenuEntry(value: 'product', label: 'Product'),
-                  DropdownMenuEntry(value: 'sales', label: 'Sales'),
-                ],
-                onSelected: (value) {},
+              CarbonSelect<String>(
+                labelText: 'With warning',
+                items: _fruits,
+                value: 'banana',
+                warn: true,
+                warnText: 'Bananas are almost sold out',
+                onChanged: (_) {},
+              ),
+            ],
+          ),
+        ),
+        DemoSection(
+          title: 'Read-only and disabled',
+          description:
+              'Read-only stays focusable but the menu does not open; '
+              'disabled is inert.',
+          builder: (context) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CarbonSelect<String>(
+                labelText: 'Read-only',
+                items: _fruits,
+                value: 'cherry',
+                readOnly: true,
               ),
               const SizedBox(height: 16),
-              DropdownMenu<String>(
-                label: const Text('Role'),
-                hintText: 'Select your role',
-                dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: 'dev', label: 'Developer'),
-                  DropdownMenuEntry(value: 'designer', label: 'Designer'),
-                  DropdownMenuEntry(value: 'manager', label: 'Manager'),
-                ],
-                onSelected: (value) {},
+              const CarbonSelect<String>(
+                labelText: 'Disabled',
+                items: _fruits,
+                value: 'apple',
+                disabled: true,
               ),
             ],
           ),

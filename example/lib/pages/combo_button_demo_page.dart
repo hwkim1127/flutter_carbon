@@ -27,27 +27,21 @@ class _ComboButtonDemoPageState extends State<ComboButtonDemoPage> {
           builder: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CarbonComboButton(
+              CarbonComboButton<String>(
                 label: 'Save',
                 onPressed: () {
                   setState(() => _lastAction = 'Save');
                 },
-                menuItems: [
-                  PopupMenuItem(
-                    value: 'save-as',
-                    child: const Text('Save as...'),
-                  ),
-                  PopupMenuItem(
-                    value: 'save-copy',
-                    child: const Text('Save a copy'),
-                  ),
-                  PopupMenuItem(
+                menuItems: const [
+                  CarbonMenuItem(value: 'save-as', label: 'Save as...'),
+                  CarbonMenuItem(value: 'save-copy', label: 'Save a copy'),
+                  CarbonMenuItem(
                     value: 'save-template',
-                    child: const Text('Save as template'),
+                    label: 'Save as template',
                   ),
                 ],
                 onMenuItemSelected: (value) {
-                  setState(() => _lastMenuItem = value.toString());
+                  setState(() => _lastMenuItem = value);
                 },
               ),
               const SizedBox(height: 16),
@@ -71,14 +65,14 @@ class _ComboButtonDemoPageState extends State<ComboButtonDemoPage> {
         DemoSection(
           title: 'Large Size (Default)',
           description: 'Combo button at 48px height',
-          builder: (context) => CarbonComboButton(
+          builder: (context) => CarbonComboButton<String>(
             label: 'Export',
             size: CarbonComboButtonSize.large,
             onPressed: () {},
-            menuItems: [
-              PopupMenuItem(value: 'pdf', child: const Text('Export as PDF')),
-              PopupMenuItem(value: 'csv', child: const Text('Export as CSV')),
-              PopupMenuItem(value: 'json', child: const Text('Export as JSON')),
+            menuItems: const [
+              CarbonMenuItem(value: 'pdf', label: 'Export as PDF'),
+              CarbonMenuItem(value: 'csv', label: 'Export as CSV'),
+              CarbonMenuItem(value: 'json', label: 'Export as JSON'),
             ],
             onMenuItemSelected: (value) {},
           ),
@@ -86,16 +80,13 @@ class _ComboButtonDemoPageState extends State<ComboButtonDemoPage> {
         DemoSection(
           title: 'Medium Size',
           description: 'Combo button at 40px height',
-          builder: (context) => CarbonComboButton(
+          builder: (context) => CarbonComboButton<String>(
             label: 'Publish',
             size: CarbonComboButtonSize.medium,
             onPressed: () {},
-            menuItems: [
-              PopupMenuItem(value: 'draft', child: const Text('Save as draft')),
-              PopupMenuItem(
-                value: 'schedule',
-                child: const Text('Schedule for later'),
-              ),
+            menuItems: const [
+              CarbonMenuItem(value: 'draft', label: 'Save as draft'),
+              CarbonMenuItem(value: 'schedule', label: 'Schedule for later'),
             ],
             onMenuItemSelected: (value) {},
           ),
@@ -103,19 +94,13 @@ class _ComboButtonDemoPageState extends State<ComboButtonDemoPage> {
         DemoSection(
           title: 'Small Size',
           description: 'Combo button at 32px height',
-          builder: (context) => CarbonComboButton(
+          builder: (context) => CarbonComboButton<String>(
             label: 'Send',
             size: CarbonComboButtonSize.small,
             onPressed: () {},
-            menuItems: [
-              PopupMenuItem(
-                value: 'send-copy',
-                child: const Text('Send a copy'),
-              ),
-              PopupMenuItem(
-                value: 'send-later',
-                child: const Text('Send later'),
-              ),
+            menuItems: const [
+              CarbonMenuItem(value: 'send-copy', label: 'Send a copy'),
+              CarbonMenuItem(value: 'send-later', label: 'Send later'),
             ],
             onMenuItemSelected: (value) {},
           ),
@@ -123,35 +108,33 @@ class _ComboButtonDemoPageState extends State<ComboButtonDemoPage> {
         DemoSection(
           title: 'Disabled State',
           description: 'Combo button when disabled',
-          builder: (context) => CarbonComboButton(
+          builder: (context) => CarbonComboButton<String>(
             label: 'Submit',
             disabled: true,
             onPressed: () {},
-            menuItems: [
-              PopupMenuItem(
-                value: 'review',
-                child: const Text('Submit for review'),
-              ),
+            menuItems: const [
+              CarbonMenuItem(value: 'review', label: 'Submit for review'),
             ],
             onMenuItemSelected: (value) {},
           ),
         ),
         DemoSection(
-          title: 'With Dividers',
-          description: 'Menu with dividers separating actions',
-          builder: (context) => CarbonComboButton(
+          title: 'With Dividers and Danger Item',
+          description: 'Menu with dividers and a destructive action',
+          builder: (context) => CarbonComboButton<String>(
             label: 'Actions',
             onPressed: () {},
-            menuItems: [
-              PopupMenuItem(value: 'edit', child: const Text('Edit')),
-              PopupMenuItem(value: 'duplicate', child: const Text('Duplicate')),
-              const PopupMenuDivider(),
-              PopupMenuItem(value: 'share', child: const Text('Share')),
-              PopupMenuItem(value: 'download', child: const Text('Download')),
-              const PopupMenuDivider(),
-              PopupMenuItem(
+            menuItems: const [
+              CarbonMenuItem(value: 'edit', label: 'Edit'),
+              CarbonMenuItem(value: 'duplicate', label: 'Duplicate'),
+              CarbonMenuItemDivider(),
+              CarbonMenuItem(value: 'share', label: 'Share'),
+              CarbonMenuItem(value: 'download', label: 'Download'),
+              CarbonMenuItemDivider(),
+              CarbonMenuItem(
                 value: 'delete',
-                child: Text('Delete', style: TextStyle(color: Colors.red)),
+                label: 'Delete',
+                kind: CarbonMenuItemKind.danger,
               ),
             ],
             onMenuItemSelected: (value) {},
@@ -164,59 +147,35 @@ class _ComboButtonDemoPageState extends State<ComboButtonDemoPage> {
             spacing: 16,
             runSpacing: 16,
             children: [
-              CarbonComboButton(
+              CarbonComboButton<String>(
                 label: 'Create',
                 onPressed: () {},
-                menuItems: [
-                  PopupMenuItem(
-                    value: 'document',
-                    child: const Text('New document'),
-                  ),
-                  PopupMenuItem(
-                    value: 'folder',
-                    child: const Text('New folder'),
-                  ),
-                  PopupMenuItem(
-                    value: 'template',
-                    child: const Text('From template'),
-                  ),
+                menuItems: const [
+                  CarbonMenuItem(value: 'document', label: 'New document'),
+                  CarbonMenuItem(value: 'folder', label: 'New folder'),
+                  CarbonMenuItem(value: 'template', label: 'From template'),
                 ],
                 onMenuItemSelected: (value) {},
               ),
-              CarbonComboButton(
+              CarbonComboButton<String>(
                 label: 'Download',
                 size: CarbonComboButtonSize.medium,
                 onPressed: () {},
-                menuItems: [
-                  PopupMenuItem(
-                    value: 'original',
-                    child: const Text('Original quality'),
-                  ),
-                  PopupMenuItem(
-                    value: 'compressed',
-                    child: const Text('Compressed'),
-                  ),
-                  PopupMenuItem(
-                    value: 'zip',
-                    child: const Text('Download as ZIP'),
-                  ),
+                menuItems: const [
+                  CarbonMenuItem(value: 'original', label: 'Original quality'),
+                  CarbonMenuItem(value: 'compressed', label: 'Compressed'),
+                  CarbonMenuItem(value: 'zip', label: 'Download as ZIP'),
                 ],
                 onMenuItemSelected: (value) {},
               ),
-              CarbonComboButton(
+              CarbonComboButton<String>(
                 label: 'Share',
                 size: CarbonComboButtonSize.small,
                 onPressed: () {},
-                menuItems: [
-                  PopupMenuItem(value: 'link', child: const Text('Copy link')),
-                  PopupMenuItem(
-                    value: 'email',
-                    child: const Text('Share via email'),
-                  ),
-                  PopupMenuItem(
-                    value: 'embed',
-                    child: const Text('Get embed code'),
-                  ),
+                menuItems: const [
+                  CarbonMenuItem(value: 'link', label: 'Copy link'),
+                  CarbonMenuItem(value: 'email', label: 'Share via email'),
+                  CarbonMenuItem(value: 'embed', label: 'Get embed code'),
                 ],
                 onMenuItemSelected: (value) {},
               ),

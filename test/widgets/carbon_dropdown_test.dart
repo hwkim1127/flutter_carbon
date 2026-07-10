@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
 
@@ -196,6 +197,68 @@ void main() {
 
       // The options list sits inside the menu's 1px border on each side.
       expect(tester.getSize(find.byType(ListView)).width, closeTo(250, 2.5));
+    });
+
+    testWidgets(
+        'menu keyboard: arrows + Enter select, Escape closes, focus restores '
+        'even when another widget held focus', (tester) async {
+      String? selected;
+      final neighborFocus = FocusNode();
+      addTearDown(neighborFocus.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          child: Column(
+            children: [
+              Focus(
+                focusNode: neighborFocus,
+                child: const SizedBox(width: 40, height: 40),
+              ),
+              CarbonDropdown<String>(
+                value: null,
+                items: const [
+                  CarbonDropdownItem(value: 'a', child: Text('Alpha')),
+                  CarbonDropdownItem(
+                    value: 'b',
+                    child: Text('Beta'),
+                    enabled: false,
+                  ),
+                  CarbonDropdownItem(value: 'c', child: Text('Gamma')),
+                ],
+                onChanged: (value) => selected = value,
+              ),
+            ],
+          ),
+        ),
+      );
+
+      neighborFocus.requestFocus();
+      await tester.pump();
+
+      await tester.tap(find.byType(CarbonDropdown<String>));
+      await tester.pumpAndSettle();
+      expect(find.text('Alpha'), findsOneWidget);
+
+      // Arrows drive the menu highlight (skipping the disabled item),
+      // not the app's focus traversal.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      expect(selected, 'c');
+      expect(find.text('Alpha'), findsNothing); // menu closed
+      expect(neighborFocus.hasPrimaryFocus, isTrue); // focus restored
+
+      // Escape closes too.
+      await tester.tap(find.byType(CarbonDropdown<String>));
+      await tester.pumpAndSettle();
+      expect(find.text('Alpha'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Alpha'), findsNothing);
     });
   });
 

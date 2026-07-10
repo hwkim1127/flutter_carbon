@@ -212,7 +212,6 @@ class _NewCarbonWidgetsSectionState extends State<NewCarbonWidgetsSection> {
                 bottom: 8,
                 right: 8,
                 child: CarbonFloatingMenu(
-                  heroTag: 'all-components-fab',
                   icon: Icons.add,
                   items: [
                     CarbonFloatingMenuItem(

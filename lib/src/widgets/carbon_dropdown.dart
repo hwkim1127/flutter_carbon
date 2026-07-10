@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show KeyDownEvent, LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
 import '../base/carbon_anchored_overlay.dart';
@@ -118,6 +119,11 @@ class CarbonDropdown<T> extends StatefulWidget {
 class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   OverlayEntry? _overlayEntry;
   final GlobalKey _triggerKey = GlobalKey();
+  final FocusNode _menuFocusNode = FocusNode(debugLabel: 'CarbonDropdownMenu');
+
+  /// Whatever held focus before the menu opened; restored on close.
+  FocusNode? _previousFocus;
+
   bool _isOpen = false;
   T? _highlightedValue;
 
@@ -126,7 +132,67 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     // Remove overlay without calling setState since widget is being disposed
     _overlayEntry?.remove();
     _overlayEntry = null;
+    _menuFocusNode.dispose();
     super.dispose();
+  }
+
+  void _restorePreviousFocus() {
+    final current = FocusManager.instance.primaryFocus;
+    final previous = _previousFocus;
+    _previousFocus = null;
+    if (previous != null &&
+        previous.context != null &&
+        (current == null ||
+            current == _menuFocusNode ||
+            current is FocusScopeNode)) {
+      previous.requestFocus();
+    }
+  }
+
+  /// Keyboard for the open menu: Escape closes, arrows move the highlight
+  /// through enabled items, Enter/Space selects.
+  KeyEventResult _handleMenuKey(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      _closeDropdown();
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      _moveHighlight(1);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      _moveHighlight(-1);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      final highlighted = _highlightedValue;
+      if (highlighted != null) {
+        _selectItem(highlighted);
+        return KeyEventResult.handled;
+      }
+      return KeyEventResult.ignored;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  void _moveHighlight(int direction) {
+    final items = widget.items;
+    if (items.isEmpty) return;
+    var index = items.indexWhere((item) => item.value == _highlightedValue);
+    if (index < 0) index = direction > 0 ? -1 : items.length;
+    for (var step = 0; step < items.length; step++) {
+      index += direction;
+      if (index < 0 || index >= items.length) return; // no wrap-around
+      if (items[index].enabled) {
+        setState(() => _highlightedValue = items[index].value);
+        _overlayEntry?.markNeedsBuild();
+        return;
+      }
+    }
   }
 
   void _toggleDropdown() {
@@ -140,8 +206,15 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   void _openDropdown() {
     if (!widget.enabled || _isOpen) return;
 
+    _previousFocus = FocusManager.instance.primaryFocus;
     _overlayEntry = _createOverlayEntry();
     Overlay.of(context).insert(_overlayEntry!);
+    // Take focus so arrows/Enter/Escape drive the menu instead of the app's
+    // focus traversal (`autofocus` would be ignored while anything is
+    // focused).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_isOpen && mounted) _menuFocusNode.requestFocus();
+    });
     if (mounted) {
       setState(() {
         _isOpen = true;
@@ -153,6 +226,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   void _closeDropdown() {
     _overlayEntry?.remove();
     _overlayEntry = null;
+    _restorePreviousFocus();
     if (mounted) {
       setState(() {
         _isOpen = false;
@@ -182,14 +256,18 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
         matchAnchorWidth: true,
         spacing: 1,
         onDismiss: _closeDropdown,
-        contentBuilder: (context, _) => CarbonOverlaySurface(
-          // Read value/highlight live (not captured) so hover and
-          // selection changes render via markNeedsBuild.
-          child: _buildDropdownMenu(
-            carbon: context.carbon,
-            items: widget.items,
-            currentValue: widget.value,
-            highlightedValue: _highlightedValue,
+        contentBuilder: (context, _) => Focus(
+          focusNode: _menuFocusNode,
+          onKeyEvent: _handleMenuKey,
+          child: CarbonOverlaySurface(
+            // Read value/highlight live (not captured) so hover and
+            // selection changes render via markNeedsBuild.
+            child: _buildDropdownMenu(
+              carbon: context.carbon,
+              items: widget.items,
+              currentValue: widget.value,
+              highlightedValue: _highlightedValue,
+            ),
           ),
         ),
       ),

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
 
@@ -12,6 +13,60 @@ void main() {
         ),
       );
       expect(find.byType(CarbonCodeSnippet), findsOneWidget);
+    });
+
+    testWidgets('multi variant never soft-wraps (long lines scroll)', (
+      tester,
+    ) async {
+      const code =
+          "import 'package:flutter_carbon/material.dart';\n\nvoid main() {\n  runApp(MyApp());\n}";
+      await tester.pumpWidget(
+        buildTestApp(
+          child: const CarbonCodeSnippet(
+            code: code,
+            type: CarbonCodeSnippetType.multi,
+          ),
+        ),
+      );
+
+      // 5 logical lines at fontSize 14 × height 1.5 = 105px. Any soft wrap
+      // (e.g. the caret margin eating into the measured width) adds a line.
+      final editable = tester.widget<EditableText>(find.byType(EditableText));
+      final lineHeight =
+          editable.style.fontSize! * (editable.style.height ?? 1.0);
+      expect(
+        tester.getSize(find.byType(EditableText)).height,
+        closeTo(5 * lineHeight, 1),
+      );
+    });
+
+    testWidgets('multi variant is a read-only native editable; expand '
+        'updates the visible text', (tester) async {
+      final code = List.generate(6, (i) => 'line ${i + 1}').join('\n');
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonCodeSnippet(
+            code: code,
+            type: CarbonCodeSnippetType.multi,
+            maxCollapsedLines: 3,
+          ),
+        ),
+      );
+
+      final editable = tester.widget<EditableText>(find.byType(EditableText));
+      expect(editable.readOnly, isTrue);
+      expect(editable.controller.text, 'line 1\nline 2\nline 3');
+
+      await tester.tap(find.text('Show more'));
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<EditableText>(find.byType(EditableText))
+            .controller
+            .text,
+        code,
+      );
+      expect(find.text('Show less'), findsOneWidget);
     });
 
     testWidgets('displays code', (tester) async {

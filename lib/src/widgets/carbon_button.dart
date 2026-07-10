@@ -255,9 +255,13 @@ class _CarbonButtonState extends State<CarbonButton> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        DefaultTextStyle.merge(
-          style: _textStyle().copyWith(color: contentColor),
-          child: widget.child!,
+        // Flexible so a width-constrained button lets its label ellipsize
+        // instead of overflowing (loose fit: shrink-wraps when unconstrained).
+        Flexible(
+          child: DefaultTextStyle.merge(
+            style: _textStyle().copyWith(color: contentColor),
+            child: widget.child!,
+          ),
         ),
         if (widget.icon != null) ...[
           const SizedBox(width: 8),

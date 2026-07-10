@@ -67,7 +67,8 @@ class CarbonLoading extends StatelessWidget {
 
     if (withOverlay) {
       return Container(
-        color: carbon.layer.overlay.withValues(alpha: 0.5),
+        // $overlay already encodes its alpha (black @ 0.6).
+        color: carbon.layer.overlay,
         child: Center(child: content),
       );
     }

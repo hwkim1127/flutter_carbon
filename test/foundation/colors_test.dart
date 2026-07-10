@@ -4,8 +4,8 @@ import 'package:flutter_carbon/flutter_carbon.dart';
 
 void main() {
   group('CarbonPalette', () {
-    test('overlay color has correct value', () {
-      expect(CarbonPalette.overlay, const Color(0x52999999));
+    test('overlay color matches the Carbon spec (rgba(black, 0.6))', () {
+      expect(CarbonPalette.overlay, const Color(0x99000000));
     });
 
     group('Black & White colors', () {

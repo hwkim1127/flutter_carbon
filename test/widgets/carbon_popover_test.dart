@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
 
@@ -17,6 +18,29 @@ void main() {
       );
       expect(find.byType(CarbonPopover), findsOneWidget);
       expect(find.text('Trigger'), findsOneWidget);
+    });
+
+    testWidgets('Escape closes an open popover (mouse-opened, no prior '
+        'keyboard focus)', (tester) async {
+      var closed = 0;
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonPopover(
+            content: const Text('Popover content'),
+            onClose: () => closed++,
+            child: const Text('Trigger'),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Trigger'));
+      await tester.pumpAndSettle();
+      expect(find.text('Popover content'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Popover content'), findsNothing);
+      expect(closed, 1);
     });
 
     testWidgets('displays child widget', (tester) async {

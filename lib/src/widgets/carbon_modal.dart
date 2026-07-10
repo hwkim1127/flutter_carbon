@@ -1,14 +1,22 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
-import '../foundation/colors.dart';
+import '../base/carbon_overlay_surface.dart';
+import '../base/carbon_pressable.dart';
+import '../foundation/motion.dart';
+import '../foundation/typography.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
+import 'carbon_button.dart';
 import 'carbon_text_input.dart';
 
 /// Carbon Design System modal dialog.
 ///
-/// Uses PageRouteBuilder with full Scaffold for proper positioning
-/// on foldable phones and various screen configurations.
+/// Uses a widgets-layer [PageRouteBuilder] (no Material route machinery) with
+/// the Carbon spec entrance motion, `$overlay` barrier, and the signature
+/// Carbon footer (64px buttons filling the container width in halves).
+///
+/// Note: modal content no longer has a `Material` ancestor — Material widgets
+/// passed as `content` need their own `Material`.
 class CarbonModal {
   /// Shows a passive modal (informational only, no actions required).
   ///
@@ -28,20 +36,17 @@ class CarbonModal {
     Widget? image,
     bool dismissible = true,
     bool showCloseButton = true,
-  }) async {
-    await Navigator.of(context).push(
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            _CarbonPassiveModal(
-              title: title,
-              content: content,
-              image: image,
-              dismissible: dismissible,
-              showCloseButton: showCloseButton,
-            ),
+  }) {
+    return _show<void>(
+      context,
+      _CarbonPassiveModal(
+        title: title,
+        content: content,
+        image: image,
+        dismissible: dismissible,
+        showCloseButton: showCloseButton,
       ),
+      dismissible: dismissible,
     );
   }
 
@@ -67,27 +72,25 @@ class CarbonModal {
     String primaryButtonText = 'Confirm',
     String secondaryButtonText = 'Cancel',
     bool dismissible = false,
-  }) async {
-    return await Navigator.of(context).push(
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            _CarbonTransactionalModal(
-              title: title,
-              content: content,
-              image: image,
-              primaryButtonText: primaryButtonText,
-              secondaryButtonText: secondaryButtonText,
-              dismissible: dismissible,
-            ),
+  }) {
+    return _show<bool>(
+      context,
+      _CarbonTransactionalModal(
+        title: title,
+        content: content,
+        image: image,
+        primaryButtonText: primaryButtonText,
+        secondaryButtonText: secondaryButtonText,
+        dismissible: dismissible,
       ),
+      dismissible: dismissible,
     );
   }
 
   /// Shows a danger modal (destructive action warning).
   ///
-  /// Returns true if user confirmed the dangerous action.
+  /// Per the Carbon spec this is a standard modal whose primary button is
+  /// the `danger` kind. Returns true if the user confirmed.
   ///
   /// Example:
   /// ```dart
@@ -105,20 +108,17 @@ class CarbonModal {
     String primaryButtonText = 'Delete',
     String secondaryButtonText = 'Cancel',
     bool dismissible = false,
-  }) async {
-    return await Navigator.of(context).push(
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            _CarbonDangerModal(
-              title: title,
-              content: content,
-              primaryButtonText: primaryButtonText,
-              secondaryButtonText: secondaryButtonText,
-              dismissible: dismissible,
-            ),
+  }) {
+    return _show<bool>(
+      context,
+      _CarbonDangerModal(
+        title: title,
+        content: content,
+        primaryButtonText: primaryButtonText,
+        secondaryButtonText: secondaryButtonText,
+        dismissible: dismissible,
       ),
+      dismissible: dismissible,
     );
   }
 
@@ -148,26 +148,23 @@ class CarbonModal {
     TextInputType? keyboardType,
     int? maxLines,
     int? maxLength,
-  }) async {
-    return await Navigator.of(context).push(
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            _CarbonInputModal(
-              title: title,
-              label: label,
-              hintText: hintText,
-              helperText: helperText,
-              initialValue: initialValue,
-              primaryButtonText: primaryButtonText,
-              secondaryButtonText: secondaryButtonText,
-              dismissible: dismissible,
-              keyboardType: keyboardType,
-              maxLines: maxLines,
-              maxLength: maxLength,
-            ),
+  }) {
+    return _show<String>(
+      context,
+      _CarbonInputModal(
+        title: title,
+        label: label,
+        hintText: hintText,
+        helperText: helperText,
+        initialValue: initialValue,
+        primaryButtonText: primaryButtonText,
+        secondaryButtonText: secondaryButtonText,
+        dismissible: dismissible,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        maxLength: maxLength,
       ),
+      dismissible: dismissible,
     );
   }
 
@@ -187,24 +184,68 @@ class CarbonModal {
     bool dismissible = true,
     bool showCloseButton = false,
     double? maxWidth,
-  }) async {
-    return await Navigator.of(context).push<T>(
-      PageRouteBuilder(
+  }) {
+    return _show<T>(
+      context,
+      _CarbonCustomModal<T>(
+        content: content,
+        dismissible: dismissible,
+        showCloseButton: showCloseButton,
+        maxWidth: maxWidth,
+      ),
+      dismissible: dismissible,
+    );
+  }
+
+  /// Pushes [modal] with the Carbon spec motion: 240ms fade + 24px rise
+  /// (expressive easing) over the `$overlay` barrier.
+  ///
+  /// [dismissible] also enables the route's Escape-to-dismiss handling
+  /// (ModalRoute wires Escape → DismissIntent → pop when
+  /// `barrierDismissible` is true).
+  static Future<T?> _show<T>(
+    BuildContext context,
+    Widget modal, {
+    required bool dismissible,
+  }) {
+    final overlayColor = context.carbon.layer.overlay;
+    return Navigator.of(context).push<T>(
+      PageRouteBuilder<T>(
         opaque: false,
-        barrierColor: CarbonPalette.black.withValues(alpha: 0.5),
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            _CarbonCustomModal<T>(
-              content: content,
-              dismissible: dismissible,
-              showCloseButton: showCloseButton,
-              maxWidth: maxWidth,
+        barrierColor: overlayColor,
+        barrierDismissible: dismissible,
+        barrierLabel: dismissible ? 'Dismiss' : null,
+        transitionDuration: CarbonMotion.moderate02,
+        reverseTransitionDuration: CarbonMotion.moderate02,
+        pageBuilder: (context, animation, secondaryAnimation) => modal,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: CarbonMotion.entranceExpressive,
+            reverseCurve: CarbonMotion.exitExpressive,
+          );
+          return FadeTransition(
+            opacity: curved,
+            child: AnimatedBuilder(
+              animation: curved,
+              builder: (context, child) => Transform.translate(
+                offset: Offset(0, -24 * (1 - curved.value)),
+                child: child,
+              ),
+              child: child,
             ),
+          );
+        },
       ),
     );
   }
 }
 
-/// Base modal scaffold wrapper.
+/// Base modal route content: barrier, centering, keyboard avoidance.
+///
+/// Replaces the previous Scaffold: [CarbonOverlaySurface] restores the
+/// default text style Material used to provide, and the bottom-inset padding
+/// replaces `resizeToAvoidBottomInset`.
 class _ModalScaffold extends StatelessWidget {
   final Widget child;
   final bool dismissible;
@@ -218,28 +259,178 @@ class _ModalScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CarbonPalette.transparent,
-      body: SafeArea(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Dismissible overlay
-            GestureDetector(
-              onTap: dismissible ? Navigator.of(context).pop : null,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                color: CarbonPalette.transparent,
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+
+    return CarbonOverlaySurface(
+      child: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: bottomInset),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Dismiss barrier (the route's barrierColor paints the scrim).
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: dismissible ? Navigator.of(context).pop : null,
+                ),
               ),
-            ),
-            // Modal content
-            Container(
-              constraints: BoxConstraints(maxWidth: maxWidth),
-              margin: const EdgeInsets.all(16),
-              child: child,
-            ),
-          ],
+              // Modal content
+              Container(
+                constraints: BoxConstraints(maxWidth: maxWidth),
+                margin: const EdgeInsets.all(16),
+                child: child,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Shared modal container: header / body / flush footer per the Carbon spec,
+/// with an optional overlaid close button.
+class _ModalContainer extends StatelessWidget {
+  final String? title;
+  final Widget? image;
+  final Widget body;
+  final Widget? footer;
+  final bool showCloseButton;
+  final bool padBody;
+
+  const _ModalContainer({
+    this.title,
+    this.image,
+    required this.body,
+    this.footer,
+    this.showCloseButton = false,
+    this.padBody = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final carbon = context.carbon;
+
+    return Stack(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: carbon.layer.layer01,
+            border: Border.all(color: carbon.layer.borderSubtle01),
+            borderRadius: BorderRadius.zero,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (image != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Center(
+                    child: SizedBox(width: 80, height: 80, child: image),
+                  ),
+                ),
+              if (title != null)
+                Padding(
+                  // Right inset clears the 48px close button.
+                  padding: const EdgeInsets.only(top: 16, left: 16, right: 48),
+                  child: Text(
+                    title!,
+                    style: CarbonTypography.heading03.copyWith(
+                      color: carbon.text.textPrimary,
+                    ),
+                  ),
+                ),
+              Padding(
+                padding: padBody
+                    ? const EdgeInsets.only(
+                        top: 8,
+                        left: 16,
+                        right: 16,
+                        bottom: 48,
+                      )
+                    : EdgeInsets.zero,
+                child: DefaultTextStyle(
+                  style: CarbonTypography.body01.copyWith(
+                    color: carbon.text.textPrimary,
+                  ),
+                  child: body,
+                ),
+              ),
+              // Flush footer — no padding, buttons touch the edges.
+              ?footer,
+            ],
+          ),
+        ),
+        if (showCloseButton)
+          Positioned(
+            right: 0,
+            top: 0,
+            child: _ModalCloseButton(onTap: Navigator.of(context).pop),
+          ),
+      ],
+    );
+  }
+}
+
+/// Carbon spec footer: 64px-tall buttons filling the width in halves.
+Widget _modalFooter(
+  BuildContext context, {
+  required String secondaryText,
+  required VoidCallback onSecondary,
+  required String primaryText,
+  required VoidCallback onPrimary,
+  CarbonButtonKind primaryKind = CarbonButtonKind.primary,
+}) {
+  return Row(
+    children: [
+      Expanded(
+        child: CarbonButton(
+          kind: CarbonButtonKind.secondary,
+          size: CarbonButtonSize.xl,
+          onPressed: onSecondary,
+          child: Text(secondaryText),
+        ),
+      ),
+      // No gap — Carbon modal footer buttons touch.
+      Expanded(
+        child: CarbonButton(
+          kind: primaryKind,
+          size: CarbonButtonSize.xl,
+          onPressed: onPrimary,
+          child: Text(primaryText),
+        ),
+      ),
+    ],
+  );
+}
+
+/// 48×48 close button, 20px icon (spec).
+class _ModalCloseButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ModalCloseButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final carbon = context.carbon;
+
+    return Semantics(
+      button: true,
+      label: 'Close',
+      child: CarbonPressable(
+        onTap: onTap,
+        focusable: true,
+        builder: (context, state) => Container(
+          width: 48,
+          height: 48,
+          color: state.hovered ? carbon.layer.layerHover01 : null,
+          child: Icon(
+            CarbonIcons.close,
+            color: carbon.text.iconPrimary,
+            size: 20,
+          ),
         ),
       ),
     );
@@ -264,63 +455,13 @@ class _CarbonPassiveModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final carbon = context.carbon;
-
     return _ModalScaffold(
       dismissible: dismissible,
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: carbon.layer.layer02,
-              borderRadius: BorderRadius.zero,
-            ),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (image != null) ...[
-                  Center(child: SizedBox(width: 80, height: 80, child: image)),
-                  const SizedBox(height: 16),
-                ],
-                if (title != null) ...[
-                  Text(
-                    title!,
-                    style: TextStyle(
-                      color: carbon.text.textPrimary,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                DefaultTextStyle(
-                  style: TextStyle(
-                    color: carbon.text.textPrimary,
-                    fontSize: 14,
-                  ),
-                  textAlign: TextAlign.center,
-                  child: content,
-                ),
-              ],
-            ),
-          ),
-          if (showCloseButton)
-            Positioned(
-              right: 0,
-              top: 0,
-              child: IconButton(
-                onPressed: Navigator.of(context).pop,
-                icon: Icon(
-                  CarbonIcons.close,
-                  color: carbon.text.iconPrimary,
-                  size: 20,
-                ),
-              ),
-            ),
-        ],
+      child: _ModalContainer(
+        title: title,
+        image: image,
+        body: content,
+        showCloseButton: showCloseButton,
       ),
     );
   }
@@ -346,71 +487,25 @@ class _CarbonTransactionalModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final carbon = context.carbon;
-
     return _ModalScaffold(
       dismissible: dismissible,
-      child: Container(
-        decoration: BoxDecoration(
-          color: carbon.layer.layer02,
-          borderRadius: BorderRadius.zero,
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (image != null) ...[
-              Center(child: SizedBox(width: 80, height: 80, child: image)),
-              const SizedBox(height: 16),
-            ],
-            if (title != null) ...[
-              Text(
-                title!,
-                style: TextStyle(
-                  color: carbon.text.textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-            DefaultTextStyle(
-              style: TextStyle(color: carbon.text.textPrimary, fontSize: 14),
-              child: content,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: Text(secondaryButtonText),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: Text(primaryButtonText),
-                  ),
-                ),
-              ],
-            ),
-          ],
+      child: _ModalContainer(
+        title: title,
+        image: image,
+        body: content,
+        footer: _modalFooter(
+          context,
+          secondaryText: secondaryButtonText,
+          onSecondary: () => Navigator.of(context).pop(false),
+          primaryText: primaryButtonText,
+          onPrimary: () => Navigator.of(context).pop(true),
         ),
       ),
     );
   }
 }
 
-/// Danger modal implementation.
+/// Danger modal implementation: standard modal + danger primary button.
 class _CarbonDangerModal extends StatelessWidget {
   final String? title;
   final Widget content;
@@ -428,89 +523,18 @@ class _CarbonDangerModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final carbon = context.carbon;
-
     return _ModalScaffold(
       dismissible: dismissible,
-      child: Container(
-        decoration: BoxDecoration(
-          color: carbon.layer.layer02,
-          borderRadius: BorderRadius.zero,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Danger header
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: carbon.layer.supportError),
-              child: Row(
-                children: [
-                  Icon(
-                    CarbonIcons.warningFilled,
-                    color: carbon.text.textOnColor,
-                    size: 24,
-                  ),
-                  if (title != null) ...[
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        title!,
-                        style: TextStyle(
-                          color: carbon.text.textOnColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  DefaultTextStyle(
-                    style: TextStyle(
-                      color: carbon.text.textPrimary,
-                      fontSize: 14,
-                    ),
-                    child: content,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.of(context).pop(false),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          child: Text(secondaryButtonText),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: FilledButton(
-                          onPressed: () => Navigator.of(context).pop(true),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: carbon.layer.supportError,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          child: Text(primaryButtonText),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+      child: _ModalContainer(
+        title: title,
+        body: content,
+        footer: _modalFooter(
+          context,
+          secondaryText: secondaryButtonText,
+          onSecondary: () => Navigator.of(context).pop(false),
+          primaryText: primaryButtonText,
+          onPrimary: () => Navigator.of(context).pop(true),
+          primaryKind: CarbonButtonKind.danger,
         ),
       ),
     );
@@ -566,83 +590,46 @@ class _CarbonInputModalState extends State<_CarbonInputModal> {
 
   @override
   Widget build(BuildContext context) {
-    final carbon = context.carbon;
+    // Native Carbon input. Note: [maxLength] still enforces the limit, but
+    // Material's character counter UI is gone (the Carbon counter is a
+    // deferred CarbonTextInput feature).
+    final Widget field;
+    if ((widget.maxLines ?? 1) > 1) {
+      field = CarbonTextArea(
+        labelText: widget.label ?? widget.hintText ?? '',
+        hideLabel: widget.label == null,
+        controller: _controller,
+        autofocus: true,
+        placeholder: widget.hintText,
+        helperText: widget.helperText,
+        minLines: widget.maxLines!,
+        maxLines: widget.maxLines,
+        maxLength: widget.maxLength,
+      );
+    } else {
+      field = CarbonTextInput(
+        labelText: widget.label ?? widget.hintText ?? '',
+        hideLabel: widget.label == null,
+        controller: _controller,
+        autofocus: true,
+        placeholder: widget.hintText,
+        helperText: widget.helperText,
+        keyboardType: widget.keyboardType,
+        maxLength: widget.maxLength,
+      );
+    }
 
     return _ModalScaffold(
       dismissible: widget.dismissible,
-      child: Container(
-        decoration: BoxDecoration(
-          color: carbon.layer.layer02,
-          borderRadius: BorderRadius.zero,
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (widget.title != null) ...[
-              Text(
-                widget.title!,
-                style: TextStyle(
-                  color: carbon.text.textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-            // Native Carbon input. Note: [maxLength] still enforces the
-            // limit, but Material's character counter UI is gone (the Carbon
-            // counter is a deferred CarbonTextInput feature).
-            if ((widget.maxLines ?? 1) > 1)
-              CarbonTextArea(
-                labelText: widget.label ?? widget.hintText ?? '',
-                hideLabel: widget.label == null,
-                controller: _controller,
-                autofocus: true,
-                placeholder: widget.hintText,
-                helperText: widget.helperText,
-                minLines: widget.maxLines!,
-                maxLines: widget.maxLines,
-                maxLength: widget.maxLength,
-              )
-            else
-              CarbonTextInput(
-                labelText: widget.label ?? widget.hintText ?? '',
-                hideLabel: widget.label == null,
-                controller: _controller,
-                autofocus: true,
-                placeholder: widget.hintText,
-                helperText: widget.helperText,
-                keyboardType: widget.keyboardType,
-                maxLength: widget.maxLength,
-              ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: Text(widget.secondaryButtonText),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () =>
-                        Navigator.of(context).pop(_controller.text),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: Text(widget.primaryButtonText),
-                  ),
-                ),
-              ],
-            ),
-          ],
+      child: _ModalContainer(
+        title: widget.title,
+        body: field,
+        footer: _modalFooter(
+          context,
+          secondaryText: widget.secondaryButtonText,
+          onSecondary: () => Navigator.of(context).pop(),
+          primaryText: widget.primaryButtonText,
+          onPrimary: () => Navigator.of(context).pop(_controller.text),
         ),
       ),
     );
@@ -665,34 +652,13 @@ class _CarbonCustomModal<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final carbon = context.carbon;
-
     return _ModalScaffold(
       dismissible: dismissible,
       maxWidth: maxWidth ?? 480,
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: carbon.layer.layer02,
-              borderRadius: BorderRadius.zero,
-            ),
-            child: content,
-          ),
-          if (showCloseButton)
-            Positioned(
-              right: 0,
-              top: 0,
-              child: IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(
-                  CarbonIcons.close,
-                  color: carbon.text.iconPrimary,
-                  size: 20,
-                ),
-              ),
-            ),
-        ],
+      child: _ModalContainer(
+        body: content,
+        padBody: false,
+        showCloseButton: showCloseButton,
       ),
     );
   }

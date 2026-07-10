@@ -91,7 +91,9 @@ class DemoPageTemplate extends StatelessWidget {
         ],
         const SizedBox(height: 16),
 
-        // Section content
+        // Section content. The inner Material keeps Material descendants
+        // (ListTile & friends) painting above this decorated background —
+        // without it they assert in debug builds.
         section.builder == null
             ? const SizedBox.shrink()
             : Container(
@@ -100,7 +102,10 @@ class DemoPageTemplate extends StatelessWidget {
                   color: carbon.layer.layer01,
                   border: Border.all(color: carbon.layer.borderSubtle01),
                 ),
-                child: section.builder!(context),
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: section.builder!(context),
+                ),
               ),
       ],
     );

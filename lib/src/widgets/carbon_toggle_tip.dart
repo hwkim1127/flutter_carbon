@@ -117,6 +117,9 @@ class _CarbonToggleTipState extends State<CarbonToggleTip> {
 
     _overlayEntry = _createOverlayEntry();
     Overlay.of(context).insert(_overlayEntry!);
+    // The Escape handler lives on this node — a mouse click on the trigger
+    // doesn't focus it, so take focus explicitly while the tip is open.
+    _focusNode.requestFocus();
     setState(() => _isOpen = true);
     widget.onOpen?.call();
   }
@@ -131,8 +134,9 @@ class _CarbonToggleTipState extends State<CarbonToggleTip> {
   }
 
   OverlayEntry _createOverlayEntry() {
-    final anchorRect =
-        CarbonAnchoredOverlay.anchorRectGetterFor(_triggerKey.currentContext!);
+    final anchorRect = CarbonAnchoredOverlay.anchorRectGetterFor(
+      _triggerKey.currentContext!,
+    );
 
     return OverlayEntry(
       builder: (context) => CarbonAnchoredOverlay(
@@ -231,7 +235,8 @@ class _ToggleTipButtonState extends State<_ToggleTipButton> {
                   : carbon.toggleTip.buttonBackground,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: widget.icon ??
+            child:
+                widget.icon ??
                 Icon(
                   CarbonIcons.information,
                   size: 16,
@@ -288,39 +293,39 @@ class _ToggleTipContent extends StatelessWidget {
             ],
           ),
           child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DefaultTextStyle(
-                    style: TextStyle(
-                      color: carbon.toggleTip.contentText,
-                      fontSize: 14,
-                      height: 1.4,
-                    ),
-                    child: content,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DefaultTextStyle(
+                  style: TextStyle(
+                    color: carbon.toggleTip.contentText,
+                    fontSize: 14,
+                    height: 1.4,
                   ),
-                  if (actions != null && actions!.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: actions!.map((action) {
-                        return DefaultTextStyle(
-                          style: TextStyle(
-                            color: carbon.toggleTip.actionButtonText,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          child: action,
-                        );
-                      }).toList(),
-                    ),
-                  ],
+                  child: content,
+                ),
+                if (actions != null && actions!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: actions!.map((action) {
+                      return DefaultTextStyle(
+                        style: TextStyle(
+                          color: carbon.toggleTip.actionButtonText,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        child: action,
+                      );
+                    }).toList(),
+                  ),
                 ],
-              ),
+              ],
             ),
+          ),
         ),
         if (_isTopAligned) _buildCaret(carbon.toggleTip.caret, isTop: false),
       ],

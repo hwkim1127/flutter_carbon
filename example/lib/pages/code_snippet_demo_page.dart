@@ -36,6 +36,7 @@ void main() {
   runApp(MyApp());
 }''',
             type: CarbonCodeSnippetType.multi,
+            highlighter: CarbonDartHighlighter(),
           ),
         ),
         DemoSection(
@@ -108,6 +109,7 @@ class HomePage extends StatelessWidget {
 }''',
             type: CarbonCodeSnippetType.multi,
             maxCollapsedLines: 15,
+            highlighter: CarbonDartHighlighter(),
           ),
         ),
         DemoSection(

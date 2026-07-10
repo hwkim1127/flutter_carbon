@@ -18,14 +18,12 @@ class _MaterialSelectionDemoPageState extends State<MaterialSelectionDemoPage> {
 
   bool _switchValue = false;
 
-  double _sliderValue = 30;
-
   @override
   Widget build(BuildContext context) {
     return DemoPageTemplate(
       title: 'Material Selection Controls',
       description:
-          'Standard Material selection controls (Checkbox, Radio, Switch, Slider) automatically themed to match Carbon Design System.',
+          'Standard Material selection controls (Checkbox, Radio, Switch) automatically themed to match Carbon Design System. For sliders, see the native CarbonSlider demo under Forms.',
       sections: [
         DemoSection(
           title: 'Checkbox',
@@ -43,7 +41,8 @@ class _MaterialSelectionDemoPageState extends State<MaterialSelectionDemoPage> {
                 onChanged: (value) => setState(() => _checkboxValue2 = value!),
               ),
               CheckboxListTile(
-                title: const Text('Option 3 (Disabled)'),
+                title: const Text('Option 3 (Disabled, indeterminate)'),
+                tristate: true, // value: null asserts without it
                 value: null,
                 onChanged: null,
               ),
@@ -90,39 +89,6 @@ class _MaterialSelectionDemoPageState extends State<MaterialSelectionDemoPage> {
                 title: const Text('Disabled'),
                 value: false,
                 onChanged: null,
-              ),
-            ],
-          ),
-        ),
-        DemoSection(
-          title: 'Slider',
-          description: 'Material Slider with Carbon styling',
-          builder: (context) => Column(
-            children: [
-              Row(
-                children: [
-                  const Text('Value:'),
-                  Expanded(
-                    child: Slider(
-                      value: _sliderValue,
-                      min: 0,
-                      max: 100,
-                      label: _sliderValue.round().toString(),
-                      onChanged: (value) =>
-                          setState(() => _sliderValue = value),
-                    ),
-                  ),
-                  Text(_sliderValue.round().toString()),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Text('Disabled:'),
-                  Expanded(
-                    child: Slider(value: 50, min: 0, max: 100, onChanged: null),
-                  ),
-                ],
               ),
             ],
           ),

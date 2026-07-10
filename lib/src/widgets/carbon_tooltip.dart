@@ -37,6 +37,11 @@ class CarbonTooltip extends StatefulWidget {
   /// Delay before hiding after the pointer leaves (Carbon default: 300ms).
   final Duration leaveDelay;
 
+  /// When false the tooltip never shows (and hides if visible). Lets hosts
+  /// suppress it — e.g. while a menu anchored to the same trigger is open —
+  /// without unmounting the wrapper (which would reset the child's state).
+  final bool enabled;
+
   const CarbonTooltip({
     super.key,
     required this.child,
@@ -44,6 +49,7 @@ class CarbonTooltip extends StatefulWidget {
     this.alignment = CarbonPopoverAlignment.top,
     this.enterDelay = const Duration(milliseconds: 100),
     this.leaveDelay = const Duration(milliseconds: 300),
+    this.enabled = true,
   });
 
   @override
@@ -68,6 +74,9 @@ class _CarbonTooltipState extends State<CarbonTooltip> {
         _overlayEntry?.markNeedsBuild();
       });
     }
+    if (!widget.enabled && oldWidget.enabled) {
+      _hide();
+    }
   }
 
   @override
@@ -80,6 +89,7 @@ class _CarbonTooltipState extends State<CarbonTooltip> {
   }
 
   void _scheduleShow() {
+    if (!widget.enabled) return;
     _leaveTimer?.cancel();
     _leaveTimer = null;
     if (_overlayEntry != null || _enterTimer != null) return;
@@ -100,7 +110,7 @@ class _CarbonTooltipState extends State<CarbonTooltip> {
   }
 
   void _show() {
-    if (_overlayEntry != null) return;
+    if (!widget.enabled || _overlayEntry != null) return;
 
     final anchorRect = CarbonAnchoredOverlay.anchorRectGetterFor(context);
     _overlayEntry = OverlayEntry(

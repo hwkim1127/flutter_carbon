@@ -31,7 +31,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(FloatingActionButton), findsOneWidget);
+      // Native trigger button (no Material FloatingActionButton anymore).
       expect(find.byIcon(Icons.menu), findsOneWidget);
     });
 
@@ -89,8 +89,8 @@ void main() {
         ),
       );
 
-      // Open menu by tapping FAB
-      await tester.tap(find.byType(FloatingActionButton));
+      // Open menu by tapping the trigger (default add icon)
+      await tester.tap(find.byIcon(CarbonIcons.add));
       await tester.pumpAndSettle();
 
       // Menu should be open and visible
@@ -118,7 +118,7 @@ void main() {
       expect(find.byIcon(Icons.menu), findsOneWidget);
 
       // Tap to open
-      await tester.tap(find.byType(FloatingActionButton));
+      await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
 
       // Should show close icon when open
@@ -227,7 +227,7 @@ void main() {
       );
 
       // Tap to open
-      await tester.tap(find.byType(FloatingActionButton));
+      await tester.tap(find.byIcon(CarbonIcons.add));
       await tester.pump(); // Start animation
       await tester.pump(const Duration(milliseconds: 100)); // Mid-animation
 

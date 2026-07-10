@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show KeyDownEvent, LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
 import '../base/carbon_anchored_overlay.dart';
@@ -89,6 +90,16 @@ class CarbonMultiSelect<T> extends StatefulWidget {
 
 class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
   final GlobalKey _fieldKey = GlobalKey();
+  final FocusNode _menuFocusNode = FocusNode(
+    debugLabel: 'CarbonMultiSelectMenu',
+  );
+  final FocusNode _filterFocusNode = FocusNode(
+    debugLabel: 'CarbonMultiSelectFilter',
+  );
+
+  /// Whatever held focus before the menu opened; restored on close.
+  FocusNode? _previousFocus;
+
   OverlayEntry? _overlayEntry;
   bool _isOpen = false;
   String _filterText = '';
@@ -115,6 +126,8 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     _overlayEntry?.remove();
     _overlayEntry = null;
     _filterController.dispose();
+    _menuFocusNode.dispose();
+    _filterFocusNode.dispose();
     super.dispose();
   }
 
@@ -129,8 +142,16 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
   void _openMenu() {
     if (!widget.enabled || _isOpen) return;
 
+    _previousFocus = FocusManager.instance.primaryFocus;
     _overlayEntry = _createOverlayEntry();
     Overlay.of(context).insert(_overlayEntry!);
+    // Focus the filter (or the menu itself) explicitly — `autofocus` is
+    // ignored whenever something else already holds focus, which would
+    // leave Escape dead and typing going nowhere.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isOpen || !mounted) return;
+      (widget.filterable ? _filterFocusNode : _menuFocusNode).requestFocus();
+    });
     setState(() => _isOpen = true);
   }
 
@@ -141,8 +162,23 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     _overlayEntry = null;
     _filterController.clear();
     _filterText = '';
+    _restorePreviousFocus();
     if (mounted) {
       setState(() => _isOpen = false);
+    }
+  }
+
+  void _restorePreviousFocus() {
+    final current = FocusManager.instance.primaryFocus;
+    final previous = _previousFocus;
+    _previousFocus = null;
+    if (previous != null &&
+        previous.context != null &&
+        (current == null ||
+            current == _menuFocusNode ||
+            current == _filterFocusNode ||
+            current is FocusScopeNode)) {
+      previous.requestFocus();
     }
   }
 
@@ -196,8 +232,19 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
         matchAnchorWidth: true,
         spacing: 4,
         onDismiss: _closeMenu,
-        contentBuilder: (context, _) =>
-            CarbonOverlaySurface(child: _buildMenu(context.carbon)),
+        contentBuilder: (context, _) => Focus(
+          focusNode: _menuFocusNode,
+          // Escape closes; bubbles up here from the filter field too.
+          onKeyEvent: (node, event) {
+            if (event is KeyDownEvent &&
+                event.logicalKey == LogicalKeyboardKey.escape) {
+              _closeMenu();
+              return KeyEventResult.handled;
+            }
+            return KeyEventResult.ignored;
+          },
+          child: CarbonOverlaySurface(child: _buildMenu(context.carbon)),
+        ),
       ),
     );
   }
@@ -235,7 +282,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: CarbonEditableCore(
                   controller: _filterController,
-                  autofocus: true,
+                  focusNode: _filterFocusNode,
                   placeholder: 'Filter options',
                   placeholderStyle: TextStyle(
                     color: carbon.text.textPlaceholder,

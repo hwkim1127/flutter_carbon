@@ -49,19 +49,13 @@ CarbonApp(
 ```
 
 `CarbonApp` provides navigation (`CarbonPageRoute`: fade + rise, Carbon
-productive motion), localizations, and animated theme switching. **Not yet
-supported inside a pure `CarbonApp`** — these widgets still require a
-Material host (use the bridge setup above) until their native primitives land:
+productive motion), localizations, and animated theme switching.
 
-| Widget | Material dependency |
-|---|---|
-| `CarbonComboBox`, `CarbonNumberInput`, `CarbonMultiSelect`, `CarbonToolbar` (search), `CarbonModal` | `TextField` / `Scaffold` |
-| `CarbonDataTable` (selectable rows) | `Checkbox` / `Radio` |
-| `CarbonLoading`, `CarbonFileUploader` | `CircularProgressIndicator` |
-| `CarbonPagination`, `CarbonComboButton` | Material `Tooltip` / menus |
-| `CarbonFloatingMenu` | `FloatingActionButton` |
-| `CarbonUIShell` | `Scaffold` |
-| `CarbonCodeSnippet` | `SelectableText` |
+As of 2.0.0 **every `Carbon*` widget works inside a pure `CarbonApp`** — no
+widget imports Material anymore (guard-test enforced). The bridge setup is
+only needed when you mix Material widgets into the app (e.g. Material's
+date/time pickers, `ListTile`, `LinearProgressIndicator`) and want them
+Carbon-themed via `carbonTheme()`.
 
 ### API changes
 
@@ -75,6 +69,44 @@ Material host (use the bridge setup above) until their native primitives land:
 
 Reading the Carbon data back off a Material `ThemeData` (rare):
 `themeData.extension<CarbonMaterialThemeExtension>()!.data`.
+
+### Widget API changes
+
+* **`CarbonComboButton` → `CarbonComboButton<T>`** with a native menu model:
+
+  ```dart
+  // 1.x (Material menu entries)
+  CarbonComboButton(
+    label: 'Save',
+    menuItems: [
+      PopupMenuItem(value: 'draft', child: Text('Save as draft')),
+      PopupMenuDivider(),
+      PopupMenuItem(value: 'export', child: Text('Export')),
+    ],
+    onMenuItemSelected: (value) => ...,
+  )
+
+  // 2.0
+  CarbonComboButton<String>(
+    label: 'Save',
+    menuItems: const [
+      CarbonMenuItem(value: 'draft', label: 'Save as draft'),
+      CarbonMenuItemDivider(),
+      CarbonMenuItem(value: 'export', label: 'Export'),
+    ],
+    onMenuItemSelected: (value) => ..., // now typed
+  )
+  ```
+
+* **`CarbonFloatingMenu.heroTag` removed** — it only existed for Material's
+  FloatingActionButton Hero animation; delete the argument.
+* **`CarbonDataTable.sortable` removed** (deprecated no-op since 1.2.1) —
+  a column sorts iff its header has `sortable: true` and the table has a
+  non-null `onSort`; delete the argument.
+* **Behavioral:** `CarbonUIShell` and `CarbonModal` no longer provide
+  `Scaffold`/`Material` ancestors. Material widgets passed as their content
+  (e.g. `ListTile`, `TextButton`) need their own `Material` ancestor:
+  `Material(type: MaterialType.transparency, child: ...)`.
 
 ---
 

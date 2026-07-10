@@ -8,8 +8,9 @@ import 'dart:ui';
 class CarbonPalette {
   const CarbonPalette._();
 
-  // Custom Color is used NOT rgba(0,0,0,0.6)
-  static const Color overlay = Color(0x52999999);
+  /// Carbon `$overlay`: rgba(black, 0.6) in all four themes (v11.96).
+  /// (v1 shipped a custom light-gray here; corrected to spec in v2.)
+  static const Color overlay = Color(0x99000000);
 
   static const Color transparent = Color(0x00000000);
 

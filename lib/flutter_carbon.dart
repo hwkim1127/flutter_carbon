@@ -9,9 +9,21 @@ export 'src/theme/carbon_theme.dart';
 export 'src/theme/carbon_theme_data.dart';
 
 // Widgets
+export 'src/widgets/carbon_accordion.dart';
 export 'src/widgets/carbon_button.dart';
 export 'src/widgets/carbon_checkbox.dart';
+export 'src/widgets/carbon_menu.dart'
+    show
+        CarbonMenuEntry,
+        CarbonMenuItem,
+        CarbonMenuItemDivider,
+        CarbonMenuItemKind,
+        CarbonMenuSize;
 export 'src/widgets/carbon_radio.dart';
+export 'src/widgets/carbon_search.dart';
+export 'src/widgets/carbon_select.dart';
+export 'src/widgets/carbon_slider.dart';
+export 'src/widgets/carbon_syntax.dart';
 export 'src/widgets/carbon_text_input.dart';
 export 'src/widgets/carbon_tooltip.dart';
 export 'src/text/carbon_text_selection_labels.dart';

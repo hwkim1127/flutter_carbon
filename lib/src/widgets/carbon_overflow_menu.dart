@@ -211,7 +211,63 @@ class _MenuContent extends StatefulWidget {
 }
 
 class _MenuContentState extends State<_MenuContent> {
+  final FocusNode _focusNode = FocusNode(debugLabel: 'CarbonOverflowMenu');
+
+  /// Whatever held focus before the menu opened; restored on close.
+  FocusNode? _previousFocus;
+
   int? _hoveredIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _previousFocus = FocusManager.instance.primaryFocus;
+    // `autofocus` is ignored when the scope already has a focused node —
+    // without primary focus here, Escape is dead and arrow keys run the
+    // app's focus traversal behind the menu. Take focus explicitly.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    final current = FocusManager.instance.primaryFocus;
+    final previous = _previousFocus;
+    if (previous != null &&
+        previous.context != null &&
+        (current == null ||
+            current == _focusNode ||
+            current is FocusScopeNode)) {
+      previous.requestFocus();
+    }
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  bool _isEnabledItem(int index) {
+    final item = widget.items[index];
+    return item is CarbonOverflowMenuItem && !item.disabled;
+  }
+
+  void _activate(CarbonOverflowMenuItem item) {
+    item.onTap?.call();
+    widget.onItemTapped();
+  }
+
+  void _moveHighlight(int direction) {
+    final count = widget.items.length;
+    if (count == 0) return;
+    var index = _hoveredIndex ?? (direction > 0 ? -1 : count);
+    for (var step = 0; step < count; step++) {
+      index += direction;
+      if (index < 0 || index >= count) return; // no wrap-around
+      if (_isEnabledItem(index)) {
+        setState(() => _hoveredIndex = index);
+        return;
+      }
+    }
+  }
 
   double get _minWidth {
     switch (widget.size) {
@@ -242,12 +298,31 @@ class _MenuContentState extends State<_MenuContent> {
   @override
   Widget build(BuildContext context) {
     return Focus(
-      autofocus: true,
+      focusNode: _focusNode,
       onKeyEvent: (node, event) {
-        if (event is KeyDownEvent &&
-            event.logicalKey == LogicalKeyboardKey.escape) {
+        if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+        if (event.logicalKey == LogicalKeyboardKey.escape) {
           widget.onItemTapped();
           return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+          _moveHighlight(1);
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+          _moveHighlight(-1);
+          return KeyEventResult.handled;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.enter ||
+            event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+            event.logicalKey == LogicalKeyboardKey.space) {
+          final index = _hoveredIndex;
+          if (index != null && _isEnabledItem(index)) {
+            _activate(widget.items[index] as CarbonOverflowMenuItem);
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
         }
         return KeyEventResult.ignored;
       },
@@ -282,9 +357,7 @@ class _MenuContentState extends State<_MenuContent> {
       final item = widget.items[i];
 
       if (item is CarbonOverflowMenuDivider) {
-        widgets.add(
-          CarbonDivider(color: widget.theme.divider),
-        );
+        widgets.add(CarbonDivider(color: widget.theme.divider));
       } else if (item is CarbonOverflowMenuItem) {
         widgets.add(_buildMenuItem(item, i));
       }
@@ -322,11 +395,11 @@ class _MenuContentState extends State<_MenuContent> {
                   data: IconThemeData(
                     color: item.isDanger
                         ? (isHovered
-                            ? widget.theme.itemDangerTextHover
-                            : widget.theme.itemDangerText)
+                              ? widget.theme.itemDangerTextHover
+                              : widget.theme.itemDangerText)
                         : (isHovered
-                            ? widget.theme.itemTextHover
-                            : widget.theme.itemText),
+                              ? widget.theme.itemTextHover
+                              : widget.theme.itemText),
                     size: 16,
                   ),
                   child: item.icon!,
@@ -341,11 +414,11 @@ class _MenuContentState extends State<_MenuContent> {
                     style: TextStyle(
                       color: item.isDanger
                           ? (isHovered
-                              ? widget.theme.itemDangerTextHover
-                              : widget.theme.itemDangerText)
+                                ? widget.theme.itemDangerTextHover
+                                : widget.theme.itemDangerText)
                           : (isHovered
-                              ? widget.theme.itemTextHover
-                              : widget.theme.itemText),
+                                ? widget.theme.itemTextHover
+                                : widget.theme.itemText),
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),

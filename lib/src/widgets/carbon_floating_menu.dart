@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../base/carbon_pressable.dart';
 import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
@@ -43,9 +44,6 @@ class CarbonFloatingMenu extends StatefulWidget {
   /// Whether the menu starts open.
   final bool initiallyOpen;
 
-  /// The hero tag for the FAB.
-  final Object? heroTag;
-
   const CarbonFloatingMenu({
     super.key,
     this.icon = CarbonIcons.add,
@@ -53,7 +51,6 @@ class CarbonFloatingMenu extends StatefulWidget {
     required this.items,
     this.label,
     this.initiallyOpen = false,
-    this.heroTag,
   });
 
   @override
@@ -137,19 +134,44 @@ class _CarbonFloatingMenuState extends State<CarbonFloatingMenu>
           );
         }),
 
-        // Main FAB
-        FloatingActionButton(
-          heroTag: widget.heroTag ?? 'floating_menu_fab',
-          backgroundColor: theme.fabBackground,
-          foregroundColor: theme.fabForeground,
-          onPressed: _toggle,
-          elevation: 4,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          child: AnimatedRotation(
-            turns: _isOpen ? 0.125 : 0.0, // 45 degree rotation when open
-            duration: const Duration(milliseconds: 200),
-            child: Icon(
-              _isOpen ? (widget.openIcon ?? CarbonIcons.close) : widget.icon,
+        // Main trigger button (Carbon has no FAB spec — native square with
+        // hover/pressed feedback the Material FAB variant never had).
+        Semantics(
+          button: true,
+          label: widget.label,
+          child: CarbonPressable(
+            onTap: _toggle,
+            focusable: true,
+            builder: (context, state) => Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: state.pressed
+                    ? carbon.button.buttonPrimaryActive
+                    : state.hovered
+                        ? carbon.button.buttonPrimaryHover
+                        : theme.fabBackground,
+                boxShadow: [
+                  BoxShadow(
+                    color: CarbonPalette.black.withValues(alpha: 0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: AnimatedRotation(
+                  turns: _isOpen ? 0.125 : 0.0, // 45° rotation when open
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    _isOpen
+                        ? (widget.openIcon ?? CarbonIcons.close)
+                        : widget.icon,
+                    color: theme.fabForeground,
+                    size: 24,
+                  ),
+                ),
+              ),
             ),
           ),
         ),

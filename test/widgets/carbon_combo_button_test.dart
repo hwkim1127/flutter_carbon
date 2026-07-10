@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_carbon/material.dart';
 
@@ -9,15 +10,14 @@ void main() {
     testWidgets('renders without error', (tester) async {
       await tester.pumpWidget(
         buildTestApp(
-          child: CarbonComboButton(
+          child: CarbonComboButton<String>(
             onPressed: () {},
-            menuItems: const [],
             label: 'Action',
           ),
         ),
       );
 
-      expect(find.byType(CarbonComboButton), findsOneWidget);
+      expect(find.byType(CarbonComboButton<String>), findsOneWidget);
       expect(find.text('Action'), findsOneWidget);
     });
 
@@ -26,9 +26,8 @@ void main() {
 
       await tester.pumpWidget(
         buildTestApp(
-          child: CarbonComboButton(
+          child: CarbonComboButton<String>(
             onPressed: () => pressed = true,
-            menuItems: const [],
             label: 'Main',
           ),
         ),
@@ -40,67 +39,47 @@ void main() {
       expect(pressed, isTrue);
     });
 
-    testWidgets('shows menu when dropdown button tapped', (tester) async {
+    testWidgets('shows menu when the chevron is tapped; divider renders', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         buildTestApp(
-          child: CarbonComboButton(
+          child: CarbonComboButton<String>(
             onPressed: () {},
             menuItems: const [
-              PopupMenuItem(value: '1', child: Text('Option 1')),
-              PopupMenuItem(value: '2', child: Text('Option 2')),
+              CarbonMenuItem(value: '1', label: 'Option 1'),
+              CarbonMenuItemDivider(),
+              CarbonMenuItem(value: '2', label: 'Option 2'),
             ],
             label: 'Action',
           ),
         ),
       );
 
-      // Tap dropdown arrow
       await tester.tap(find.byIcon(CarbonIcons.chevronDown));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Option 1'), findsOneWidget);
       expect(find.text('Option 2'), findsOneWidget);
     });
 
-    testWidgets('can be disabled', (tester) async {
-      await tester.pumpWidget(
-        buildTestApp(
-          child: CarbonComboButton(
-            onPressed: null,
-            menuItems: const [],
-            label: 'Disabled',
-          ),
-        ),
-      );
-
-      final button = tester.widget<CarbonComboButton>(
-        find.byType(CarbonComboButton),
-      );
-      expect(button.onPressed, isNull);
-    });
-
-    testWidgets('calls onMenuItemSelected when menu item tapped', (
-      tester,
-    ) async {
-      String? selected;
+    testWidgets('selecting an item fires onTap AND onMenuItemSelected, '
+        'then closes', (tester) async {
+      final calls = <String>[];
 
       await tester.pumpWidget(
         buildTestApp(
-          child: CarbonComboButton(
+          child: CarbonComboButton<String>(
             onPressed: () {},
             menuItems: [
-              PopupMenuItem(
+              CarbonMenuItem(
                 value: 'edit',
-                child: Text('Edit'),
-                onTap: () => selected = 'edit',
+                label: 'Edit',
+                onTap: () => calls.add('onTap'),
               ),
-              PopupMenuItem(
-                value: 'delete',
-                child: Text('Delete'),
-                onTap: () => selected = 'delete',
-              ),
+              const CarbonMenuItem(value: 'delete', label: 'Delete'),
             ],
-            onMenuItemSelected: (value) => selected = value,
+            onMenuItemSelected: (value) => calls.add('selected:$value'),
             label: 'Actions',
           ),
         ),
@@ -112,7 +91,180 @@ void main() {
       await tester.tap(find.text('Edit'));
       await tester.pumpAndSettle();
 
-      expect(selected, 'edit');
+      expect(calls, ['onTap', 'selected:edit']);
+      expect(find.text('Delete'), findsNothing); // menu closed
+    });
+
+    testWidgets('tap outside dismisses the menu', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonComboButton<String>(
+            onPressed: () {},
+            menuItems: const [CarbonMenuItem(value: '1', label: 'Option 1')],
+            label: 'Action',
+          ),
+        ),
+      );
+
+      await tester.tap(find.byIcon(CarbonIcons.chevronDown));
+      await tester.pumpAndSettle();
+      expect(find.text('Option 1'), findsOneWidget);
+
+      await tester.tapAt(const Offset(700, 500));
+      await tester.pumpAndSettle();
+      expect(find.text('Option 1'), findsNothing);
+    });
+
+    testWidgets('chevron rotates while the menu is open', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonComboButton<String>(
+            onPressed: () {},
+            menuItems: const [CarbonMenuItem(value: '1', label: 'One')],
+            label: 'Action',
+          ),
+        ),
+      );
+
+      AnimatedRotation rotation() =>
+          tester.widget<AnimatedRotation>(find.byType(AnimatedRotation));
+
+      expect(rotation().turns, 0.0);
+
+      await tester.tap(find.byIcon(CarbonIcons.chevronDown));
+      await tester.pumpAndSettle();
+      expect(rotation().turns, 0.5);
+
+      await tester.tapAt(const Offset(700, 500));
+      await tester.pumpAndSettle();
+      expect(rotation().turns, 0.0);
+    });
+
+    testWidgets('menu width matches the full container width', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonComboButton<String>(
+            onPressed: () {},
+            menuItems: const [CarbonMenuItem(value: '1', label: 'One')],
+            label: 'A very long primary action label',
+          ),
+        ),
+      );
+
+      final containerWidth =
+          tester.getSize(find.byType(CarbonComboButton<String>)).width;
+
+      await tester.tap(find.byIcon(CarbonIcons.chevronDown));
+      await tester.pumpAndSettle();
+
+      final menuFinder = find.ancestor(
+        of: find.text('One'),
+        matching: find.byWidgetPredicate(
+          (widget) => widget.runtimeType.toString() == 'CarbonMenuPanel<String>',
+        ),
+      );
+      expect(
+        tester.getSize(menuFinder).width,
+        closeTo(containerWidth, 0.5),
+      );
+    });
+
+    testWidgets('disabled: primary inert and chevron opens nothing', (
+      tester,
+    ) async {
+      bool pressed = false;
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonComboButton<String>(
+            onPressed: () => pressed = true,
+            menuItems: const [CarbonMenuItem(value: '1', label: 'Option 1')],
+            label: 'Submit',
+            disabled: true,
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Submit'), warnIfMissed: false);
+      await tester.tap(
+        find.byIcon(CarbonIcons.chevronDown),
+        warnIfMissed: false,
+      );
+      await tester.pumpAndSettle();
+
+      expect(pressed, isFalse);
+      expect(find.text('Option 1'), findsNothing);
+    });
+
+    testWidgets(
+        'arrow keys drive the menu (not focus traversal) even when another '
+        'widget held focus; focus is restored on close', (tester) async {
+      String? selected;
+      final neighborFocus = FocusNode();
+      addTearDown(neighborFocus.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          child: Column(
+            children: [
+              Focus(
+                focusNode: neighborFocus,
+                child: const SizedBox(width: 40, height: 40),
+              ),
+              CarbonComboButton<String>(
+                onPressed: () {},
+                menuItems: const [
+                  CarbonMenuItem(value: 'one', label: 'One'),
+                  CarbonMenuItem(value: 'two', label: 'Two'),
+                ],
+                onMenuItemSelected: (value) => selected = value,
+                label: 'Action',
+              ),
+            ],
+          ),
+        ),
+      );
+
+      // Reproduce the report: something else already holds focus, so the
+      // panel's old `autofocus` would have been silently ignored.
+      neighborFocus.requestFocus();
+      await tester.pump();
+      expect(neighborFocus.hasPrimaryFocus, isTrue);
+
+      await tester.tap(find.byIcon(CarbonIcons.chevronDown));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      expect(selected, 'two');
+      // Focus went back to where it was before the menu opened.
+      expect(neighborFocus.hasPrimaryFocus, isTrue);
+    });
+
+    testWidgets('removes an open menu overlay when unmounted', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonComboButton<String>(
+            onPressed: () {},
+            menuItems: const [CarbonMenuItem(value: '1', label: 'Leaky?')],
+            label: 'Action',
+          ),
+        ),
+      );
+
+      await tester.tap(find.byIcon(CarbonIcons.chevronDown));
+      await tester.pumpAndSettle();
+      expect(find.text('Leaky?'), findsOneWidget);
+
+      await tester.pumpWidget(buildTestApp(child: const SizedBox()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Leaky?'), findsNothing);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('works in all themes', (tester) async {
@@ -123,20 +275,16 @@ void main() {
         G100Theme.theme,
       ]) {
         await tester.pumpWidget(
-          MaterialApp(
-            theme: carbonTheme(carbon: theme),
-            builder: (context, child) => CarbonMaterialBridge(child: child!),
-            home: Scaffold(
-              body: CarbonComboButton(
-                onPressed: () {},
-                menuItems: const [],
-                label: 'Test',
-              ),
+          buildTestApp(
+            theme: theme,
+            child: CarbonComboButton<String>(
+              onPressed: () {},
+              label: 'Test',
             ),
           ),
         );
 
-        expect(find.byType(CarbonComboButton), findsOneWidget);
+        expect(find.byType(CarbonComboButton<String>), findsOneWidget);
         await tester.pumpAndSettle();
       }
     });

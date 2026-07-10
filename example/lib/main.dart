@@ -48,6 +48,7 @@ import 'pages/tag_demo_page.dart';
 import 'pages/tooltip_demo_page.dart';
 import 'pages/search_demo_page.dart';
 import 'pages/select_demo_page.dart';
+import 'pages/slider_demo_page.dart';
 import 'pages/data_table_demo_page.dart';
 import 'pages/tile_demo_page.dart';
 import 'pages/material_selection_demo_page.dart';
@@ -186,6 +187,9 @@ class _CarbonExampleAppState extends State<CarbonExampleApp> {
             break;
           case AppRoutes.fileUploader:
             builder = (_) => const FileUploaderDemoPage();
+            break;
+          case AppRoutes.slider:
+            builder = (_) => const SliderDemoPage();
             break;
 
           // Notifications

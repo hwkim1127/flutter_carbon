@@ -21,6 +21,27 @@ void main() {
       expect(find.text('Main content'), findsOneWidget);
     });
 
+    testWidgets('creates no Scaffold (Material-free shell)', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: carbonTheme(carbon: WhiteTheme.theme),
+          builder: (context, child) => CarbonMaterialBridge(child: child!),
+          home: CarbonUIShell(
+            appName: 'App',
+            child: const Text('Content'),
+          ),
+        ),
+      );
+
+      expect(
+        find.descendant(
+          of: find.byType(CarbonUIShell),
+          matching: find.byType(Scaffold),
+        ),
+        findsNothing,
+      );
+    });
+
     testWidgets('displays side nav when provided', (tester) async {
       await tester.pumpWidget(
         MaterialApp(

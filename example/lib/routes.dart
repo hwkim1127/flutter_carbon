@@ -23,12 +23,16 @@ class AppRoutes {
   static const String dateTimePicker = '/forms/date-time-picker';
   static const String toggle = '/forms/toggle';
   static const String fileUploader = '/forms/file-uploader';
+  static const String slider = '/forms/slider';
+  static const String search = '/forms/search';
+  static const String select = '/forms/select';
 
   // Notifications
   static const String notifications = '/notifications';
   static const String status = '/notifications/status';
 
   // Content
+  static const String accordion = '/content/accordion';
   static const String contentSwitcher = '/content/switcher';
   static const String skeleton = '/content/skeleton';
   static const String codeSnippet = '/content/code-snippet';
@@ -60,12 +64,9 @@ class AppRoutes {
   static const String pageHeader = '/other/page-header';
 
   // Material Equivalents
-  static const String accordion = '/material/accordion';
   static const String tabs = '/material/tabs';
   static const String tag = '/material/tag';
   static const String tooltip = '/material/tooltip';
-  static const String search = '/material/search';
-  static const String select = '/material/select';
   static const String dataTable = '/material/data-table';
   static const String tile = '/material/tile';
   static const String selectionControls = '/material/selection-controls';
@@ -196,6 +197,21 @@ final List<ComponentCategory> componentCategories = [
         route: AppRoutes.fileUploader,
         description: 'File upload with drag & drop',
       ),
+      ComponentItem(
+        title: 'Slider',
+        route: AppRoutes.slider,
+        description: 'CarbonSlider — single and two-handle range',
+      ),
+      ComponentItem(
+        title: 'Search',
+        route: AppRoutes.search,
+        description: 'CarbonSearch — sizes, expandable, clear',
+      ),
+      ComponentItem(
+        title: 'Select',
+        route: AppRoutes.select,
+        description: 'CarbonSelect — form states, Carbon menu',
+      ),
     ],
   ),
   ComponentCategory(
@@ -218,6 +234,11 @@ final List<ComponentCategory> componentCategories = [
     title: 'Content',
     subtitle: 'Content display components',
     items: [
+      ComponentItem(
+        title: 'Accordion',
+        route: AppRoutes.accordion,
+        description: 'CarbonAccordion — sizes, flush, controlled',
+      ),
       ComponentItem(
         title: 'Content Switcher',
         route: AppRoutes.contentSwitcher,
@@ -397,29 +418,14 @@ final List<ComponentCategory> componentCategories = [
     subtitle: 'Carbon components handled via Material theming',
     items: [
       ComponentItem(
-        title: 'Accordion',
-        route: AppRoutes.accordion,
-        description: 'ExpansionTile with Carbon theme',
-      ),
-      ComponentItem(
         title: 'Tooltip',
         route: AppRoutes.tooltip,
         description: 'Tooltip with Carbon theme',
       ),
       ComponentItem(
-        title: 'Search',
-        route: AppRoutes.search,
-        description: 'SearchBar with Carbon theme',
-      ),
-      ComponentItem(
-        title: 'Select',
-        route: AppRoutes.select,
-        description: 'DropdownMenu with Carbon theme',
-      ),
-      ComponentItem(
         title: 'Selection Controls',
         route: AppRoutes.selectionControls,
-        description: 'Checkbox, Radio, Switch, Slider with Carbon theme',
+        description: 'Checkbox, Radio, Switch with Carbon theme',
       ),
     ],
   ),

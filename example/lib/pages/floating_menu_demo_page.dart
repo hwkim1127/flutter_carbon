@@ -24,7 +24,6 @@ class FloatingMenuDemoPage extends StatelessWidget {
                   bottom: 16,
                   right: 16,
                   child: CarbonFloatingMenu(
-                    heroTag: 'fab1',
                     icon: Icons.add,
                     items: [
                       CarbonFloatingMenuItem(
@@ -60,7 +59,6 @@ class FloatingMenuDemoPage extends StatelessWidget {
                   bottom: 16,
                   right: 16,
                   child: CarbonFloatingMenu(
-                    heroTag: 'fab2',
                     icon: Icons.menu,
                     openIcon: Icons.close,
                     items: [

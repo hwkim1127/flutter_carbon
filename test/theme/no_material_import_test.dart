@@ -2,19 +2,18 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-/// Guards the v2.0 invariant: the theming core is Material-free.
-///
-/// Full package-wide Material freedom waits for the native primitives
-/// (Phase 2/3 of doc/V2_ROADMAP.md); until then only `lib/src/widgets`
-/// and `lib/src/material` may import Material.
+/// Guards the v2 invariant: everything except the explicit Material bridge
+/// (`lib/material.dart` + `lib/src/material/`) is Material-free.
 void main() {
-  test('theming core has no material/cupertino imports', () {
+  test('package (minus the bridge) has no material/cupertino imports', () {
     const guardedDirs = [
       'lib/src/theme',
       'lib/src/foundation',
       'lib/src/base',
       'lib/src/app',
       'lib/src/text',
+      'lib/src/widgets',
+      'lib/src/icons',
     ];
     final offenders = <String>[];
 

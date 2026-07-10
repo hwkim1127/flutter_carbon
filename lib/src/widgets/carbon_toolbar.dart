@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 
 import '../../flutter_carbon.dart';
 import '../base/carbon_pressable.dart';
-import '../text/carbon_editable_core.dart';
 
 /// Carbon Design System Toolbar.
 ///
@@ -278,8 +277,9 @@ class _CancelButtonState extends State<_CancelButton> {
 
 /// Search field for toolbar.
 ///
-/// A text field styled for Carbon toolbar usage with transparent background
-/// and proper focus states.
+/// A thin wrapper over [CarbonSearch] at toolbar size (48px): expandable by
+/// default (persistent renders the field permanently), 300px wide expanded —
+/// or filling the toolbar with [expanded].
 class CarbonToolbarSearch extends StatefulWidget {
   /// Current search value.
   final String? value;
@@ -317,39 +317,19 @@ class CarbonToolbarSearch extends StatefulWidget {
 
 class _CarbonToolbarSearchState extends State<CarbonToolbarSearch> {
   late final TextEditingController _controller;
-  final FocusNode _inputFocusNode = FocusNode(); // For TextField input
-  final FocusNode _iconFocusNode = FocusNode(); // For collapsed icon
-  bool _isExpanded = false;
+
+  /// Keeps the search's state (focus, expansion, animation) alive while
+  /// this wrapper reparents it between the collapsed bare widget and the
+  /// expanded SizedBox/Expanded shells.
+  final GlobalKey _searchKey = GlobalKey();
+
+  bool _searchExpanded = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.value);
-    _isExpanded = widget.persistent;
-    _inputFocusNode.addListener(_onInputFocusChange);
-    _iconFocusNode.addListener(_onIconFocusChange);
-    // The clear button appears/disappears with the text.
-    _controller.addListener(_onTextChange);
-  }
-
-  void _onTextChange() {
-    if (mounted) setState(() {});
-  }
-
-  void _onInputFocusChange() {
-    // Repaint the focus outline on every change.
-    if (mounted) setState(() {});
-    // Handle focus out - collapse if no value and not persistent
-    if (!_inputFocusNode.hasFocus) {
-      _handleFocusOut();
-    }
-  }
-
-  void _onIconFocusChange() {
-    // When collapsed icon gains focus (keyboard navigation), expand
-    if (_iconFocusNode.hasFocus && !_isExpanded) {
-      _handleExpand();
-    }
+    _searchExpanded = widget.persistent;
   }
 
   @override
@@ -362,125 +342,31 @@ class _CarbonToolbarSearchState extends State<CarbonToolbarSearch> {
 
   @override
   void dispose() {
-    _inputFocusNode.removeListener(_onInputFocusChange);
-    _iconFocusNode.removeListener(_onIconFocusChange);
     _controller.dispose();
-    _inputFocusNode.dispose();
-    _iconFocusNode.dispose();
     super.dispose();
-  }
-
-  /// Handles user-initiated expand (click/focus).
-  /// Matches Carbon's _handleUserInitiatedExpand implementation.
-  Future<void> _handleExpand() async {
-    if (_isExpanded) return;
-
-    setState(() => _isExpanded = true);
-
-    // Wait for widget to rebuild before focusing (matches Carbon's await this.updateComplete)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _inputFocusNode.requestFocus();
-      }
-    });
-  }
-
-  /// Handles focus out - collapse if no value and not persistent.
-  void _handleFocusOut() {
-    if (_controller.text.isEmpty && !widget.persistent) {
-      setState(() => _isExpanded = false);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final carbon = context.carbon;
-
-    // 1px focus outline (pre-existing visual; the Carbon spec says 2px —
-    // left as-is deliberately, flagged as a follow-up).
-    Widget searchField = Container(
-      constraints: const BoxConstraints(minHeight: 48),
-      foregroundDecoration: BoxDecoration(
-        border: Border.all(
-          color: _inputFocusNode.hasFocus
-              ? carbon.layer.focus
-              : CarbonPalette.transparent,
-        ),
-      ),
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Icon(
-              CarbonIcons.search,
-              size: 16,
-              color: carbon.text.iconPrimary,
-            ),
-          ),
-          Expanded(
-            child: CarbonEditableCore(
-              controller: _controller,
-              focusNode: _inputFocusNode,
-              onChanged: widget.onChanged,
-              onSubmitted: widget.onSubmitted,
-              placeholder: widget.placeholder,
-              placeholderStyle: TextStyle(
-                color: carbon.text.textPlaceholder,
-                fontSize: 14,
-              ),
-              style: TextStyle(fontSize: 14, color: carbon.text.textPrimary),
-            ),
-          ),
-          if (_controller.text.isNotEmpty)
-            CarbonPressable(
-              onTap: () {
-                _controller.clear();
-                widget.onChanged?.call('');
-                _handleFocusOut();
-              },
-              focusable: true,
-              builder: (context, state) => Container(
-                width: 48,
-                height: 48,
-                color: state.hovered ? carbon.layer.layerHover01 : null,
-                child: Icon(
-                  CarbonIcons.close,
-                  size: 16,
-                  color: carbon.text.iconPrimary,
-                ),
-              ),
-            ),
-        ],
-      ),
+    final search = CarbonSearch(
+      key: _searchKey,
+      controller: _controller,
+      onChanged: widget.onChanged,
+      onSubmitted: widget.onSubmitted,
+      placeholder: widget.placeholder,
+      size: CarbonSearchSize.lg,
+      expandable: !widget.persistent,
+      initiallyExpanded: widget.persistent,
+      onExpandedChanged: (value) => setState(() => _searchExpanded = value),
     );
 
-    // First check if collapsed (regardless of expanded property)
-    if (!widget.persistent && !_isExpanded) {
-      // Collapsed state - show only icon
-      // Supports both click and keyboard focus (tab navigation)
-      return Focus(
-        focusNode: _iconFocusNode,
-        child: CarbonPressable(
-          onTap: _handleExpand,
-          builder: (context, _) => Container(
-            width: 48,
-            height: 48,
-            alignment: Alignment.center,
-            child: Icon(
-              CarbonIcons.search,
-              size: 16,
-              color: carbon.text.iconPrimary,
-            ),
-          ),
-        ),
-      );
+    // Collapsed: the bare 48px square (unbounded in the toolbar Row).
+    if (!widget.persistent && !_searchExpanded) {
+      return search;
     }
-
-    // Expanded state - decide layout based on expanded property
     if (widget.expanded) {
-      return Expanded(child: searchField);
+      return Expanded(child: search);
     }
-
-    return SizedBox(width: 300, child: searchField);
+    return SizedBox(width: 300, child: search);
   }
 }
