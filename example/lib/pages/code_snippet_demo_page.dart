@@ -58,7 +58,7 @@ void main() {
           builder: (context) => const CarbonCodeSnippet(
             code: 'flutter run',
             type: CarbonCodeSnippetType.single,
-            feedbackMessage: 'Command copied!',
+            labels: CarbonCodeSnippetLabels(copied: 'Command copied!'),
           ),
         ),
         DemoSection(
@@ -67,7 +67,7 @@ void main() {
           builder: (context) => const CarbonCodeSnippet(
             code: 'flutter doctor',
             type: CarbonCodeSnippetType.single,
-            showCopyButton: false,
+            hideCopyButton: true,
           ),
         ),
         DemoSection(
@@ -108,7 +108,6 @@ class HomePage extends StatelessWidget {
   }
 }''',
             type: CarbonCodeSnippetType.multi,
-            maxCollapsedLines: 15,
             highlighter: CarbonDartHighlighter(),
           ),
         ),
@@ -119,6 +118,66 @@ class HomePage extends StatelessWidget {
             code:
                 'flutter pub add flutter_carbon provider http dio shared_preferences cached_network_image',
             type: CarbonCodeSnippetType.single,
+          ),
+        ),
+        DemoSection(
+          title: 'Line Numbers',
+          description: 'Multi-line snippet with a non-selectable gutter',
+          builder: (context) => const CarbonCodeSnippet(
+            code: '''void main() {
+  final items = List.generate(3, (i) => 'item \$i');
+  for (final item in items) {
+    print(item);
+  }
+}''',
+            type: CarbonCodeSnippetType.multi,
+            showLineNumbers: true,
+            highlighter: CarbonDartHighlighter(),
+          ),
+        ),
+        DemoSection(
+          title: 'Wrap Text',
+          description:
+              'Long lines soft-wrap instead of scrolling horizontally',
+          builder: (context) => const CarbonCodeSnippet(
+            code:
+                'flutter pub add flutter_carbon provider http dio shared_preferences cached_network_image collection intl path url_launcher',
+            type: CarbonCodeSnippetType.multi,
+            wrapText: true,
+          ),
+        ),
+        DemoSection(
+          title: 'Custom Row Limits',
+          description:
+              'Collapsed at 5 rows; expanding is capped at 10 rows',
+          builder: (context) => CarbonCodeSnippet(
+            code: List.generate(20, (i) => 'line ${i + 1}').join('\n'),
+            type: CarbonCodeSnippetType.multi,
+            maxCollapsedNumberOfRows: 5,
+            minCollapsedNumberOfRows: 3,
+            maxExpandedNumberOfRows: 10,
+            minExpandedNumberOfRows: 8,
+          ),
+        ),
+        DemoSection(
+          title: 'Disabled',
+          description: 'Copy and expand are inert; text is dimmed',
+          builder: (context) => CarbonCodeSnippet(
+            code: List.generate(20, (i) => 'secret line ${i + 1}').join('\n'),
+            type: CarbonCodeSnippetType.multi,
+            disabled: true,
+          ),
+        ),
+        DemoSection(
+          title: 'Skeleton',
+          description: 'Loading placeholders for single and multi',
+          builder: (context) => const Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              CarbonCodeSnippetSkeleton(),
+              SizedBox(height: 16),
+              CarbonCodeSnippetSkeleton(type: CarbonCodeSnippetType.multi),
+            ],
           ),
         ),
       ],

@@ -172,22 +172,23 @@ class MyApp extends StatelessWidget {
       expect((rich.textSpan! as TextSpan).children, isNotEmpty);
     });
 
-    testWidgets('expand keeps highlighting in sync with the visible text', (
+    testWidgets('highlighting stays in sync when the code changes', (
       tester,
     ) async {
-      final code = List.generate(6, (i) => 'class C$i {}').join('\n');
-      await tester.pumpWidget(
-        buildTestApp(
-          child: CarbonCodeSnippet(
-            code: code,
-            type: CarbonCodeSnippetType.multi,
-            maxCollapsedLines: 3,
-            highlighter: const CarbonDartHighlighter(),
-          ),
-        ),
-      );
+      Widget build(String code) => buildTestApp(
+            child: CarbonCodeSnippet(
+              code: code,
+              type: CarbonCodeSnippetType.multi,
+              highlighter: const CarbonDartHighlighter(),
+            ),
+          );
 
-      await tester.tap(find.text('Show more'));
+      await tester.pumpWidget(
+        build(List.generate(3, (i) => 'class C$i {}').join('\n')),
+      );
+      await tester.pumpWidget(
+        build(List.generate(6, (i) => 'class C$i {}').join('\n')),
+      );
       await tester.pumpAndSettle();
 
       final editable = tester.widget<EditableText>(find.byType(EditableText));
@@ -196,8 +197,8 @@ class MyApp extends StatelessWidget {
         style: editable.style,
         withComposing: false,
       );
-      // The LAST class keyword (line 6) must be classified — spans were
-      // recomputed for the expanded text.
+      // ALL six class keywords must be classified — spans were recomputed
+      // for the new text in didUpdateWidget.
       final classSpans = span.children!.whereType<TextSpan>().where(
         (child) => child.text == 'class',
       );

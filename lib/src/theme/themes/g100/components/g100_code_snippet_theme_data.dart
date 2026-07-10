@@ -7,9 +7,9 @@ class G100CodeSnippetThemeData extends CarbonCodeSnippetThemeData {
       : super(
           background: CarbonPalette.gray90,
           codeText: CarbonPalette.gray10,
-          border: CarbonPalette.gray80,
           copyButtonBackground: CarbonPalette.gray90,
           copyButtonBackgroundHover: CarbonPalette.gray90Hover,
+          copyButtonBackgroundActive: CarbonPalette.gray70,
           copyButtonIcon: CarbonPalette.gray10,
         );
 }

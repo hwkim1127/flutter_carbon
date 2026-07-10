@@ -48,6 +48,20 @@ one `builder:` line.
   back to instance identity as before.
 * `CarbonStructuredListRow.data` removed (an untyped payload the widget never
   read; selection is index-based via `selectedIndex`/`onRowSelected`).
+* `CarbonCodeSnippet` API aligned to React's CodeSnippet:
+  `showCopyButton` → `hideCopyButton` (inverted), `feedbackMessage` →
+  `labels.copied` (via `CarbonCodeSnippetLabels`), `maxCollapsedLines` →
+  `maxCollapsedNumberOfRows` (**semantics change**: rows are 16px viewport
+  rows clipped by height — the text is never truncated, so selection
+  survives collapse and copy always gets the full code; default 10 → 15),
+  `useMonospace` removed (the spec `code-01` mono type is always used).
+* `CarbonCopyButton` reworked to the spec icon-only square button (sizes
+  sm 32 / md 40 / lg 48) with a feedback tooltip: the visible
+  `label`/`successLabel` texts are gone (→ `iconDescription` a11y label and
+  the `feedback` tooltip text) and `successDuration` is now
+  `feedbackTimeout`.
+* `CarbonCodeSnippetThemeData`: `border` removed (spec snippets have no
+  border); `copyButtonBackgroundActive` added.
 * Behavioral: `CarbonUIShell` and `CarbonModal` no longer create
   `Scaffold`/`Material` ancestors — Material widgets passed as content need
   their own `Material`.
@@ -118,12 +132,30 @@ New native widgets (previously themed-Material or missing):
   the Carbon Menu spec: per-item `onTap` plus typed values, danger kind
   (red on hover/focus only, per spec), disabled items, icons, shortcut
   hints, and keyboard navigation (arrows/Home/End/Enter/Escape).
-* **Syntax highlighting for `CarbonCodeSnippet`** — new optional
+* **Syntax highlighting for `CarbonCodeSnippet`** — optional
   `highlighter` parameter with a pluggable `CarbonSyntaxHighlighter`
-  interface, `CarbonSyntaxSpan`/`CarbonSyntaxKind` model, and a built-in
-  zero-dependency `CarbonDartHighlighter`. Colors come from the theme's
-  previously unused `carbon.syntax` tokens, so highlighting follows all
-  four themes and animated theme switches. Selection/copy are unaffected.
+  interface and a `CarbonSyntaxSpan`/`CarbonSyntaxKind` model. Colors come
+  from the theme's previously unused `carbon.syntax` tokens, so
+  highlighting follows all four themes and animated theme switches.
+  Selection/copy are unaffected. **Thirteen built-in languages** on a
+  shared zero-dependency tokenizer engine: Dart (Flutter-aware — named
+  argument labels color as property names), Bash, JSON/JSONC, Python,
+  JavaScript, TypeScript, C, C++, Java, C#, Rust, Go, and PHP — plus
+  **`carbonHighlighterFor('tag')`** resolving Markdown fence tags.
+  String interpolation islands (`$name`, `${expr}`, `{expr}`, f-strings,
+  template literals) render in the `escape` color.
+* **`CarbonCodeSnippet` to the Carbon spec** — `code-01` typography (12/16)
+  in all variants; the inline chip is a click-to-copy button per spec (4px
+  radius, hover/active layers, focus border); single-line is the spec 40px
+  field; multi-line uses the spec row model
+  (`min`/`maxCollapsedNumberOfRows`, `min`/`maxExpandedNumberOfRows` × 16px
+  rows) with an animated viewport, a ghost Show more/less button with
+  rotating chevron, and overflow fade indicators that clear on focus. New:
+  `wrapText`, `showLineNumbers` (non-selectable gutter, wrap-aware),
+  `disabled`, `copyText`, `onCopy`, `feedbackTimeout`, localizable
+  **`CarbonCodeSnippetLabels`**, and a **`CarbonCodeSnippetSkeleton`**
+  loading placeholder. Copy feedback is a real Carbon tooltip bubble,
+  announced as a live region.
 
 Keyboard and focus:
 

@@ -77,7 +77,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 
 **Content Display**
 - `CarbonAccordion` - Vertically stacked expandable sections (sizes, flush, controlled mode)
-- `CarbonCodeSnippet` - Syntax-highlighted code display (single-line, multi-line, inline)
+- `CarbonCodeSnippet` - Syntax-highlighted code display (single-line, multi-line, inline; 13 built-in language highlighters via `carbonHighlighterFor`, line numbers, wrap, skeleton)
 - `CarbonContentSwitcher` - Tab-like content switcher
 - `CarbonStructuredList` - Table-like list with selectable rows
 - `CarbonDataTable` - Comprehensive data table with:

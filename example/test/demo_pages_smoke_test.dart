@@ -219,4 +219,70 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('wave-6 demo interactions', () {
+    testWidgets('code snippet copies with feedback and expands', (
+      tester,
+    ) async {
+      await openRoute(tester, AppRoutes.codeSnippet);
+
+      // Copy from the first single-line snippet: feedback bubble appears.
+      final copyButton = find.byType(CarbonCopyButton).first;
+      await tester.tap(copyButton, warnIfMissed: false);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.text('Copied!'), findsWidgets);
+      // Let the feedback time out so no timers leak into the next step.
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pump(const Duration(milliseconds: 200));
+
+      // Expand the long example: viewport grows.
+      final showMore = find.text('Show more').first;
+      await tester.scrollUntilVisible(
+        showMore,
+        400,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
+      await tester.tap(showMore, warnIfMissed: false);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Show less'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('language gallery renders colored spans per fixture', (
+      tester,
+    ) async {
+      await openRoute(tester, AppRoutes.syntaxHighlighting);
+
+      // Every VISIBLE multi snippet paints at least one colored span (the
+      // page is a lazy scrollable, so only the on-screen fixtures build;
+      // per-language classification is covered by the package unit tests).
+      final editables = tester
+          .widgetList<EditableText>(find.byType(EditableText))
+          .toList();
+      expect(editables.length, greaterThanOrEqualTo(5));
+      for (final editable in editables) {
+        final span = editable.controller.buildTextSpan(
+          context: tester.element(find.byType(EditableText).first),
+          style: editable.style,
+          withComposing: false,
+        );
+        final colored = <TextSpan>[];
+        span.visitChildren((child) {
+          if (child is TextSpan && child.style?.color != null) {
+            colored.add(child);
+          }
+          return true;
+        });
+        expect(
+          colored,
+          isNotEmpty,
+          reason: 'a gallery fixture rendered without any highlight spans',
+        );
+      }
+      expect(tester.takeException(), isNull);
+    });
+  });
 }

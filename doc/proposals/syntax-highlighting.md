@@ -1,6 +1,12 @@
 # Proposal — Syntax highlighting: more languages & advanced features
 
-Status: **v1 shipped** (2.0.0); this document now proposes **v2**.
+Status: **v1 and v2 (part A + B-1 + B-2) shipped** (2.0.0, wave 6 —
+`../implementation/wave6/`). Shipped: the shared engine
+(`CarbonRegexHighlighter` + `CarbonSyntaxLanguage`, package-private), 13
+languages (the six below **plus Python, C, C++, Java, C#, PHP**),
+`carbonHighlighterFor`, string interpolation islands (B-1), and the
+line-numbers gutter (B-2, `CarbonCodeSnippet.showLineNumbers`). Still
+proposed: diff highlighting (B-3) and `CarbonCodeEditor` (B-4).
 
 ## What shipped in v1 (for reference)
 

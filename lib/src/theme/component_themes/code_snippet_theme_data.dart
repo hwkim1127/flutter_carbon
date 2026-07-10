@@ -9,14 +9,14 @@ class CarbonCodeSnippetThemeData {
   /// Text color for code.
   final Color codeText;
 
-  /// Border color for code snippet container.
-  final Color border;
-
   /// Copy button background color.
   final Color copyButtonBackground;
 
   /// Copy button background color on hover.
   final Color copyButtonBackgroundHover;
+
+  /// Copy button background color while pressed.
+  final Color copyButtonBackgroundActive;
 
   /// Copy button icon color.
   final Color copyButtonIcon;
@@ -24,27 +24,28 @@ class CarbonCodeSnippetThemeData {
   const CarbonCodeSnippetThemeData({
     required this.background,
     required this.codeText,
-    required this.border,
     required this.copyButtonBackground,
     required this.copyButtonBackgroundHover,
+    required this.copyButtonBackgroundActive,
     required this.copyButtonIcon,
   });
 
   CarbonCodeSnippetThemeData copyWith({
     Color? background,
     Color? codeText,
-    Color? border,
     Color? copyButtonBackground,
     Color? copyButtonBackgroundHover,
+    Color? copyButtonBackgroundActive,
     Color? copyButtonIcon,
   }) {
     return CarbonCodeSnippetThemeData(
       background: background ?? this.background,
       codeText: codeText ?? this.codeText,
-      border: border ?? this.border,
       copyButtonBackground: copyButtonBackground ?? this.copyButtonBackground,
       copyButtonBackgroundHover:
           copyButtonBackgroundHover ?? this.copyButtonBackgroundHover,
+      copyButtonBackgroundActive:
+          copyButtonBackgroundActive ?? this.copyButtonBackgroundActive,
       copyButtonIcon: copyButtonIcon ?? this.copyButtonIcon,
     );
   }
@@ -55,11 +56,12 @@ class CarbonCodeSnippetThemeData {
     return CarbonCodeSnippetThemeData(
       background: Color.lerp(background, other.background, t)!,
       codeText: Color.lerp(codeText, other.codeText, t)!,
-      border: Color.lerp(border, other.border, t)!,
       copyButtonBackground:
           Color.lerp(copyButtonBackground, other.copyButtonBackground, t)!,
       copyButtonBackgroundHover: Color.lerp(
           copyButtonBackgroundHover, other.copyButtonBackgroundHover, t)!,
+      copyButtonBackgroundActive: Color.lerp(
+          copyButtonBackgroundActive, other.copyButtonBackgroundActive, t)!,
       copyButtonIcon: Color.lerp(copyButtonIcon, other.copyButtonIcon, t)!,
     );
   }

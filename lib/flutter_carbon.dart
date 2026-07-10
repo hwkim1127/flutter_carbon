@@ -25,6 +25,7 @@ export 'src/widgets/carbon_search.dart';
 export 'src/widgets/carbon_select.dart';
 export 'src/widgets/carbon_slider.dart';
 export 'src/widgets/carbon_syntax.dart';
+export 'src/widgets/carbon_syntax_languages.dart';
 export 'src/widgets/carbon_text_input.dart';
 export 'src/widgets/carbon_time_picker.dart';
 export 'src/widgets/carbon_tooltip.dart';

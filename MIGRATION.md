@@ -131,6 +131,32 @@ Reading the Carbon data back off a Material `ThemeData` (rare):
   non-null `onSort`; delete the argument.
 * **`CarbonUIShell.onSideNavItemTap` removed** (deprecated) — set
   `CarbonNavItem.onTap` on each nav item instead.
+* **`CarbonCodeSnippet` API aligned to the Carbon spec**:
+
+  ```dart
+  // 1.x
+  CarbonCodeSnippet(
+    code: code,
+    showCopyButton: false,
+    feedbackMessage: 'Copied it!',
+    maxCollapsedLines: 10,     // removed lines from the text
+    useMonospace: true,
+  )
+
+  // 2.0
+  CarbonCodeSnippet(
+    code: code,
+    hideCopyButton: true,
+    labels: CarbonCodeSnippetLabels(copied: 'Copied it!'),
+    maxCollapsedNumberOfRows: 10,  // clips the viewport height (16px rows);
+                                   // the text itself is never truncated
+    // monospace (code-01) is always used — drop useMonospace
+  )
+  ```
+* **`CarbonCopyButton` is now the spec icon-only button** — drop
+  `label`/`successLabel` (use `iconDescription` for the accessible name and
+  `feedback` for the tooltip text) and rename `successDuration` →
+  `feedbackTimeout`.
 * **`CarbonStructuredListRow.data` removed** — the widget never read it;
   track row payloads on your side, keyed by the `selectedIndex` the list
   reports.

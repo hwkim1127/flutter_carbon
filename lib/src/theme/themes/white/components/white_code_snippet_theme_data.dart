@@ -7,9 +7,9 @@ class WhiteCodeSnippetThemeData extends CarbonCodeSnippetThemeData {
       : super(
           background: CarbonPalette.gray10,
           codeText: CarbonPalette.gray100,
-          border: CarbonPalette.gray30,
           copyButtonBackground: CarbonPalette.gray10,
           copyButtonBackgroundHover: CarbonPalette.gray10Hover,
+          copyButtonBackgroundActive: CarbonPalette.gray30,
           copyButtonIcon: CarbonPalette.gray100,
         );
 }

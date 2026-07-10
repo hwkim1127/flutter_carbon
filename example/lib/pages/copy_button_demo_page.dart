@@ -43,22 +43,45 @@ class _CopyButtonDemoPageState extends State<CopyButtonDemoPage> {
           ),
         ),
         DemoSection(
-          title: 'Custom Labels',
-          description: 'Copy button with custom label text',
+          title: 'Custom Feedback',
+          description: 'Copy button with custom tooltip texts',
           builder: (context) => CarbonCopyButton(
             textToCopy: 'flutter pub add flutter_carbon',
-            label: 'Copy command',
-            successLabel: 'Command copied!',
+            iconDescription: 'Copy command',
+            feedback: 'Command copied!',
             onCopied: () {},
           ),
         ),
         DemoSection(
-          title: 'Custom Success Duration',
-          description: 'Success state shown for 5 seconds',
+          title: 'Sizes',
+          description: 'Small (32), medium (40, default), and large (48)',
+          builder: (context) => Row(
+            children: [
+              CarbonCopyButton(
+                textToCopy: 'small',
+                size: CarbonCopyButtonSize.sm,
+                onCopied: () {},
+              ),
+              const SizedBox(width: 8),
+              CarbonCopyButton(
+                textToCopy: 'medium',
+                onCopied: () {},
+              ),
+              const SizedBox(width: 8),
+              CarbonCopyButton(
+                textToCopy: 'large',
+                size: CarbonCopyButtonSize.lg,
+                onCopied: () {},
+              ),
+            ],
+          ),
+        ),
+        DemoSection(
+          title: 'Custom Feedback Duration',
+          description: 'Feedback tooltip stays for 5 seconds',
           builder: (context) => CarbonCopyButton(
             textToCopy: 'Example text',
-            successDuration: const Duration(seconds: 5),
-            label: 'Copy (5s feedback)',
+            feedbackTimeout: const Duration(seconds: 5),
             onCopied: () {},
           ),
         ),
@@ -185,8 +208,7 @@ class _CopyButtonDemoPageState extends State<CopyButtonDemoPage> {
                         CarbonCopyButton(
                           textToCopy:
                               'https://github.com/hwkim1127/flutter_carbon.git',
-                          label: 'Clone',
-                          successLabel: 'Copied!',
+                          iconDescription: 'Copy clone URL',
                           onCopied: () {},
                         ),
                       ],
@@ -229,7 +251,7 @@ class _CopyButtonDemoPageState extends State<CopyButtonDemoPage> {
                         const SizedBox(width: 16),
                         CarbonCopyButton(
                           textToCopy: 'https://example.com/share/abc123',
-                          label: 'Copy link',
+                          iconDescription: 'Copy link',
                           onCopied: () {},
                         ),
                       ],
