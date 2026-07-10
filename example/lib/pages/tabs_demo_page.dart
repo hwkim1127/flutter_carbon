@@ -100,6 +100,21 @@ class _TabsDemoPageState extends State<TabsDemoPage>
           ),
         ),
         DemoSection(
+          title: 'CarbonTabs — Overflow scroll buttons',
+          description:
+              'When tabs overflow, chevron buttons appear at the edges: '
+              'click steps ~1.5 tabs, press-and-hold scrolls continuously.',
+          builder: (context) => SizedBox(
+            width: 360,
+            child: CarbonTabs(
+              tabs: [
+                for (var i = 1; i <= 12; i++)
+                  CarbonTab(label: 'Section $i'),
+              ],
+            ),
+          ),
+        ),
+        DemoSection(
           title: 'CarbonTabs — Contained',
           description:
               'Contained tabs use a filled background indicator for higher visual emphasis.',

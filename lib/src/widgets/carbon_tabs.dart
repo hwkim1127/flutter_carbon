@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import '../../flutter_carbon.dart';
 
@@ -79,6 +81,15 @@ class _CarbonTabsState extends State<CarbonTabs> {
   final ScrollController _scrollController = ScrollController();
   List<GlobalKey> _tabKeys = [];
 
+  /// Spec overflow nav buttons: shown exactly while scrolling that way is
+  /// possible (hidden — not disabled — at the ends, like Carbon web).
+  bool _canScrollPrev = false;
+  bool _canScrollNext = false;
+
+  /// Drives press-and-hold continuous scrolling (5px per ~frame, React
+  /// parity).
+  Timer? _holdTimer;
+
   @override
   void initState() {
     super.initState();
@@ -109,8 +120,66 @@ class _CarbonTabsState extends State<CarbonTabs> {
     }
   }
 
+  @override
+  void dispose() {
+    _holdTimer?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   void _generateKeys() {
     _tabKeys = List.generate(widget.tabs.length, (_) => GlobalKey());
+  }
+
+  /// Flips the nav-button visibility flags from the latest metrics —
+  /// setState only on change (scroll/metrics notifications fire often).
+  void _updateOverflow(ScrollMetrics metrics) {
+    final prev = metrics.pixels > metrics.minScrollExtent + 1;
+    final next = metrics.pixels < metrics.maxScrollExtent - 1;
+    if (prev != _canScrollPrev || next != _canScrollNext) {
+      setState(() {
+        _canScrollPrev = prev;
+        _canScrollNext = next;
+      });
+    }
+  }
+
+  /// Click: scroll by ~1.5 average tab widths (React parity), clamped.
+  void _stepScroll(int direction) {
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    final contentWidth =
+        position.maxScrollExtent + position.viewportDimension;
+    final step = contentWidth / widget.tabs.length * 1.5;
+    _scrollController.animateTo(
+      (position.pixels + direction * step)
+          .clamp(position.minScrollExtent, position.maxScrollExtent),
+      duration: CarbonMotion.durationModerate01,
+      curve: CarbonMotion.standardProductive,
+    );
+  }
+
+  /// Press-and-hold: continuous 5px steps per ~frame until release.
+  void _startHold(int direction) {
+    _holdTimer?.cancel();
+    _holdTimer = Timer.periodic(const Duration(milliseconds: 16), (_) {
+      if (!_scrollController.hasClients) return;
+      final position = _scrollController.position;
+      final target = (position.pixels + direction * 5.0)
+          .clamp(position.minScrollExtent, position.maxScrollExtent);
+      if (target == position.pixels) {
+        // Hit the end — the button hides (unmounts) here, so its
+        // onLongPressEnd can never fire. Stop ourselves.
+        _stopHold();
+        return;
+      }
+      _scrollController.jumpTo(target);
+    });
+  }
+
+  void _stopHold() {
+    _holdTimer?.cancel();
+    _holdTimer = null;
   }
 
   void _handleTabTap(int index) {
@@ -144,7 +213,7 @@ class _CarbonTabsState extends State<CarbonTabs> {
   Widget build(BuildContext context) {
     final carbon = context.carbon;
 
-    Widget content = SingleChildScrollView(
+    Widget scrollView = SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       controller: _scrollController,
       child: IntrinsicHeight(
@@ -169,6 +238,109 @@ class _CarbonTabsState extends State<CarbonTabs> {
       ),
     );
 
+    // Track overflow so the spec nav buttons appear exactly while
+    // scrolling that way is possible.
+    if (widget.scrollable) {
+      scrollView = NotificationListener<ScrollMetricsNotification>(
+        onNotification: (n) {
+          if (n.metrics.axis == Axis.horizontal && n.depth == 0) {
+            _updateOverflow(n.metrics);
+          }
+          return false;
+        },
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (n) {
+            if (n.metrics.axis == Axis.horizontal && n.depth == 0) {
+              _updateOverflow(n.metrics);
+            }
+            return false;
+          },
+          child: scrollView,
+        ),
+      );
+    }
+
+    Widget content = scrollView;
+    if (_canScrollPrev || _canScrollNext) {
+      final isRtl = Directionality.of(context) == TextDirection.rtl;
+      final background = carbon.layer.background;
+      // IntrinsicHeight: `stretch` must resolve to the tab bar's height,
+      // not the incoming constraint (unbounded inside scrollable pages).
+      content = IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+          if (_canScrollPrev)
+            _OverflowNavButton(
+              type: widget.type,
+              icon: isRtl ? CarbonIcons.chevronRight : CarbonIcons.chevronLeft,
+              onTap: () => _stepScroll(-1),
+              onHoldStart: () => _startHold(-1),
+              onHoldEnd: _stopHold,
+            ),
+          Expanded(
+            child: Stack(
+              children: [
+                scrollView,
+                // 8px edge fades over the list (line variant only, spec).
+                if (widget.type == CarbonTabsType.line && _canScrollPrev)
+                  PositionedDirectional(
+                    start: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 8,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: AlignmentDirectional.centerEnd,
+                            end: AlignmentDirectional.centerStart,
+                            colors: [
+                              background.withValues(alpha: 0),
+                              background,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (widget.type == CarbonTabsType.line && _canScrollNext)
+                  PositionedDirectional(
+                    end: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 8,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: AlignmentDirectional.centerStart,
+                            end: AlignmentDirectional.centerEnd,
+                            colors: [
+                              background.withValues(alpha: 0),
+                              background,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (_canScrollNext)
+            _OverflowNavButton(
+              type: widget.type,
+              icon: isRtl ? CarbonIcons.chevronLeft : CarbonIcons.chevronRight,
+              onTap: () => _stepScroll(1),
+              onHoldStart: () => _startHold(1),
+              onHoldEnd: _stopHold,
+            ),
+        ],
+        ),
+      );
+    }
+
     // If extendLine is true and type is line, wrap in a Stack with a bottom border line
     if (widget.extendLine && widget.type == CarbonTabsType.line) {
       content = Container(
@@ -186,6 +358,79 @@ class _CarbonTabsState extends State<CarbonTabs> {
     }
 
     return content;
+  }
+}
+
+/// Spec overflow nav button: pointer-only (Carbon web renders it
+/// `aria-hidden` with `tabIndex={-1}` — keyboard users move between tabs
+/// with arrow keys), hidden at the scroll ends by the caller.
+class _OverflowNavButton extends StatefulWidget {
+  final CarbonTabsType type;
+  final IconData icon;
+  final VoidCallback onTap;
+  final VoidCallback onHoldStart;
+  final VoidCallback onHoldEnd;
+
+  const _OverflowNavButton({
+    required this.type,
+    required this.icon,
+    required this.onTap,
+    required this.onHoldStart,
+    required this.onHoldEnd,
+  });
+
+  @override
+  State<_OverflowNavButton> createState() => _OverflowNavButtonState();
+}
+
+class _OverflowNavButtonState extends State<_OverflowNavButton> {
+  bool _hovered = false;
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final carbon = context.carbon;
+    final contained = widget.type == CarbonTabsType.contained;
+
+    // Line: 40px on $background, no hover/active states (spec).
+    // Contained: 48px on $layer-accent with hover/active.
+    final Color background;
+    if (contained) {
+      background = _pressed
+          ? carbon.layer.layerAccentActive01
+          : _hovered
+              ? carbon.layer.layerAccentHover01
+              : carbon.layer.layerAccent01;
+    } else {
+      background = carbon.layer.background;
+    }
+
+    return ExcludeSemantics(
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          onTapDown: (_) => setState(() => _pressed = true),
+          onTapUp: (_) => setState(() => _pressed = false),
+          onTapCancel: () => setState(() => _pressed = false),
+          onLongPressStart: (_) => widget.onHoldStart(),
+          onLongPressEnd: (_) => widget.onHoldEnd(),
+          onLongPressCancel: widget.onHoldEnd,
+          child: Container(
+            width: contained ? 48 : 40,
+            color: background,
+            alignment: Alignment.center,
+            child: Icon(
+              widget.icon,
+              size: 16,
+              color: carbon.text.iconPrimary,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

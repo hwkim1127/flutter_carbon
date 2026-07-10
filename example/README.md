@@ -1,12 +1,12 @@
 # Carbon Flutter Example App
 
-This example app demonstrates the Flutter Carbon package with **36 custom `Carbon*` widgets** and **Material theming coverage** across **12 categories and 48+ demo pages**.
+This example app demonstrates the Flutter Carbon package's native `Carbon*` widgets and its **Material theming coverage** across **12 categories and 48+ demo pages**.
 
 ## Overview
 
 The example app provides interactive demonstrations of IBM's Carbon Design System implementation in Flutter, featuring:
 
-- **36 Custom Carbon Widgets**: Native `Carbon*` implementations following Carbon Design System specifications
+- **Native Carbon Widgets**: `Carbon*` implementations following Carbon Design System specifications
 - **Material Theming**: Standard Flutter widgets (TabBar, Checkbox, ExpansionTile, etc.) automatically styled to match Carbon
 - **48+ Interactive Demo Pages**: Dedicated demos for every component
 - **4 Theme Variants**: Live switching between White, G10, G90, and G100 themes

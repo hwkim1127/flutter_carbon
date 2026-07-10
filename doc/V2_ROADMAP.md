@@ -192,8 +192,10 @@ scrollbars; Flutter draws none, so the internal `CarbonScrollbar`
 primitive (visible exactly while content overflows) is adopted by every
 library scrollable: menus, data table, tearsheet, tree view, UI shell
 side nav, text areas, and the code snippet's nested 2D scrolling. Tabs
-deliberately keep none (the spec scrolls tab bars with chevron buttons —
-a future item). See `doc/implementation/wave7/`.
+keep no scrollbar — they got the spec's **chevron overflow scroll
+buttons** instead (wave 8: edge buttons that appear on overflow, click
+steps ~1.5 tabs, hold scrolls continuously). See
+`doc/implementation/wave7/` and `doc/implementation/wave8/`.
 
 ---
 

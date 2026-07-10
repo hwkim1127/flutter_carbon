@@ -44,7 +44,8 @@ Maintainer decisions baked in:
 ## Deliberate deviations
 
 - **Tabs keep no scrollbar** — the spec mechanism is chevron scroll
-  buttons (future item); a bar under the tab bar is off-spec.
+  buttons; a bar under the tab bar is off-spec. (The buttons shipped
+  right after this wave — see `../wave8/`.)
 - **No scrollbar theme token** — reuses `border-strong-01`; the native
   hover-darkening nicety is skipped.
 - **Code snippet with line numbers**: the horizontal track ends

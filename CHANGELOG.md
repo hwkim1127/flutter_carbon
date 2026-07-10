@@ -166,11 +166,18 @@ New native widgets (previously themed-Material or missing):
   nav; multiline text areas; and the code snippet (vertical + horizontal,
   drawn above the overflow fades). Interactive (thumb drag scrolls), RTL
   aware, and the framework's default desktop scrollbar is suppressed so
-  there is exactly one bar per axis. Deviation: tab bars keep no scrollbar
-  (the spec scrolls tabs with chevron buttons). Fix that fell out of this:
-  a multi-line snippet whose content fits no longer scrolls by its 24px
-  bottom padding — the viewport is content-sized between the row limits,
-  matching React.
+  there is exactly one bar per axis. Tab bars keep no scrollbar — they get
+  the spec's chevron scroll buttons instead (next bullet). Fix that fell
+  out of this: a multi-line snippet whose content fits no longer scrolls
+  by its 24px bottom padding — the viewport is content-sized between the
+  row limits, matching React.
+* **Tabs overflow scroll buttons** — an overflowing `CarbonTabs` bar now
+  shows the spec chevron nav buttons at its edges (hidden at the scroll
+  ends, like Carbon web): click steps ~1.5 average tab widths,
+  press-and-hold scrolls continuously; the line variant gets the 8px edge
+  fade, the contained variant the `$layer-accent` button treatment. The
+  buttons are pointer-only (semantics-excluded, not focusable) — keyboard
+  users move between tabs directly.
 
 Keyboard and focus:
 
@@ -213,6 +220,10 @@ Keyboard and focus:
   out of the "Material Theming" category (Slider gets its own demo under
   Forms); "Material Theming" now demos Tooltip and the Checkbox/Radio/Switch
   selection controls only.
+* README/pubspec now count **49** native widgets (was 48): `inline-loading`
+  was misattributed to Material theming, but it has been native all along
+  as `CarbonInlineLoading` — the Material-themed set is down to `list` and
+  `progress-bar`.
 * Example app: the Syntax Highlighting demo is now a 13-language gallery
   rendering real `CarbonCodeSnippet` highlighters via `carbonHighlighterFor`
   (previously hand-painted spans); the Code Snippet demo gained line
@@ -228,6 +239,8 @@ Keyboard and focus:
 
 ### Bug Fixes
 
+* `CarbonTabs` no longer leaks its scroll controller (it was never
+  disposed).
 * Post-frame callbacks in `CarbonTabs`, `CarbonPopover` (`initiallyOpen`),
   and `CarbonToggleTip` (`defaultOpen`) are now `mounted`-guarded — a
   widget disposed within its first frame (fast-rebuilding lists) could
