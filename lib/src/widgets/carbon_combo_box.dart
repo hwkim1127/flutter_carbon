@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 import '../base/carbon_anchored_overlay.dart';
+import '../base/carbon_scrollbar.dart';
 import '../base/carbon_overlay_surface.dart';
 import '../base/carbon_pressable.dart';
 import '../foundation/colors.dart';
@@ -326,12 +327,15 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                           ),
                         ),
                       )
-                    : ListView.builder(
+                    : CarbonScrollbar(
                         controller: _scrollController,
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        itemCount: items.length,
-                        itemExtent: _itemHeight,
+                        builder: (context, scrollController) =>
+                            ListView.builder(
+                          controller: scrollController,
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          itemCount: items.length,
+                          itemExtent: _itemHeight,
                         itemBuilder: (context, index) {
                           final item = items[index];
                           final isSelected = item.value == widget.value;
@@ -368,6 +372,7 @@ class _CarbonComboBoxState<T> extends State<CarbonComboBox<T>> {
                             ),
                           );
                         },
+                        ),
                       ),
               ),
             ),

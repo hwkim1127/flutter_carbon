@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../base/carbon_copy_feedback.dart';
 import '../base/carbon_pressable.dart';
+import '../base/carbon_scrollbar.dart';
 import '../foundation/colors.dart';
 import '../foundation/motion.dart';
 import '../foundation/typography.dart';
@@ -178,6 +179,13 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
   late final _HighlightingController _codeController =
       _HighlightingController(text: widget.code);
 
+  /// Drive the [CarbonScrollbar] indicators (Carbon web relies on native
+  /// browser scrollbars; Flutter has none, so the snippet draws its own).
+  /// Only one variant is mounted at a time, so the horizontal controller is
+  /// shared between single and no-wrap multi.
+  final ScrollController _verticalScroll = ScrollController();
+  final ScrollController _horizontalScroll = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -220,9 +228,12 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
   @override
   void dispose() {
     _inlineFeedbackTimer?.cancel();
+    _verticalScroll.dispose();
+    _horizontalScroll.dispose();
     _codeController.dispose();
     super.dispose();
   }
+
 
   String get _textToCopy => widget.copyText ?? widget.code;
 
@@ -372,32 +383,39 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
             child: Row(
               children: [
                 Expanded(
-                  child: Stack(
-                    children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsetsDirectional.only(
-                          start: 16,
-                          end: 32,
-                        ),
-                        child: Align(
-                          alignment: AlignmentDirectional.centerStart,
-                          widthFactor: 1,
-                          child: _codeText(widget.code, style, carbon),
-                        ),
-                      ),
-                      if (!_focusWithin)
-                        PositionedDirectional(
-                          end: 0,
-                          top: 0,
-                          bottom: 0,
-                          width: 32,
-                          child: _EdgeFade(
-                            background: background,
-                            horizontal: true,
+                  // The scrollbar wraps the Stack so its thumb paints above
+                  // the edge fade.
+                  child: CarbonScrollbar(
+                    controller: _horizontalScroll,
+                    axis: Axis.horizontal,
+                    builder: (context, scrollController) => Stack(
+                      children: [
+                        SingleChildScrollView(
+                          controller: scrollController,
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsetsDirectional.only(
+                            start: 16,
+                            end: 32,
+                          ),
+                          child: Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            widthFactor: 1,
+                            child: _codeText(widget.code, style, carbon),
                           ),
                         ),
-                    ],
+                        if (!_focusWithin)
+                          PositionedDirectional(
+                            end: 0,
+                            top: 0,
+                            bottom: 0,
+                            width: 32,
+                            child: _EdgeFade(
+                              background: background,
+                              horizontal: true,
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
                 if (!widget.hideCopyButton)
@@ -596,19 +614,27 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
         (maxExpanded == 0 || maxExpanded > maxCollapsed);
     final expanded = _expanded && canExpand;
 
-    final collapsedRows = maxCollapsed >= minCollapsed
-        ? contentRows.clamp(minCollapsed, maxCollapsed)
-        : maxCollapsed;
-    final int expandedRows;
-    if (maxExpanded == 0) {
-      expandedRows = contentRows > minExpanded ? contentRows : minExpanded;
+    // React's box is CONTENT-sized between the row limits (min/max-height
+    // CSS) — and the content includes the 24px scroll padding below the
+    // last row. A pure rows×16 height would leave a spurious 24px scroll
+    // (and a scrollbar thumb) on snippets that visually fit.
+    final contentExtent = contentRows * rowHeight + 24;
+    final double viewportHeight;
+    if (expanded) {
+      final minH = minExpanded * rowHeight;
+      viewportHeight = maxExpanded == 0
+          ? (contentExtent > minH ? contentExtent : minH)
+          : contentExtent.clamp(
+              minH < maxExpanded * rowHeight ? minH : maxExpanded * rowHeight,
+              maxExpanded * rowHeight,
+            );
     } else {
-      expandedRows = maxExpanded >= minExpanded
-          ? contentRows.clamp(minExpanded, maxExpanded)
-          : maxExpanded;
+      final minH = minCollapsed * rowHeight;
+      viewportHeight = contentExtent.clamp(
+        minH < maxCollapsed * rowHeight ? minH : maxCollapsed * rowHeight,
+        maxCollapsed * rowHeight,
+      );
     }
-    final viewportHeight = (expanded ? expandedRows : collapsedRows) *
-        rowHeight;
 
     final editable = CarbonEditableCore(
       controller: _codeController,
@@ -617,6 +643,81 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
       maxLines: null,
       style: style,
     );
+
+    // The clipped viewport: scroll views at the bottom, edge fades above
+    // them. The scrollbar wrappers below paint their thumbs via
+    // foregroundPainter — ABOVE everything here, so the fades never wash
+    // the thumbs out.
+    Widget viewport = ClipRect(
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            controller: _verticalScroll,
+            padding: const EdgeInsets.only(bottom: 24),
+            child: _withGutter(
+              carbon,
+              style,
+              rowHeight: rowHeight,
+              gutterWidth: gutterWidth,
+              lineCount: lines.length,
+              rowsPerLine: rowsPerLine,
+              // The code area scrolls horizontally in no-wrap mode;
+              // the gutter sits beside it, pinned.
+              child: widget.wrapText
+                  ? editable
+                  : SingleChildScrollView(
+                      controller: _horizontalScroll,
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsetsDirectional.only(end: 24),
+                      child: SizedBox(
+                        width: measuredWidth,
+                        child: editable,
+                      ),
+                    ),
+            ),
+          ),
+          // Overflow fades — pointer-transparent, removed on focus-within.
+          if (!widget.wrapText && !_focusWithin)
+            PositionedDirectional(
+              end: 0,
+              top: 0,
+              bottom: 0,
+              width: 32,
+              child: _EdgeFade(background: background, horizontal: true),
+            ),
+          if (canExpand && !expanded && !_focusWithin)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 16,
+              child: _EdgeFade(background: background, horizontal: false),
+            ),
+        ],
+      ),
+    );
+
+    if (!widget.wrapText) {
+      final inner = viewport;
+      viewport = CarbonScrollbar(
+        controller: _horizontalScroll,
+        axis: Axis.horizontal,
+        // The horizontal scrollable is nested inside the vertical one, so
+        // its notifications arrive at depth 1 — filter by axis only.
+        notificationPredicate: (n) => n.metrics.axis == Axis.horizontal,
+        // Keep the track off the line-number gutter (cosmetic limit: the
+        // track ends gutterWidth short of the trailing edge).
+        padding: EdgeInsetsDirectional.only(start: gutterWidth),
+        builder: (context, _) => inner,
+      );
+    }
+    {
+      final inner = viewport;
+      viewport = CarbonScrollbar(
+        controller: _verticalScroll,
+        builder: (context, _) => inner,
+      );
+    }
 
     return Stack(
       children: [
@@ -630,52 +731,10 @@ class _CarbonCodeSnippetState extends State<CarbonCodeSnippet> {
               duration: CarbonMotion.durationModerate01,
               curve: CarbonMotion.standardProductive,
               height: viewportHeight,
-              child: ClipRect(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  child: _withGutter(
-                    carbon,
-                    style,
-                    rowHeight: rowHeight,
-                    gutterWidth: gutterWidth,
-                    lineCount: lines.length,
-                    rowsPerLine: rowsPerLine,
-                    // The code area scrolls horizontally in no-wrap mode;
-                    // the gutter sits beside it, pinned.
-                    child: widget.wrapText
-                        ? editable
-                        : SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            padding:
-                                const EdgeInsetsDirectional.only(end: 24),
-                            child: SizedBox(
-                              width: measuredWidth,
-                              child: editable,
-                            ),
-                          ),
-                  ),
-                ),
-              ),
+              child: viewport,
             ),
           ),
         ),
-        // Overflow fades — pointer-transparent, removed on focus-within.
-        if (!widget.wrapText && !_focusWithin)
-          PositionedDirectional(
-            end: 0,
-            top: 0,
-            bottom: 0,
-            width: 32,
-            child: _EdgeFade(background: background, horizontal: true),
-          ),
-        if (canExpand && !expanded && !_focusWithin)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 16,
-            child: _EdgeFade(background: background, horizontal: false),
-          ),
         if (!widget.hideCopyButton)
           PositionedDirectional(
             top: 8,

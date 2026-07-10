@@ -179,10 +179,13 @@ In dependency order (1–3 ✅ shipped as wave 1, see
    native; **Phase 3 is complete** — the example's remaining Material
    usage is the deliberate bridge showcase only.
 
-✅ **Code snippet syntax highlighting** (shipped alongside wave 3) — the
-41 `carbon.syntax` tokens now drive an optional pluggable highlighter with
-a built-in zero-dependency Dart tokenizer; see
-`doc/proposals/syntax-highlighting.md`.
+✅ **Code snippet syntax highlighting** (v1 shipped alongside wave 3; v2
+in wave 6) — the 41 `carbon.syntax` tokens drive a pluggable highlighter
+with a shared zero-dependency tokenizer engine, **13 built-in languages**
+(`carbonHighlighterFor`), string interpolation islands, and a
+line-numbers gutter; `CarbonCodeSnippet` itself is fully to spec (row
+model, fades, click-to-copy inline, skeleton). See
+`doc/implementation/wave6/` and `doc/proposals/syntax-highlighting.md`.
 
 ---
 

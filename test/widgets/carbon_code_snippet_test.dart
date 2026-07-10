@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_carbon/flutter_carbon.dart';
+import 'package:flutter_carbon/src/base/carbon_scrollbar.dart';
 
 import '../shared/build.dart';
 
@@ -27,9 +28,10 @@ void main() {
       .map((call) => (call.arguments as Map)['text'] as String)
       .toList();
 
-  /// The multi variant's animated viewport (the height-clipped code area).
+  /// The multi variant's animated viewport (the height-clipped code area —
+  /// its child is the scrollbar wrapper around the ClipRect).
   Finder viewport() => find.byWidgetPredicate(
-        (w) => w is AnimatedContainer && w.child is ClipRect,
+        (w) => w is AnimatedContainer && w.child is CarbonScrollbar,
       );
 
   /// The gradient overflow fades.
@@ -204,7 +206,8 @@ void main() {
       await tester.tap(find.text('Show more'));
       await tester.pumpAndSettle();
 
-      expect(tester.getSize(viewport()).height, 20 * 16.0); // > minExpanded 16
+      // Content-sized: 20 rows × 16 + the 24px scroll padding.
+      expect(tester.getSize(viewport()).height, 20 * 16.0 + 24);
       expect(find.text('Show less'), findsOneWidget);
       expect(
         tester.widget<EditableText>(find.byType(EditableText)).controller.text,
@@ -270,7 +273,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Show less'), findsNothing);
-      expect(tester.getSize(viewport()).height, 5 * 16.0);
+      // Content-sized: 5 rows × 16 + the 24px scroll padding.
+      expect(tester.getSize(viewport()).height, 5 * 16.0 + 24);
     });
 
     testWidgets('multi fills the available width (capped at 768)', (
@@ -495,6 +499,100 @@ void main() {
 
       expect(copiedTexts(), isEmpty);
       expect(tester.getSize(viewport()).height, collapsedHeight);
+    });
+
+    // ---------------------------------------------------------- scrollbars
+
+    testWidgets('collapsed multi shows a vertical scrollbar thumb', (
+      tester,
+    ) async {
+      final code = List.generate(30, (i) => 'line ${i + 1}').join('\n');
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonCodeSnippet(
+            code: code,
+            type: CarbonCodeSnippetType.multi,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Vertical thumb: 6px wide.
+      expect(
+        find.byType(RawScrollbar).first,
+        (paints
+              ..something((method, args) {
+                if (method != #drawRect) return false;
+                final rect = args[0] as Rect;
+                final paint = args[1] as Paint;
+                return rect.width == 6 && paint.color.a > 0.9;
+              }))
+            as Matcher,
+      );
+    });
+
+    testWidgets('long no-wrap lines show a horizontal thumb; wrapText none', (
+      tester,
+    ) async {
+      final longLine = List.filled(120, 'word').join(' ');
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonCodeSnippet(
+            code: longLine,
+            type: CarbonCodeSnippetType.multi,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      bool horizontalThumb(Widget w) => w is RawScrollbar;
+      expect(
+        find.byWidgetPredicate(horizontalThumb).first,
+        (paints
+              ..something((method, args) {
+                if (method != #drawRect) return false;
+                final rect = args[0] as Rect;
+                final paint = args[1] as Paint;
+                return rect.height == 6 && paint.color.a > 0.9;
+              }))
+            as Matcher,
+      );
+
+      // wrapText removes the horizontal scrollable AND its scrollbar.
+      await tester.pumpWidget(
+        buildTestApp(
+          child: CarbonCodeSnippet(
+            code: longLine,
+            type: CarbonCodeSnippetType.multi,
+            wrapText: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(RawScrollbar), findsOneWidget); // vertical only
+    });
+
+    testWidgets('no thumbs when the content fits', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          child: const CarbonCodeSnippet(
+            code: 'a\nb\nc',
+            type: CarbonCodeSnippetType.multi,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      for (final element in find.byType(RawScrollbar).evaluate()) {
+        expect(
+          element.widget,
+          isA<RawScrollbar>().having(
+            (s) => s.thumbVisibility,
+            'thumbVisibility',
+            isFalse,
+          ),
+        );
+      }
     });
 
     // -------------------------------------------------------- line numbers

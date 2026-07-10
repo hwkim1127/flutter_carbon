@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../base/carbon_pressable.dart';
+import '../base/carbon_scrollbar.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
 
@@ -72,6 +73,14 @@ class _CarbonTreeViewState<T> extends State<CarbonTreeView<T>> {
   final Set<Object> _expandedKeys = {};
   Object? _hoveredKey;
 
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   Object _keyOf(CarbonTreeNode<T> node) => node.value ?? node;
 
   @override
@@ -87,9 +96,13 @@ class _CarbonTreeViewState<T> extends State<CarbonTreeView<T>> {
             : null,
         borderRadius: BorderRadius.zero,
       ),
-      child: ListView(
-        shrinkWrap: true,
-        children: widget.nodes.map((node) => _buildNode(node, 0)).toList(),
+      child: CarbonScrollbar(
+        controller: _scrollController,
+        builder: (context, controller) => ListView(
+          controller: controller,
+          shrinkWrap: true,
+          children: widget.nodes.map((node) => _buildNode(node, 0)).toList(),
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/services.dart' show KeyDownEvent, LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
 import '../base/carbon_anchored_overlay.dart';
+import '../base/carbon_scrollbar.dart';
 import '../base/carbon_overlay_surface.dart';
 import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
@@ -97,6 +98,9 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     debugLabel: 'CarbonMultiSelectFilter',
   );
 
+  /// Drives the menu's scrollbar (the state outlives OverlayEntry rebuilds).
+  final ScrollController _menuScrollController = ScrollController();
+
   /// Whatever held focus before the menu opened; restored on close.
   FocusNode? _previousFocus;
 
@@ -128,6 +132,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
     _filterController.dispose();
     _menuFocusNode.dispose();
     _filterFocusNode.dispose();
+    _menuScrollController.dispose();
     super.dispose();
   }
 
@@ -303,10 +308,13 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
 
           // Options list
           Flexible(
-            child: ListView.builder(
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              itemCount: filteredItems.length,
+            child: CarbonScrollbar(
+              controller: _menuScrollController,
+              builder: (context, scrollController) => ListView.builder(
+                controller: scrollController,
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: filteredItems.length,
               itemBuilder: (context, index) {
                 final item = filteredItems[index];
                 final isSelected = widget.values.contains(item.value);
@@ -354,6 +362,7 @@ class _CarbonMultiSelectState<T> extends State<CarbonMultiSelect<T>> {
                   ),
                 );
               },
+              ),
             ),
           ),
         ],

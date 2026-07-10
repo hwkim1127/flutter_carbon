@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../base/carbon_scrollbar.dart';
 import '../foundation/colors.dart';
 import '../foundation/motion.dart';
 import '../foundation/typography.dart';
@@ -327,6 +328,9 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
 
   bool _hovered = false;
 
+  /// Drives the scrollbar shown when the content exceeds [CarbonTextArea.maxLines].
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -354,6 +358,7 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
       _handleFocusChanged,
     );
     _internalFocusNode?.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -390,29 +395,36 @@ class _CarbonTextAreaState extends State<CarbonTextArea> {
           ? null
           : () => _effectiveFocusNode.requestFocus(),
       iconTopAligned: true,
-      child: CarbonEditableCore(
-        controller: widget.controller,
-        focusNode: _effectiveFocusNode,
-        style: CarbonTypography.body01.copyWith(
-          color: state == _FieldState.disabled
-              ? carbon.text.textDisabled
-              : carbon.text.textPrimary,
+      // Like a native <textarea>: indicate overflow when the content
+      // exceeds maxLines (with maxLines null the editable grows unbounded
+      // and never overflows — the gate keeps the bar hidden).
+      child: CarbonScrollbar(
+        controller: _scrollController,
+        builder: (context, scrollController) => CarbonEditableCore(
+          controller: widget.controller,
+          focusNode: _effectiveFocusNode,
+          scrollController: scrollController,
+          style: CarbonTypography.body01.copyWith(
+            color: state == _FieldState.disabled
+                ? carbon.text.textDisabled
+                : carbon.text.textPrimary,
+          ),
+          placeholder: widget.placeholder,
+          placeholderStyle: CarbonTypography.body01.copyWith(
+            color: state == _FieldState.disabled
+                ? carbon.text.textDisabled
+                : carbon.text.textPlaceholder,
+          ),
+          enabled: state != _FieldState.disabled,
+          readOnly: widget.readOnly,
+          autofocus: widget.autofocus,
+          keyboardType: TextInputType.multiline,
+          inputFormatters: formatters.isEmpty ? null : formatters,
+          minLines: widget.minLines,
+          maxLines: widget.maxLines,
+          onChanged: widget.onChanged,
+          selectionLabels: widget.selectionLabels,
         ),
-        placeholder: widget.placeholder,
-        placeholderStyle: CarbonTypography.body01.copyWith(
-          color: state == _FieldState.disabled
-              ? carbon.text.textDisabled
-              : carbon.text.textPlaceholder,
-        ),
-        enabled: state != _FieldState.disabled,
-        readOnly: widget.readOnly,
-        autofocus: widget.autofocus,
-        keyboardType: TextInputType.multiline,
-        inputFormatters: formatters.isEmpty ? null : formatters,
-        minLines: widget.minLines,
-        maxLines: widget.maxLines,
-        onChanged: widget.onChanged,
-        selectionLabels: widget.selectionLabels,
       ),
     );
 

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../base/carbon_pressable.dart';
+import '../base/carbon_scrollbar.dart';
 import '../foundation/motion.dart';
 import '../icons/carbon_icons.dart';
 import '../theme/carbon_theme.dart';
@@ -426,9 +427,11 @@ class _SideNav extends StatelessWidget {
       child: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: items.length,
+            child: CarbonScrollbar(
+              builder: (context, scrollController) => ListView.builder(
+                controller: scrollController,
+                padding: EdgeInsets.zero,
+                itemCount: items.length,
               itemBuilder: (context, index) {
                 final item = items[index];
                 if (item.children != null && item.children!.isNotEmpty) {
@@ -455,6 +458,7 @@ class _SideNav extends StatelessWidget {
                   theme: theme,
                 );
               },
+              ),
             ),
           ),
         ],

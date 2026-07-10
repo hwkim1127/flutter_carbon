@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../base/carbon_divider.dart';
+import '../base/carbon_scrollbar.dart';
 import '../base/carbon_overlay_surface.dart';
 import '../base/carbon_pressable.dart';
 import '../foundation/colors.dart';
@@ -209,9 +210,13 @@ class CarbonTearsheet extends StatelessWidget {
                 fit: FlexFit.loose,
                 child: hasInfluencer
                     ? _buildBodyWithInfluencer(tearsheetTheme)
-                    : SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
-                        child: child,
+                    : CarbonScrollbar(
+                        builder: (context, controller) =>
+                            SingleChildScrollView(
+                          controller: controller,
+                          padding: const EdgeInsets.all(16),
+                          child: child,
+                        ),
                       ),
               )
             else
@@ -334,16 +339,22 @@ class CarbonTearsheet extends StatelessWidget {
     final influencerSection = Container(
       width: influencerWidth == CarbonTearsheetInfluencerWidth.wide ? 320 : 256,
       color: theme.influencerBackground,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: influencer,
+      child: CarbonScrollbar(
+        builder: (context, controller) => SingleChildScrollView(
+          controller: controller,
+          padding: const EdgeInsets.all(16),
+          child: influencer,
+        ),
       ),
     );
 
     final contentSection = Expanded(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: child,
+      child: CarbonScrollbar(
+        builder: (context, controller) => SingleChildScrollView(
+          controller: controller,
+          padding: const EdgeInsets.all(16),
+          child: child,
+        ),
       ),
     );
 

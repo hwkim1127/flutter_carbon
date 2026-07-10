@@ -157,6 +157,21 @@ New native widgets (previously themed-Material or missing):
   loading placeholder. Copy feedback is a real Carbon tooltip bubble,
   announced as a live region.
 
+* **Carbon-styled scrollbars everywhere** — Carbon web relies on native
+  browser scrollbars, which Flutter doesn't have. Every library scrollable
+  now shows a sharp-cornered thumb that is **visible whenever the content
+  overflows** (hidden entirely when it fits): dropdown, select,
+  multi-select, and combo-box menus; the data table's horizontal scroll;
+  tearsheet content and influencer panels; tree view; the UI shell side
+  nav; multiline text areas; and the code snippet (vertical + horizontal,
+  drawn above the overflow fades). Interactive (thumb drag scrolls), RTL
+  aware, and the framework's default desktop scrollbar is suppressed so
+  there is exactly one bar per axis. Deviation: tab bars keep no scrollbar
+  (the spec scrolls tabs with chevron buttons). Fix that fell out of this:
+  a multi-line snippet whose content fits no longer scrolls by its 24px
+  bottom padding — the viewport is content-sized between the row limits,
+  matching React.
+
 Keyboard and focus:
 
 * Overlay keyboard/focus pass across the library: dropdown, overflow menu,
@@ -198,6 +213,10 @@ Keyboard and focus:
   out of the "Material Theming" category (Slider gets its own demo under
   Forms); "Material Theming" now demos Tooltip and the Checkbox/Radio/Switch
   selection controls only.
+* Example app: the Syntax Highlighting demo is now a 13-language gallery
+  rendering real `CarbonCodeSnippet` highlighters via `carbonHighlighterFor`
+  (previously hand-painted spans); the Code Snippet demo gained line
+  numbers, wrap, custom row limits, disabled, and skeleton sections.
 * Example app: the Date & Time Picker demo is fully native
   (`CarbonDatePicker`/`CarbonTimePicker`) — `showDatePicker`,
   `showDateRangePicker`, and `showTimePicker` remain available to bridge

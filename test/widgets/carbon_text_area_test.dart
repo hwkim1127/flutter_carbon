@@ -5,6 +5,83 @@ import 'package:flutter_carbon/material.dart';
 import '../shared/build.dart';
 
 void main() {
+  group('CarbonTextArea scrollbar', () {
+    testWidgets('thumb appears only when content exceeds maxLines', (
+      tester,
+    ) async {
+      final controller = TextEditingController(text: 'one\ntwo');
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          child: SizedBox(
+            width: 300,
+            child: CarbonTextArea(
+              labelText: 'Notes',
+              minLines: 2,
+              maxLines: 4,
+              controller: controller,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      RawScrollbar bar() =>
+          tester.widget<RawScrollbar>(find.byType(RawScrollbar));
+      expect(bar().thumbVisibility, isFalse); // 2 lines fit in 4
+
+      controller.text = List.generate(12, (i) => 'line $i').join('\n');
+      await tester.pumpAndSettle();
+      expect(bar().thumbVisibility, isTrue); // 12 lines overflow 4
+
+      // Selection interactions still land on the editable.
+      await tester.tap(find.byType(EditableText));
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<EditableText>(find.byType(EditableText)).focusNode
+            .hasFocus,
+        isTrue,
+      );
+    });
+
+    testWidgets('thumb drag scrolls the editable', (tester) async {
+      final controller = TextEditingController(
+        text: List.generate(30, (i) => 'line $i').join('\n'),
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          child: SizedBox(
+            width: 300,
+            child: CarbonTextArea(
+              labelText: 'Notes',
+              minLines: 2,
+              maxLines: 4,
+              controller: controller,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final editableRect = tester.getRect(find.byType(EditableText));
+      final scrollable = tester.widget<EditableText>(
+        find.byType(EditableText),
+      );
+      expect(scrollable.scrollController, isNotNull);
+      expect(scrollable.scrollController!.offset, 0);
+
+      await tester.dragFrom(
+        Offset(editableRect.right - 3, editableRect.top + 5),
+        const Offset(0, 40),
+      );
+      await tester.pumpAndSettle();
+      expect(scrollable.scrollController!.offset, greaterThan(0));
+    });
+  });
+
   group('CarbonTextArea', () {
     testWidgets('renders label, placeholder, and helper', (tester) async {
       await tester.pumpWidget(

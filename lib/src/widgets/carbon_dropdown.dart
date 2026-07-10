@@ -2,6 +2,7 @@ import 'package:flutter/services.dart' show KeyDownEvent, LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
 import '../base/carbon_anchored_overlay.dart';
+import '../base/carbon_scrollbar.dart';
 import '../base/carbon_overlay_surface.dart';
 import '../foundation/colors.dart';
 import '../icons/carbon_icons.dart';
@@ -121,6 +122,9 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
   final GlobalKey _triggerKey = GlobalKey();
   final FocusNode _menuFocusNode = FocusNode(debugLabel: 'CarbonDropdownMenu');
 
+  /// Drives the menu's scrollbar (the state outlives OverlayEntry rebuilds).
+  final ScrollController _menuScrollController = ScrollController();
+
   /// Whatever held focus before the menu opened; restored on close.
   FocusNode? _previousFocus;
 
@@ -133,6 +137,7 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
     _overlayEntry?.remove();
     _overlayEntry = null;
     _menuFocusNode.dispose();
+    _menuScrollController.dispose();
     super.dispose();
   }
 
@@ -295,20 +300,24 @@ class _CarbonDropdownState<T> extends State<CarbonDropdown<T>> {
           ),
         ],
       ),
-      child: ListView(
-        padding: EdgeInsets.zero,
-        shrinkWrap: true,
-        children: items.map((item) {
-          final isSelected = item.value == currentValue;
-          final isHighlighted = item.value == highlightedValue;
+      child: CarbonScrollbar(
+        controller: _menuScrollController,
+        builder: (context, controller) => ListView(
+          controller: controller,
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          children: items.map((item) {
+            final isSelected = item.value == currentValue;
+            final isHighlighted = item.value == highlightedValue;
 
-          return _buildMenuItem(
-            carbon: carbon,
-            item: item,
-            isSelected: isSelected,
-            isHighlighted: isHighlighted,
-          );
-        }).toList(),
+            return _buildMenuItem(
+              carbon: carbon,
+              item: item,
+              isSelected: isSelected,
+              isHighlighted: isHighlighted,
+            );
+          }).toList(),
+        ),
       ),
     );
   }

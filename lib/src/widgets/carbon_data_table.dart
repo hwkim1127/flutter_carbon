@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../flutter_carbon.dart';
+import '../base/carbon_scrollbar.dart';
 
 /// Sort direction for [CarbonDataTable] columns.
 enum CarbonDataTableSortDirection {
@@ -273,6 +274,18 @@ class CarbonDataTable extends StatefulWidget {
 }
 
 class _CarbonDataTableState extends State<CarbonDataTable> {
+  /// Drives the horizontal scrollbar shown when [CarbonDataTable.minWidth]
+  /// exceeds the available width. Shared by the real-table and skeleton
+  /// build paths — they are mutually exclusive, so only one scroll view
+  /// attaches at a time.
+  final ScrollController _horizontalScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _horizontalScrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final carbon = context.carbon;
@@ -382,9 +395,15 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
         );
 
         if (isScrollable) {
-          tableContent = SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: tableContent,
+          final content = tableContent;
+          tableContent = CarbonScrollbar(
+            controller: _horizontalScrollController,
+            axis: Axis.horizontal,
+            builder: (context, controller) => SingleChildScrollView(
+              controller: controller,
+              scrollDirection: Axis.horizontal,
+              child: content,
+            ),
           );
         }
 
@@ -678,9 +697,15 @@ class _CarbonDataTableState extends State<CarbonDataTable> {
         );
 
         if (isScrollable) {
-          tableContent = SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: tableContent,
+          final content = tableContent;
+          tableContent = CarbonScrollbar(
+            controller: _horizontalScrollController,
+            axis: Axis.horizontal,
+            builder: (context, controller) => SingleChildScrollView(
+              controller: controller,
+              scrollDirection: Axis.horizontal,
+              child: content,
+            ),
           );
         }
 

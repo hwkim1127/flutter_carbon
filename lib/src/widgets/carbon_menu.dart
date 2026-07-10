@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart' show KeyDownEvent, LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
+import '../base/carbon_scrollbar.dart';
+
 import '../base/carbon_divider.dart';
 import '../foundation/motion.dart';
 import '../foundation/typography.dart';
@@ -325,7 +327,12 @@ class _CarbonMenuPanelState<T> extends State<CarbonMenuPanel<T>> {
       ],
     );
     if (widget.maxHeight != null) {
-      list = SingleChildScrollView(controller: _scrollController, child: list);
+      final content = list;
+      list = CarbonScrollbar(
+        controller: _scrollController,
+        builder: (context, controller) =>
+            SingleChildScrollView(controller: controller, child: content),
+      );
     }
 
     return Focus(
