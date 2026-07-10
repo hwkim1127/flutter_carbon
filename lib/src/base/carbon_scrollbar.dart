@@ -102,9 +102,15 @@ class _CarbonScrollbarState extends State<CarbonScrollbar> {
     if (widget.controller != oldWidget.controller) {
       if (widget.controller == null) {
         _internal ??= ScrollController();
-      } else {
-        _internal?.dispose();
+      } else if (_internal != null) {
+        // The outgoing child scrollable still holds the internal controller
+        // until it rebuilds LATER this frame — disposing now would make its
+        // detach hit a disposed ChangeNotifier. Retire it post-frame.
+        final retired = _internal!;
         _internal = null;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          retired.dispose();
+        });
       }
     }
   }

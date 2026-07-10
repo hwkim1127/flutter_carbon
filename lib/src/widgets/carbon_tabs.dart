@@ -85,7 +85,9 @@ class _CarbonTabsState extends State<CarbonTabs> {
     _selectedIndex = widget.initialIndex;
     _generateKeys();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToIndex(_selectedIndex);
+      // Guard: the widget can be disposed within its first frame — and
+      // _scrollToIndex reads `widget`, which is gone after unmount.
+      if (mounted) _scrollToIndex(_selectedIndex);
     });
   }
 
@@ -102,7 +104,7 @@ class _CarbonTabsState extends State<CarbonTabs> {
         _selectedIndex = widget.initialIndex;
       });
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToIndex(_selectedIndex);
+        if (mounted) _scrollToIndex(_selectedIndex);
       });
     }
   }

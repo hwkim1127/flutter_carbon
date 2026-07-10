@@ -101,7 +101,8 @@ class _CarbonPopoverState extends State<CarbonPopover> {
     super.initState();
     if (widget.initiallyOpen) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showPopover();
+        // Guard: the widget can be disposed within its first frame.
+        if (mounted) _showPopover();
       });
     }
   }

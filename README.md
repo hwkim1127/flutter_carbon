@@ -35,6 +35,7 @@ This package brings the power and consistency of IBM's Carbon Design System V11 
 - **No Material ink ripple** — interaction feedback is a flat color change, exactly as the Carbon spec defines
 - **Carbon icon glyphs throughout** — every internal icon comes from the bundled `CarbonIcons` font, not Material Icons
 - **Native text editing** — text fields build on `EditableText` with Carbon selection handles and a Carbon context menu (localizable labels)
+- **Visible scroll indicators** — Carbon web relies on native browser scrollbars, which Flutter doesn't draw; every library scrollable (menus, data table, tearsheet, tree view, side nav, text areas, code snippet) shows a Carbon-styled thumb whenever its content overflows
 
 ### 🧩 48 Carbon Components
 
@@ -596,7 +597,10 @@ lib/
 │   │   ├── carbon_pressable.dart      # Hover/press/focus detector (no ripple)
 │   │   ├── carbon_divider.dart        # 1px rule
 │   │   ├── carbon_anchored_overlay.dart # Shared overlay positioner
-│   │   └── carbon_overlay_surface.dart # Text style root for overlays
+│   │   ├── carbon_overlay_surface.dart # Text style root for overlays
+│   │   ├── carbon_scrollbar.dart      # Visible-on-overflow scroll indicator
+│   │   ├── carbon_tooltip_bubble.dart # Shared tooltip bubble + caret
+│   │   └── carbon_copy_feedback.dart  # Click-triggered "Copied!" bubble
 │   ├── text/                          # Native text editing core (selection, context menu)
 │   ├── widgets/                       # 48 Carbon components
 │   │   ├── carbon_button.dart
@@ -644,7 +648,7 @@ Contributions are welcome! This project implements the Carbon Design System V11 
 ### Guidelines
 1. Follow Carbon Design System V11 specifications
 2. Support all 4 theme variants (White, G10, G90, G100)
-3. Build widget internals on the widgets layer — use the `lib/src/base/` primitives (`CarbonPressable`, `CarbonDivider`, `CarbonOverlaySurface`) and `CarbonIcons` instead of Material widgets/icons (see `V2_ROADMAP.md`)
+3. Build widget internals on the widgets layer — use the `lib/src/base/` primitives (`CarbonPressable`, `CarbonDivider`, `CarbonOverlaySurface`, `CarbonScrollbar` for any scrollable) and `CarbonIcons` instead of Material widgets/icons (see `V2_ROADMAP.md`)
 4. Add comprehensive examples in the example app with demos
 5. Run `flutter analyze` to ensure code quality
 6. Test across all 4 themes

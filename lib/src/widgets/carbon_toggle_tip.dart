@@ -85,7 +85,8 @@ class _CarbonToggleTipState extends State<CarbonToggleTip> {
     super.initState();
     if (widget.defaultOpen) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _open();
+        // Guard: the widget can be disposed within its first frame.
+        if (mounted) _open();
       });
     }
   }

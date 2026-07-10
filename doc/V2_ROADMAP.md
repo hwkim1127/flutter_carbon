@@ -187,6 +187,14 @@ line-numbers gutter; `CarbonCodeSnippet` itself is fully to spec (row
 model, fades, click-to-copy inline, skeleton). See
 `doc/implementation/wave6/` and `doc/proposals/syntax-highlighting.md`.
 
+✅ **Carbon scrollbars** (wave 7) — Carbon web relies on native browser
+scrollbars; Flutter draws none, so the internal `CarbonScrollbar`
+primitive (visible exactly while content overflows) is adopted by every
+library scrollable: menus, data table, tearsheet, tree view, UI shell
+side nav, text areas, and the code snippet's nested 2D scrolling. Tabs
+deliberately keep none (the spec scrolls tab bars with chevron buttons —
+a future item). See `doc/implementation/wave7/`.
+
 ---
 
 ## Risks and open questions

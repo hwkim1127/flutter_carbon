@@ -228,6 +228,10 @@ Keyboard and focus:
 
 ### Bug Fixes
 
+* Post-frame callbacks in `CarbonTabs`, `CarbonPopover` (`initiallyOpen`),
+  and `CarbonToggleTip` (`defaultOpen`) are now `mounted`-guarded — a
+  widget disposed within its first frame (fast-rebuilding lists) could
+  crash scrolling to a tab or inserting an overlay through a dead context.
 * **`CarbonPalette.overlay` corrected to the Carbon spec** `rgba(black, 0.6)`
   (was a custom light gray at 32%): modal, side panel, tearsheet, and
   loading scrims now render per spec across all four themes.
